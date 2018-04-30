@@ -5,7 +5,7 @@ Author: Nickalas Reynolds
 Date  : Fall 2017
 Misc  : Houses all useful atomic lines and short program for parsing
         lines held here: atomiclines.lineregion.linename.{val and unit}
-        to call parser, atomiclines.lines().return_lines()/.main()
+        to call parser, at = atomiclines.lines() -> at(*params)  -> return_lines()
 
 '''
 # import standard modules
