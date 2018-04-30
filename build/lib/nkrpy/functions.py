@@ -51,7 +51,7 @@ def angle_clockwise(A, B):
     else: # if the det > 0 then A is immediately clockwise of B
         return 360-inner
 
-def gen_angles(start,end,resolution=1,direction='+')
+def gen_angles(start,end,resolution=1,direction='+'):
     if direction == "+":# positive direction
         diff = round(angle_clockwise(ang_vec(start),ang_vec(end)),2)
         numd = int(ceil(diff/resolution))+1
