@@ -1,5 +1,5 @@
 from setuptools import setup
-
+#python setup.py build && python setup.py sdist && pip3 install -e .
 setup(
     name='nkrpy',
     description='Collection of Nick\'s python scripts',
