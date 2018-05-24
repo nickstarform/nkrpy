@@ -1,5 +1,6 @@
 # Misc Functions
 import numpy as np
+import os
 from math import cos,sin,acos,ceil
 
 def linear(x,a,b):
@@ -35,6 +36,55 @@ def list_files(dir):
             for file in files:
                 r.append(subdir + "/" + file)
     return r 
+
+def list_files2(startpath,ignore='',formatter=['  ','| ',1,'|--']):
+    '''
+    Will walk through directories starting at startpath
+    ignore is a csv string 'ignore1,ignore2,ignore3' that will ignore any 
+        file or directory with same name
+    Formatter will format the output in: 
+        [starting string for all lines, 
+         the iterating level parameter,
+         the number of iterations for the level parameter per level,
+         the final string to denote the termination at file/directory]
+    example: 
+    |--/
+    | |--CONTRIBUTING.md
+    | |--.gitignore
+    | |--LICENSE
+    | |--CODE_OF_CONDUCT.md
+    | |--README.md
+    | |--PULL_REQUEST_TEMPLATE.md
+    | |--refs/
+    | | |--heads/
+    | | | |--devel
+    '''
+    s,a,b,c = formatter
+    full = []
+    master = os.walk(startpath)
+    step = 0
+    for root,firs,files in os.walk(startpath):
+        level = root.replace(startpath,'').count(os.sep)
+        indent = s+a*b*level+c
+        full.append('{}{}/'.format(indent,os.path.basename(root)))
+        subindent = s + a * b * (level +1) + c
+        for f in files:
+            if f.split('/')[-1] not in ignore.split(','):
+                full.append('{}{}'.format(subindent,f))
+    '''
+    while step < len(master)-1:
+        root, dirs, files = master[step]
+        if root.split('/')[-1] not in ignore.split(','):
+            level = root.replace(startpath, '').count(os.sep)
+            indent = s + a * b * (level) + c
+            full.append('{}{}/'.format(indent, os.path.basename(root)))
+            subindent = s + a * b * (level+1) + c
+            for f in files:
+                if f.split('/')[-1] not in ignore.split(','):
+                    full.append('{}{}'.format(subindent, f))
+        step += 1
+    '''
+    return full
 
 def ang_vec(deg):
     rad = deg*pi/180.
@@ -221,6 +271,7 @@ def findLength(arr, n=0):
     # Initialize result
     max_len = 1
     i = 0
+    vals = [0,0]
     while i < len(range(n - 1)):
         #print('i:',i)
      
