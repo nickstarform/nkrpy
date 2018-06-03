@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import warnings as _warnings
 import os as _os
+from sys import version_info,exit
 
 from tempfile import mkdtemp
 
