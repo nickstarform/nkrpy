@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-'''
+"""
 Name  : Default Config, defaultconfig.py
 Author: Nickalas Reynolds
 Date  : Fall 2017
 Misc  : Default Configuration file to help the user determine input
         parameters
 Notes : DO NOT CHANGE THE STYLE OF THE FILE
-'''
+"""
 
 config = {
 'current'   : '',  # name of this input file

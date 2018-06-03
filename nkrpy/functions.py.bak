@@ -1,6 +1,4 @@
 # Misc Functions
-__filename__ = __file__.split('/')[-1].strip('.py')
-
 import numpy as np
 import os
 from math import cos,sin,acos,ceil
@@ -257,10 +255,10 @@ def between(l1,val1,val2):
 
 # Utility functions to find minimum 
 # and maximum of two elements
-def minv(x, y):
+def min(x, y):
     return x if(x < y) else y
      
-def maxv(x, y):
+def max(x, y):
     return x if(x > y) else y
  
 # Returns length of the longest
@@ -274,7 +272,7 @@ def findLength(arr, n=0):
     max_len = 1
     i = 0
     vals = [0,0]
-    while i < len(list(range(n - 1))):
+    while i < len(range(n - 1)):
         #print('i:',i)
      
         # Initialize min and max for
@@ -285,12 +283,12 @@ def findLength(arr, n=0):
         # Consider all subarrays starting
         # with i and ending with j
         j = i+1
-        while j < len(list(range(n - 1))):
+        while j < len(range(n - 1)):
             #print('j:',j)
             # Update min and max in
             # this subarray if needed
-            mn = minv(mn, arr[j])
-            mx = maxv(mx, arr[j])
+            mn = min(mn, arr[j])
+            mx = max(mx, arr[j])
  
             # If current subarray has
             # all contiguous elements
@@ -298,7 +296,7 @@ def findLength(arr, n=0):
                 #print('New Length')
                 if max_len < (mx - mn + 1):
                     vals = [mn,mx]
-                max_len = maxv(max_len, mx - mn + 1)
+                max_len = max(max_len, mx - mn + 1)
             else:
                 #print('Keeping ',vals)
                 i = j-1
