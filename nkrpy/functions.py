@@ -205,10 +205,10 @@ def between(l1,val1,val2):
 
 # Utility functions to find minimum 
 # and maximum of two elements
-def min(x, y):
+def minv(x, y):
     return x if(x < y) else y
      
-def max(x, y):
+def maxv(x, y):
     return x if(x > y) else y
  
 # Returns length of the longest
@@ -221,6 +221,7 @@ def findLength(arr, n=0):
     # Initialize result
     max_len = 1
     i = 0
+    vals = [0,0]
     while i < len(range(n - 1)):
         #print('i:',i)
      
@@ -236,8 +237,8 @@ def findLength(arr, n=0):
             #print('j:',j)
             # Update min and max in
             # this subarray if needed
-            mn = min(mn, arr[j])
-            mx = max(mx, arr[j])
+            mn = minv(mn, arr[j])
+            mx = maxv(mx, arr[j])
  
             # If current subarray has
             # all contiguous elements
@@ -245,7 +246,7 @@ def findLength(arr, n=0):
                 #print('New Length')
                 if max_len < (mx - mn + 1):
                     vals = [mn,mx]
-                max_len = max(max_len, mx - mn + 1)
+                max_len = maxv(max_len, mx - mn + 1)
             else:
                 #print('Keeping ',vals)
                 i = j-1
