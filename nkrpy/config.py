@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-'''
+"""
 Name    : Config, config.py
 Author  : Nickalas Reynolds
 Date    : Fall 2017
 Misc    : File handles reading in the configuration file and 
           for writing an example configuration file
 Example : defaultconfig.py
-'''
+"""
 
 # imported standard modules
 from os.path import isfile
@@ -22,13 +22,13 @@ from . import defaultconfig
 from . import colours
 
 def call(*args,**kwargs):
-    '''
+    """
     Better wrapper for quickly calling 
     the lines class
     Can specify the arguments within a single line without
     having to self initialize and recall
     returns the lines class pre initialized
-    '''
+    """
     try: # if key-word arguments are supplied
         return configuration(**kwargs)
     except RuntimeError: # if arguments are supplied (less specified)
@@ -40,10 +40,10 @@ def call(*args,**kwargs):
 
 # main class object for manipulating configuration files
 class configuration(object):
-    '''
+    """
     Configuration class for handling weird ocnfiguration designations
     just call configuration(infile,cwd)
-    '''
+    """
 
     def __init__(self,inputfile=None,cwd=None):
         """
@@ -66,15 +66,15 @@ class configuration(object):
             self.inputfile=self.remove_ext(self.find_file(inputfile))
 
     def get_functions(self):
-        '''
+        """
         return all defined functions 
-        '''
+        """
         return dir(self)
 
     def get_inputs(self):
-        '''
+        """
         return all input variables initialized
-        '''
+        """
         return vars(self)
 
     def read(self):
@@ -145,9 +145,9 @@ class configuration(object):
         return '.'.join(inputfile.split('.')[:-1])
 
     def find_file(self,inputfile):
-        '''
+        """
         Find the input file and make sure it is in current directory
-        '''
+        """
         if isfile(inputfile):
             if (len(inputfile.split('/')) > 1) or ('.py' not in inputfile):
                 dest = "{}/config_{}.py".format(self.cwd,self.time)

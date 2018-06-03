@@ -1,26 +1,26 @@
 #!/usr/bin/env python
-'''
+"""
 Name  : Functions, function.py
 Author: Nickalas Reynolds
 Date  : Fall 2017
 Misc  : Holds the highly used and general functions
-'''
+"""
 
 # import standard modules
 from collections import Iterable
 import math
 
 def typecheck(obj): 
-    '''
+    """
     Checks if object is iterable (array,list,tuple) and not string
-    '''
+    """
     return not isinstance(obj, str) and isinstance(obj, Iterable)
 
 def checkconv(coord):
-    '''
+    """
     will take a coord convert to a list
     return the decimal conversion
-    '''
+    """
     delimiters = [':',' ',',']
     failed = False
     orig = coord

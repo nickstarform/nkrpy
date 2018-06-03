@@ -2,21 +2,23 @@
 #
 #-------------------/Smart deprecation warnings\-------------------#
 #
+__filename__ = __file__.split('/')[-1].strip('.py')
+
 import warnings
 import functools
 
 
 def deprecated(func):
-    '''This is a decorator which can be used to mark functions
+    """This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
-    when the function is used.'''
+    when the function is used."""
 
     @functools.wraps(func)
     def new_func(*args, **kwargs):
         warnings.warn_explicit(
             "Call to deprecated function {}.".format(func.__name__),
             category=DeprecationWarning,
-            filename=func.func_code.co_filename,
+            filename=filename,
             lineno=func.func_code.co_firstlineno + 1
         )
         return func(*args, **kwargs)
@@ -28,20 +30,20 @@ def deprecated(func):
 def my_func():
     pass
 
-@other_decorators_must_be_upper
+#@other_decorators_must_be_upper
 @deprecated
 def my_func():
     pass
-
+#@other_decorators_must_be_upper
+@deprecated
+def my_func2():
+    pass
 #
 #-------------------/Ignoredeprecation warnings\-------------------#
 #
-
-import warnings
-
 def ignore_deprecation_warnings(func):
-    '''This is a decorator which can be used to ignore deprecation warnings
-    occurring in a function.'''
+    """This is a decorator which can be used to ignore deprecation warnings
+    occurring in a function."""
     def new_func(*args, **kwargs):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -68,7 +70,7 @@ class SomeClass:
 #-------------------/Type Enforcement\-------------------#
 #
 
-'''
+"""
 One of three degrees of enforcement may be specified by passing
 the 'debug' keyword argument to the decorator:
     0 -- NONE:   No type-checking. Decorators disabled.
@@ -107,11 +109,11 @@ Needed to cast params as floats in function def (or simply divide by 2.0).
       ...
     TypeError: 'fib' method accepts (int), but was given (float)
 
-'''
+"""
 import sys
 
 def accepts(*types, **kw):
-    '''Function decorator. Checks decorated function's arguments are
+    """Function decorator. Checks decorated function's arguments are
     of the expected types.
 
     Parameters:
@@ -121,7 +123,7 @@ def accepts(*types, **kw):
              keyword argument, no other should be given).
              debug = ( 0 | 1 | 2 )
 
-    '''
+    """
     if not kw:
         # default level: MEDIUM
         debug = 1
@@ -139,19 +141,19 @@ def accepts(*types, **kw):
                     if debug is 1:
                         print >> sys.stderr, 'TypeWarning: ', msg
                     elif debug is 2:
-                        raise TypeError, msg
+                        raise TypeError(msg)
                 return f(*args)
             newf.__name__ = f.__name__
             return newf
         return decorator
     except(KeyError, key):
-        raise KeyError, key + "is not a valid keyword argument"
+        raise KeyError(key + "is not a valid keyword argument")
     except(TypeError, msg):
-        raise(TypeError, msg)
+        raise TypeError(msg)
 
 
 def returns(ret_type, **kw):
-    '''Function decorator. Checks decorated function's return value
+    """Function decorator. Checks decorated function's return value
     is of the expected type.
 
     Parameters:
@@ -160,7 +162,7 @@ def returns(ret_type, **kw):
     kw       -- Optional specification of 'debug' level (this is the only valid
                 keyword argument, no other should be given).
                 debug=(0 | 1 | 2)
-    '''
+    """
     try:
         if not kw:
             # default level: MEDIUM
@@ -178,18 +180,18 @@ def returns(ret_type, **kw):
                     if debug is 1:
                         print >> sys.stderr, 'TypeWarning: ', msg
                     elif debug is 2:
-                        raise TypeError, msg
+                        raise TypeError(msg)
                 return result
             newf.__name__ = f.__name__
             return newf
         return decorator
     except(KeyError, key):
-        raise(KeyError, key + "is not a valid keyword argument")
+        raise KeyError(key + "is not a valid keyword argument")
     except(TypeError, msg):
-        raise(TypeError, msg)
+        raise TypeError(msg)
 
 def info(fname, expected, actual, flag):
-    '''Convenience function returns nicely formatted error/warning msg.'''
+    """Convenience function returns nicely formatted error/warning msg."""
     format = lambda types: ', '.join([str(t).split("'")[1] for t in types])
     expected, actual = format(expected), format(actual)
     msg = "'{}' method ".format( fname )\

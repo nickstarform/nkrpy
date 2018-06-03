@@ -1,6 +1,4 @@
 # Misc Functions
-__filename__ = __file__.split('/')[-1].strip('.py')
-
 import numpy as np
 import os
 from math import cos,sin,acos,ceil
@@ -274,7 +272,7 @@ def findLength(arr, n=0):
     max_len = 1
     i = 0
     vals = [0,0]
-    while i < len(list(range(n - 1))):
+    while i < len(range(n - 1)):
         #print('i:',i)
      
         # Initialize min and max for
@@ -285,7 +283,7 @@ def findLength(arr, n=0):
         # Consider all subarrays starting
         # with i and ending with j
         j = i+1
-        while j < len(list(range(n - 1))):
+        while j < len(range(n - 1)):
             #print('j:',j)
             # Update min and max in
             # this subarray if needed

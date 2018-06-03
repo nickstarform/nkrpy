@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''
+"""
 Name  : Atomic Lines, atomiclines.py
 Author: Nickalas Reynolds
 Date  : Fall 2017
@@ -7,20 +7,22 @@ Misc  : Houses all useful atomic lines and short program for parsing
         Suggest using the "call" wrapper for first calling the lines class
         After initial call, then use the functions defined within the class
 
-'''
+"""
+__filename__ = __file__.split('/')[-1].strip('.py')
+
 # import standard modules
 from copy import deepcopy
 import numpy as np
 from .functions import binning
 
 def call(*args,**kwargs):
-    '''
+    """
     Better wrapper for quickly calling 
     the lines class
     Can specify the arguments within a single line without
     having to self initialize and recall
     returns the lines class pre initialized
-    '''
+    """
     final = None
     try: # if key-word arguments are supplied
         final = lines()
@@ -35,13 +37,13 @@ def call(*args,**kwargs):
     return final
 
 class lines(object):
-    '''
+    """
     supported units all to anstroms and hz
     to add new units have to correct self.units and resolve_units
-    '''
+    """
 
     def __init__(self):
-        '''
+        """
         Setup the class with loading copy
 
         units{} defines all units that can be used
@@ -50,7 +52,7 @@ class lines(object):
         vals = possible aliases to resolve
         type = specifies either wavelength or frequency
         fac  = the conversion factor to get to Angstrom(Hertz) for wavelength(frequency)
-        '''
+        """
         self.c     = 2.99792458e18       # speed of light AGS
 
         self.units = {\
@@ -71,11 +73,11 @@ class lines(object):
         self.types = atomiclines.keys()
 
     def __call__(self,wtype='nir',bu='meters',x1=-1,x2=-1):
-        '''
+        """
         Allows repeat calls and inline calling of function.
         Main process to gather all files
         This returns object of itself. Use return functions to get needed items
-        '''
+        """
         assert wtype in self.types
         try:
             if (wtype == self.type) and ((bu == self.bu[1]) or (bu == self.bu[2])) and (self.fulllines):
@@ -116,45 +118,45 @@ class lines(object):
         return self
 
     def return_lines(self):
-        '''
+        """
         Returns all lines
-        '''
+        """
         return self.fulllines
 
     def return_regions(self):
-        '''
+        """
         Returns all lines within region <= all lines
-        '''
+        """
         return self.region
 
     def get_functions(self):
-        '''
+        """
         Return parameters
-        '''
+        """
         return dir(self)
 
     def get_args(self):
-        '''
+        """
         Return arguments given
-        '''
+        """
         return vars(self)
 
     def get_types(self):
-        '''
+        """
         Returns the types of line regions that have been defined
-        '''
+        """
         return self.types
 
     def get_units(self):
-        '''
+        """
         Returns the units possible in the current setup
-        '''
+        """
         return self.units.keys()
 
     def clear(self):
-        '''
+        """
         Clears major memory hogs for reset
-        '''
+        """
         self.alllines   = None
         self.fulllines  = None
         self.region     = None
@@ -163,9 +165,9 @@ class lines(object):
         self.x1,self.x2 = None,None
 
     def resolve_units(self,bu):
-        '''
+        """
         Resolves the units and conversion factor
-        '''
+        """
         tmp = self.resolve_name(bu)
         if tmp[0]:
             return tmp
@@ -173,10 +175,10 @@ class lines(object):
             self.exit('Unit: <{}> was not found in list of units: {}'.format(bu,self.get_units()))
 
     def resolve_name(self,bu):
-        '''
+        """
         Will resolve the name of the 
         unit from known types
-        '''
+        """
 
         if bu not in self.get_units():
             for i in self.units:
@@ -188,18 +190,18 @@ class lines(object):
             return True,bu,bu,self.units[bu]['type']
 
     def resolve_type(self,typel):    
-        '''
+        """
         Resolves Type
-        '''
+        """
         if typel not in self.get_types():
             self.exit('Type: <{}> was not found in list of types: {}'.format(typel,self.get_types()))
         else:
             return typel
 
     def conversion(self,init,ctype,fin,ftype):
-        '''
+        """
         returns conversion factor needed
-        '''
+        """
         if ctype == ftype: # converting between common types (wavelength->wavelength)
             return self.units[init]['fac']/self.units[fin]['fac']
         elif ctype == 'freq': # converting from freq to wavelength
@@ -209,9 +211,9 @@ class lines(object):
 
 
     def find_lines(self):    
-        '''
+        """
         Returns the dictionary of all converted types
-        '''
+        """
         self.fulllines = self.alllines
         # iterating through all lines in a type
         for i in self.alllines:
@@ -231,10 +233,10 @@ class lines(object):
             self.fulllines[i] = temp
 
     def find_regions(self,x1,x2):
-        '''
+        """
         returns line names within a region
         if you modify the line type, you will want to regen the region
-        '''
+        """
         self.region = {}
         for key in self.fulllines:
             a = np.array(self.fulllines[key])
@@ -251,13 +253,13 @@ class lines(object):
                 self.region[key] = a[ind].tolist()
 
     def aperture(self):
-        '''
+        """
         returns a new key value pair dictionary
         where the new data is suppressed 
         psuedo kmeans cluster
         First we calculate an average difference between sequential elements 
         and then group together elements whose difference is less than average.
-        '''
+        """
         tmp = {}
         for linenam in self.fulllines:
             d = sorted(self.fulllines[linenam])
@@ -280,9 +282,9 @@ class lines(object):
 
 
     def exit(self,exitcode,exitparam=0):
-        '''
+        """
         Handles error codes and exits nicely
-        '''
+        """
         print(exitcode)
         print('v--------Ignore exit codes below--------v')
         self.clear()
