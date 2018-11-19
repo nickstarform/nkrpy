@@ -4,7 +4,7 @@
 c    = 2.99792458e10      # speed of light CGS
 h    = 6.6260755e-27      # Planck's constant CGS
 g    = 6.67259e-8         # Grav const CGS
-kb   = 1.380658e-16       # Boltzmann's const CGS
+kb   = 1.38064852e-16       # Boltzmann's const CGS
 a    = 7.56591e-15        # Radiation constant CGS
 sb   = 5.67051e-5         # sigma (stefan-boltzmann const) CGS
 qe   =  4.803206e-10      # Charge of electron CGS
@@ -19,7 +19,6 @@ pi   = 3.14159265358979
 hour = 3.6e3              # s
 day  = 8.64e4             # s
 year = 3.1557600e7        # s
-
 # %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
 # ASTRONOMICAL CONSTANTS
 # %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
@@ -39,8 +38,26 @@ medd    = 3.60271e+34       # Eddington mass CGS
 j2000   = 2451545           # Julian date start j2000
 kzen    = 0.17              # typical zenith extinction
 
+# %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
+# ASTRONOMICAL CONSTANTS
+# %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
+# North galactic pole (J2000) -- according to Wikipedia
+pole_ra  = 192.859508
+pole_dec = 27.128336
+posangle = 122.932-90.0
+# North galactic pole (B1950)
+#pole_ra  = 192.25
+#pole_dec = 27.4
+#posangle = 123.0-90.0
+
 # RADIO SPECIFIC
 jy = 1.e-23                  # Jansky CGS
 restfreq_hi = 1420405751.786 # 21cm transition (Hz)
 restfreq_co = 115271201800.  # CO J=1-0 (Hz)
 cm2perkkms_hi = 1.823e18     # HI column per intensity (thin)
+
+# abundances
+abun_ratio_c18o_c17o = 4.16
+abun_ratio_c18o_h2= 1.7E-7
+abun_ratio_c17o_co = 1./1700.
+abun_ratio_co_h2 = 10**-4
