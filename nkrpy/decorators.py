@@ -1,14 +1,37 @@
-# decorators
-#
-#-------------------/Smart deprecation warnings\-------------------#
-#
-__filename__ = __file__.split('/')[-1].strip('.py')
+"""Random decorators for fancy functions."""
 
 import warnings
 import functools
+import sys
+import time
+
+
+def timing(f):
+    """Will yield the time it took to compute function."""
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('{:s} function took {:.3f} ms'
+              .format(f.__name__, (time2 - time1) * 1000.0))
+        return ret
+    return wrap
+
+"""Example:
+@timing
+def function....
+
+function()
+"""
+
+#
+# -------------------/Smart deprecation warnings\-------------------#
+#
+__filename__ = __file__.split('/')[-1].strip('.py')
 
 
 def deprecated(func):
+    """Mark function depreciated."""
     """This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
     when the function is used."""
@@ -18,30 +41,33 @@ def deprecated(func):
         warnings.warn_explicit(
             "Call to deprecated function {}.".format(func.__name__),
             category=DeprecationWarning,
-            filename=filename,
+            filename=__filename__,
             lineno=func.func_code.co_firstlineno + 1
         )
         return func(*args, **kwargs)
     return new_func
 
-
-## Usage examples ##
+"""Usage examples
 @deprecated
 def my_func():
     pass
 
-#@other_decorators_must_be_upper
+@other_decorators_must_be_upper
 @deprecated
 def my_func():
     pass
-#@other_decorators_must_be_upper
+
 @deprecated
 def my_func2():
     pass
+"""
 #
-#-------------------/Ignoredeprecation warnings\-------------------#
+# -------------------/Ignoredeprecation warnings\-------------------#
 #
+
+
 def ignore_deprecation_warnings(func):
+    """Ignore depreciation."""
     """This is a decorator which can be used to ignore deprecation warnings
     occurring in a function."""
     def new_func(*args, **kwargs):
@@ -53,8 +79,7 @@ def ignore_deprecation_warnings(func):
     new_func.__dict__.update(func.__dict__)
     return new_func
 
-# === Examples of use ===
-
+"""Usage examples
 @ignore_deprecation_warnings
 def some_function_raising_deprecation_warning():
     warnings.warn("This is a deprecationg warning.",
@@ -66,19 +91,12 @@ class SomeClass:
         warnings.warn("This is a deprecationg warning.",
                       category=DeprecationWarning)
 
-#
-#-------------------/Type Enforcement\-------------------#
-#
-
 """
-One of three degrees of enforcement may be specified by passing
-the 'debug' keyword argument to the decorator:
-    0 -- NONE:   No type-checking. Decorators disabled.
- #!python
--- MEDIUM: Print warning message to stderr. (Default)
-    2 -- STRONG: Raise TypeError with message.
-If 'debug' is not passed to the decorator, the default level is used.
 
+#
+# -------------------/Type Enforcement\-------------------#
+#
+"""
 Example usage:
     >>> NONE, MEDIUM, STRONG = 0, 1, 2
     >>>
@@ -110,13 +128,11 @@ Needed to cast params as floats in function def (or simply divide by 2.0).
     TypeError: 'fib' method accepts (int), but was given (float)
 
 """
-import sys
+
 
 def accepts(*types, **kw):
-    """Function decorator. Checks decorated function's arguments are
-    of the expected types.
-
-    Parameters:
+    """Check decorated arguments are of the expected types."""
+    """Parameters:
     types -- The expected types of the inputs to the decorated function.
              Must specify type for each parameter.
     kw    -- Optional specification of 'debug' level (this is the only valid
@@ -153,10 +169,8 @@ def accepts(*types, **kw):
 
 
 def returns(ret_type, **kw):
-    """Function decorator. Checks decorated function's return value
-    is of the expected type.
-
-    Parameters:
+    """Check decorated function's return is of the expected type."""
+    """Parameters:
     ret_type -- The expected type of the decorated function's return value.
                 Must specify type for each parameter.
     kw       -- Optional specification of 'debug' level (this is the only valid
@@ -169,6 +183,7 @@ def returns(ret_type, **kw):
             debug = 1
         else:
             debug = kw['debug']
+
         def decorator(f):
             def newf(*args):
                 result = f(*args)
@@ -190,17 +205,20 @@ def returns(ret_type, **kw):
     except(TypeError, msg):
         raise TypeError(msg)
 
+
 def info(fname, expected, actual, flag):
     """Convenience function returns nicely formatted error/warning msg."""
-    format = lambda types: ', '.join([str(t).split("'")[1] for t in types])
+    def format(types):
+        return ', '.join([str(t).split("'")[1] for t in types])
+
     expected, actual = format(expected), format(actual)
-    msg = "'{}' method ".format( fname )\
+    msg = "'{}' method ".format(fname)\
           + ("accepts", "returns")[flag] + " ({}), but ".format(expected)\
           + ("was given", "result is")[flag] + " ({})".format(actual)
     return msg
 
 #
-#-------------------/CGI Method wrapper\-------------------#
+# -------------------/CGI Method wrapper\-------------------#
 #
 
 class CGImethod(object):
@@ -223,6 +241,10 @@ class CGImethod(object):
 
         return wrapped_fn
 
+"""Usage examples
 @CGImethod("Hello with Decorator")
 def say_hello():
     print('<h1>Hello from CGI-Land</h1>')
+"""
+
+# end of file
