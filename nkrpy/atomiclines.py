@@ -13,7 +13,9 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 # import standard modules
 from copy import deepcopy
 import numpy as np
-from .functions import binning
+from .miscmath import binning
+from .constants import c
+c = c * 1E8
 
 def call(*args,**kwargs):
     """
@@ -53,7 +55,6 @@ class lines(object):
         type = specifies either wavelength or frequency
         fac  = the conversion factor to get to Angstrom(Hertz) for wavelength(frequency)
         """
-        self.c     = 2.99792458e18       # speed of light AGS
 
         self.units = {\
                          'bananas'    : {'vals':['b','banana'],'type':'wave','fac':2.032*10**9},\
@@ -205,9 +206,9 @@ class lines(object):
         if ctype == ftype: # converting between common types (wavelength->wavelength)
             return self.units[init]['fac']/self.units[fin]['fac']
         elif ctype == 'freq': # converting from freq to wavelength
-            return self.units['angstroms']['fac']/self.units[fin]['fac'] * self.c * self.units[init]['fac']/self.units['hz']['fac']
+            return self.units['angstroms']['fac']/self.units[fin]['fac'] * c * self.units[init]['fac']/self.units['hz']['fac']
         elif ctype == 'wave': # converting from wavelength to freq
-            return self.units['hz']['fac']/self.units[fin]['fac'] * self.c * self.units[init]['fac']/self.units['angstroms']['fac']
+            return self.units['hz']['fac']/self.units[fin]['fac'] * c * self.units[init]['fac']/self.units['angstroms']['fac']
 
 
     def find_lines(self):    
@@ -222,7 +223,7 @@ class lines(object):
             # Type of output desired   unit,type
             finalun     = self.bu[2:4]
             # general conversion between the two above
-            initialconv = self.conversion(*initialun,*finalun)
+            initialconv = conversion(*initialun,*finalun)
             temp = []
             # iterating through values of the given line to create final list
             for k,j in enumerate(self.alllines[i]['val']): 
@@ -287,7 +288,7 @@ class lines(object):
         """
         print(exitcode)
         print('v--------Ignore exit codes below--------v')
-        self.clear()
+        clear()
         if exitparam == 0:
             return None
         else:
@@ -309,6 +310,7 @@ atomiclines={\
         'Br17-4':{'val':[1.54431],'unit':'micrometers'},'Br18-4':{'val':[1.53460],'unit':'micrometers'},'Br19-4':{'val':[1.52647],'unit':'micrometers'},\
         'Br20-4':{'val':[1.51960],'unit':'micrometers'},'Br21-4':{'val':[1.51374],'unit':'micrometers'},\
         "Ca I":{'val':[1.9442,1.9755,2.2605,2.263,2.266],'unit':'micrometers'},\
+        "Ca II":{'val':[8498,8542,8662],'unit':'angstroms'},\
         #"Ca II":{'val':[3933.663,3968.468,8500.36, 8544.44,8664.52],'unit':'angstroms'},\
         "CO":{'val':[2.2925,2.3440,2.414,2.322,2.352,2.383],'unit':'micrometers'},\
         #"Fe I":{'val':[1.1880,1.1970],'unit':'micrometers'},\
