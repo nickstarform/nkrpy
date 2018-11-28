@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+OPT="${1}"
+NAME="${2}"
+loc=$(which template)
+loc="${loc%/template}/templates/"
+dest=$(pwd)
+
+possible_templates=('py' 'rst' 'md')
+
+if [ -z "${OPT}" ]; then
+    OPT="py,rst"
+elif [ "${OPT}" == '--help' ] || [ "${OPT}" == 'help' ] || [ "${OPT}" == '-help' ]; then
+    echo 'Helps to create and organize template files/dirs'
+    echo 'The layout is <template type name>'
+    echo 'Just call <template py fname> or comma separate <template py,rst fname>'
+    echo 'fname is simply the name of the destination to create'
+    exit
+fi
+
+if [ -z "${NAME}" ]; then
+    NAME='template'
+fi
+
+function contains() {
+    local n=$#
+    local value=${!n}
+    for ((i=1;i < $#;i++)) {
+        if [ "${!i}" == "${value}" ]; then
+            echo "y"
+            return 0
+        fi
+    }
+    echo "n"
+    return 1
+}
+
+IFS=',' read -r -a array <<< "${OPT}"
+
+for req in "${array[@]}"; do
+    if [ $(contains "${possible_templates[@]}" "${req}") == 'n' ]; then
+        echo "Not a valid request ${req}"
+    else
+        cp -v "${loc}template.${req}" "${dest}/${NAME%.${req}}.${req}"
+    fi
+done
+
+# end of file
