@@ -27,7 +27,7 @@ t_setup = f'#count _C_\n' +\
 t_target = f'_N_\t_RA_\t_DEC_\n'
 
 
-def main(data, output, obj, count=1, interval=1, binning=1, filt='B,V,R,I'):
+def mosaic(data, output, obj, count=1, interval=1, binning=1, filt='B,V,R,I'):
     """Main function caller for the data."""
     # assuming data is 2d, with each row 3vals <name, ra, dec>
     count = str(count).split(',')
@@ -52,10 +52,16 @@ def main(data, output, obj, count=1, interval=1, binning=1, filt='B,V,R,I'):
         else:
             return True
 
+def singlet():
+    pass
+
+def main():
+    pass
+
 
 def test():
     """Testing function for module."""
-    assert main((('Test Point 1', '1', '1'),), None, 'Test', 1, 1, 1, 'B')
+    assert mosaic((('Test Point 1', '1', '1'),), None, 'Test', 1, 1, 1, 'B')
 
 if __name__ == "__main__":
     """Directly Called."""
