@@ -1,49 +1,75 @@
 """Random decorators for fancy functions."""
 
+# internal modules
 import warnings
 import functools
 import sys
 import time
 
+# external modules
+
+# relative modules
+
+# global attributes
+__all__ = ('deprecated', 'call_counter', 'timing', 'checker', 'ignore_deprecation_warnings')
+__doc__ = """Generalized decorators for common usage."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+__version__ = 0.1
+
+
+def call_counter(func):
+    """Count number of function calls."""
+    def helper(x):
+        helper.calls += 1
+        return func(x)
+    helper.calls = 0
+
+    return helper
+
 
 def timing(f):
     """Will yield the time it took to compute function."""
-    def wrap(*args):
+    """Example:
+    @timing
+    def function....
+
+    function()
+    """
+    def wrap(*args, **kwargs):
         time1 = time.time()
-        ret = f(*args)
+        ret = f(*args, **kwargs)
         time2 = time.time()
         print('{:s} function took {:.3f} ms'
               .format(f.__name__, (time2 - time1) * 1000.0))
         return ret
     return wrap
 
-"""Example:
-@timing
-def function....
 
-function()
-"""
+def checker(f):
+    def wrap(*args, **kwargs):
+        print(f'args: {args}')
+        print(f'kwargs: {kwargs}')
+        return f(*args, **kwargs)
+    return wrap
+
 
 #
 # -------------------/Smart deprecation warnings\-------------------#
 #
-__filename__ = __file__.split('/')[-1].strip('.py')
 
 
 def deprecated(func):
-    """Mark function depreciated."""
     """This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
     when the function is used."""
-
     @functools.wraps(func)
     def new_func(*args, **kwargs):
-        warnings.warn_explicit(
-            "Call to deprecated function {}.".format(func.__name__),
-            category=DeprecationWarning,
-            filename=__filename__,
-            lineno=func.func_code.co_firstlineno + 1
-        )
+        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+        warnings.warn("Call to deprecated function {}.".format(func.__name__),
+                      category=DeprecationWarning,
+                      stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning)  # reset filter
         return func(*args, **kwargs)
     return new_func
 
@@ -61,6 +87,7 @@ def my_func():
 def my_func2():
     pass
 """
+
 #
 # -------------------/Ignoredeprecation warnings\-------------------#
 #
@@ -162,9 +189,9 @@ def accepts(*types, **kw):
             newf.__name__ = f.__name__
             return newf
         return decorator
-    except(KeyError, key):
+    except KeyError as key:
         raise KeyError(key + "is not a valid keyword argument")
-    except(TypeError, msg):
+    except TypeError as msg:
         raise TypeError(msg)
 
 
@@ -200,9 +227,9 @@ def returns(ret_type, **kw):
             newf.__name__ = f.__name__
             return newf
         return decorator
-    except(KeyError, key):
+    except KeyError as key:
         raise KeyError(key + "is not a valid keyword argument")
-    except(TypeError, msg):
+    except TypeError as msg:
         raise TypeError(msg)
 
 
@@ -221,11 +248,21 @@ def info(fname, expected, actual, flag):
 # -------------------/CGI Method wrapper\-------------------#
 #
 
+
 class CGImethod(object):
+    """A CGI wrapper for a givenfunction."""
+
+    """Usage examples
+    @CGImethod("Hello with Decorator")
+    def say_hello():
+        print('<h1>Hello from CGI-Land</h1>')
+    """
     def __init__(self, title):
+        """Initialization magic method."""
         self.title = title
 
     def __call__(self, fn):
+        """Caller magic method."""
         def wrapped_fn(*args):
             print("Content-Type: text/html\n\n")
             print("<HTML>")
@@ -233,18 +270,12 @@ class CGImethod(object):
             print("<BODY>")
             try:
                 fn(*args)
-            except(Exception, e):
+            except Exception as e:
                 print('\n')
                 print(e)
             print()
             print("</BODY></HTML>")
 
         return wrapped_fn
-
-"""Usage examples
-@CGImethod("Hello with Decorator")
-def say_hello():
-    print('<h1>Hello from CGI-Land</h1>')
-"""
 
 # end of file

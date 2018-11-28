@@ -1,5 +1,7 @@
 """Various Astronomy functions."""
 
+# internal modules
+
 # external modules
 import numpy as np
 
@@ -7,12 +9,13 @@ import numpy as np
 from .constants import h, c, kb, jy, msun
 from .functions import typecheck
 from .dustmodels.kappa import *
+from .decorators import deprecated
 
 c = c * 1E8 # A/s
 h = h * 1E-7 # SI
 kb = kb * 1E-7 #SI
 
-__all__ = ('Units', 'planck', 'dustmass', 'planck_nu', 'planck_wav')
+__all__ = ('Units', 'dustmass', 'planck_nu', 'planck_wav')
 
 
 class Units(object):
@@ -39,24 +42,36 @@ class Units(object):
         """
 
         self.units = {
-            'J': {'vals': ('j', 'joules', 'joule'),
+            'j': {'vals': ('j', 'joules', 'joule'),
                    'type': 'energy',
                    'fac': 1.},
-            'eV': {'vals': ('ev', 'electronvolt', 'eVs', 'electronvolts'),
+            'ev': {'vals': ('ev', 'electronvolt', 'evs', 'electronvolts'),
                    'type': 'energy',
                    'fac': 1.6021766208E-19},
-            'keV': {'vals': ('kev', 'kiloelectronvolt','keVs','kiloelectronvolts', 'kiloeV'),
+            'kev': {'vals': ('kev', 'kiloelectronvolt','kevs','kiloelectronvolts', 'kiloev'),
                    'type': 'energy',
                    'fac': 1.E3 * 1.6021766208E-19},
-            'MeV': {'vals': ('mev', 'megaelectronvolt','mevs','megaelectronvolts'),
+            'mev': {'vals': ('mev', 'megaelectronvolt','mevs','megaelectronvolts'),
                    'type': 'energy',
                    'fac': 1.E6 * 1.6021766208E-19},
-            'GeV': {'vals': ('gev', 'gigaaelectronvolt','gevs','gigaelectronvolts'),
+            'gev': {'vals': ('gev', 'gigaaelectronvolt','gevs','gigaelectronvolts'),
                    'type': 'energy',
                    'fac': 1.E9 * 1.6021766208E-19},
             'bananas': {'vals': ('b', 'banana'),
                         'type': 'wave',
                         'fac': 2.032 * 10 ** 9},
+            'degrees': {'vals': ('deg', 'd', 'degree'),
+                          'type': 'angle',
+                          'fac': 3600.},
+            'hourangle': {'vals': ('ha', 'hourangles'),
+                          'type': 'angle',
+                          'fac': 3600. / 15.},
+            'arcmin': {'vals': ('am', 'arcmins'),
+                          'type': 'angle',
+                          'fac': 60.},
+            'arcsec': {'vals': ('as', 'arcsecs'),
+                          'type': 'angle',
+                          'fac': 1.},
             'angstroms': {'vals': ('ang', 'a', 'angs', 'angstrom'),
                           'type': 'wave',
                           'fac': 1.},
@@ -113,9 +128,13 @@ class Units(object):
         Main process to gather all files
         This returns object of itself. Use return functions to get needed items
         """
-        if (type(unit) != str):
-            vals = unit
+        try:
+            _t = float(unit)
+            vals = _t
             unit = None
+        except:
+            pass
+
         if unit and vals:
             # set new unit and new vals
             # print(1)
@@ -129,7 +148,7 @@ class Units(object):
             if self.current_unit[2] != _tmp[2]:
                 self.vals = self._return_vals(unit=_tmp)
             else:
-                self._return_vals()
+                self.vals = self._return_vals()
         elif vals and self.current_unit:
             # set new values for current unit
             # print(3)
@@ -143,6 +162,14 @@ class Units(object):
             self.vals = vals
         return self._return_vals()
 
+    def __repr__(self):
+        """Representative Magic Method for calling."""
+        _t = self._return_vals()
+        if typecheck(_t):
+            return ', '.join(map(str,_t))
+        else:
+            return str(f'{_t}')
+
     def reset(self):
         self.current_unit = None
         self.vals = None
@@ -151,6 +178,7 @@ class Units(object):
     def set_base_unit(self, unit):
         _tmp = self._resolve_units(unit)
         self.current_unit = _tmp
+        self.vals = self._return_vals()
 
     def converting(self):
         print(f'Converting from {self.conv[0]} to {self.conv[1]}')
@@ -166,10 +194,11 @@ class Units(object):
             return tmp
         else:
             _u = self.get_units()
-            self.exit(f'Unit: <{bu}> was not found in list of units: {_u}')
+            self._exit(f'Unit: <{bu}> was not found in list of units: {_u}')
 
     def _resolve_name(self, bu):
         """Will resolve the name of the unit from known types."""
+        bu = bu.lower()
         if bu not in self.get_units():
             for i in self.units:
                 for k in self.units[i]['vals']:
@@ -211,27 +240,35 @@ class Units(object):
         """Convert the values appropriately."""
         """unit is the type _resolve_name output
         vals can be either single values or iterable."""
-        # print(vals, unit)
-        # print(self.scaler)
-        if (unit and self.current_unit) or vals:
+        print(vals, unit)
+        if isinstance(vals, str):
+            unit = vals
+            vals = None
+        if (unit and self.current_unit):
             # print('first')
             # convert list of self.vals to new unit
             if vals:
-                self.vals = vals
-            if typecheck(self.vals) and not isinstance(self.vals, np.ndarray):
-                for i in range(len(self.vals)):
-                    _tmp = self.vals[i]
-                    self.vals[i] = self._conversion(*self.current_unit[2:
+                _t = vals
+            else:
+                _t = self.vals
+            if typecheck(_t) and not isinstance(_t, np.ndarray):
+                for i in range(len(_t)):
+                    _tmp = _t[i]
+                    _t[i] = self._conversion(*self.current_unit[2:
                                                               len(self.current_unit)],
                                                     *unit[2:len(unit)], _tmp)
             else:
                 _tmp = self.vals
-                self.vals = self._conversion(*self.current_unit[2:
+                _t = self._conversion(*self.current_unit[2:
                                                           len(self.current_unit)],
                                              *unit[2:len(unit)], _tmp)
-        return self.vals
+            return _t
+        elif vals:
+            return vals
+        else:
+            return self.vals
 
-    def exit(self, exitcode, exitparam=0):
+    def _exit(self, exitcode, exitparam=0):
         """Handles error codes and exits nicely."""
         print(exitcode)
         print('v--------Ignore exit codes below--------v')
@@ -267,8 +304,10 @@ def planck_nu(temp=None, val=None, unit=None):
     return intensity * Units(unit='hz', vals=1)(unit)
 
 
+@deprecated
 def planck():
     pass
+
 
 def dustmass(dist, dist_unit, val, val_unit, flux, temp, model_name, beta):
     """Calculate dust mass."""

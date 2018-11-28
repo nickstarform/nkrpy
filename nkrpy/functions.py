@@ -13,7 +13,6 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 # relative modules
-from .miscmath import gauss
 
 # set the filename manually
 __filename__ = __file__.split('/')[-1].strip('.py')
@@ -24,8 +23,26 @@ def typecheck(obj):
     return not isinstance(obj, str) and isinstance(obj, Iterable)
 
 
-def addspace(sstring, spacing=20):
+def addspace(arbin, spacing='auto'):
+    if typecheck(arbin):
+        if str(spacing).lower() == 'auto':
+            spacing = max([len(x) for x in map(str, arbin)]) + 1
+            return [_add(x, spacing) for x in arbin]
+        elif isinstance(spacing, int):
+            return [_add(x, spacing) for x in arbin]
+    else:
+        arbin = str(arbin)
+        if spacing.lower() == 'auto':
+            spacing = len(arbin) + 1
+            return _add(arbin, spacing)
+        elif isinstance(spacing, int):
+            return _add(arbin, spacing)
+    raise(TypeError, f'Either input: {arbin} or spacing: {spacing} are of incorrect types. NO OBJECTS')
+
+
+def _add(sstring, spacing=20):
     """Regular spacing for column formatting."""
+    sstring = str(sstring)
     while True:
         if len(sstring) >= spacing:
             sstring = sstring[:-1]
@@ -34,7 +51,6 @@ def addspace(sstring, spacing=20):
         else:
             break
     return sstring + ' '
-
 
 def list_files(dir):
     """List all the files within a directory."""
@@ -102,6 +118,7 @@ def list_files2(startpath, ignore='', formatter=['  ', '| ', 1, '|--']):
 def equivalent_width(spectra, blf, xspec0, xspec1, fit='gauss',
                      params=[1, 1, 1]):
     """Compute spectral line eq. width."""
+    from .miscmath import gauss
     """
     finds equivalent width of line
     spectra is the full 2d array (lam, flux)

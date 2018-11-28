@@ -1,8 +1,168 @@
 """Various math functions."""
 
-import numpy as np
-from .constants import pi
+# standard modules
 from math import ceil, cos, sin, acos
+from copy import deepcopy
+
+# external modules
+import numpy as np
+import matplotlib.pyplot as plt
+
+# relative modules
+from .constants import pi
+from .functions import typecheck
+
+
+def _raster_matrix_con(fov, cen=(0, 0), width=1, height=1, main='h', theta=0, h='+',
+                       v='-', sample=2., box_bounds=None, rev=False, plot=False):
+    """Main constructor."""
+    if rev:
+        h = '+' if h == '-' else '-'
+        v = '+' if v == '-' else '-'
+        main = 'h' if main == 'v' else 'v'
+    print(h, v)
+    if not box_bounds:
+        box_bounds = ((cen[0] - width / 2., cen[1] + height / 2.),
+                      (cen[0] + width / 2., cen[1] + height / 2.),
+                      (cen[0] - width / 2., cen[1] - height / 2.),
+                      (cen[0] + width / 2., cen[1] - height / 2.))
+
+    num_centers_w = int(np.ceil(2. * width / (fov / sample) - 4))
+    num_centers_h = int(np.ceil(2. * height / (fov / sample) - 4))
+    vertrange = np.linspace(box_bounds[2][1], box_bounds[0][1], endpoint=True,
+                            num=num_centers_h)
+    horirange = np.linspace(box_bounds[0][0], box_bounds[1][0], endpoint=True,
+                            num=num_centers_w)
+
+    if v == '-':
+        vertrange = np.array(list(vertrange)[::-1])
+    if h == '-':
+        horirange = np.array(list(horirange)[::-1])
+
+    alldegrees = []
+    count = 0
+    if main == 'h':
+        for i, v in enumerate(vertrange):
+            _t = list(horirange)
+
+            if count % 2 == 1:  # negative direction
+                _t = _t[::-1]
+
+            for x in _t:
+                alldegrees.append(np.array([x, v]))
+            count += 1
+    else:
+        for i, h in enumerate(horirange):
+            _t = list(vertrange)
+
+            if count % 2 == 1:  # negative direction
+                _t = _t[::-1]
+
+            for x in _t:
+                alldegrees.append(np.array([h, x]))
+            count += 1
+    alldegrees = np.array(alldegrees)
+    if theta % 360. != 0.:
+        _t = deepcopy(alldegrees)
+        alldegrees = rotate_matrix(cen, _t, theta)
+
+    if plot:
+        _plot_raster(alldegrees)
+    return num_centers_w * num_centers_h, alldegrees
+
+
+def _plot_raster(matrix):
+    """Plotter for the raster matrix."""
+    plt.figure(figsize=[16, 16])
+
+    plt.plot(matrix[:, 0], matrix[:, 1], 'r-')
+    plt.plot(matrix[:, 0], matrix[:, 1], 'b.')
+    plt.plot(matrix[0, 0], matrix[0, 1], '*', color='black', label='start')
+    plt.plot(matrix[-1, 0], matrix[-1, 1], '*', color='purple', label='end')
+    plt.legend()
+    plt.title(f'Raster Scan: {matrix[0]} to {matrix[-1]}')
+    plt.draw()
+    plt.show()
+
+def raster_matrix(*args, auto=False, **kwargs):
+    """Return a matrix of a raster track."""
+    """Assuming all units are the same!
+    Cen: <iterable[float]> of the center points
+    width: <float> of total width (evenly split)
+    height: <float> of total height (evenly split)
+    fov: <float> field of view of window
+    auto: if auto is set will construct a double grid, one of specified
+    plot: <boolean> if should plot the output
+    direction and the next grid of opposite to maximize sensitivity
+    main: <h/v> determine which is the major track
+    h: <+/-> for direction of starting horizontal track
+    v: <+/-> for direciton of starting vertical track
+    sample: <float> give float >0 with 1 being exactly no overlap and
+    infinity being complete overlap."""
+    if auto:
+        firstn, firstm = _raster_matrix_con(*args, **kwargs)
+        secondn, secondm = _raster_matrix_con(*args, rev=True, **kwargs)
+        totaln = firstn + secondn
+        totalm = np.concatenate((firstm, secondm))
+    else:
+        totaln, totalm = _raster_matrix_con(*args, **kwargs)
+    return totaln, totalm
+
+
+def _1d(ite, dtype):
+    """Create 1d array."""
+    _shape = len(ite)
+    _return = np.zeros(_shape, dtype=dtype)
+    for i, x in enumerate(ite):
+        if typecheck(x):
+            _return[i] = x[0]
+        else:
+            _return[i] = x
+    return _return
+
+
+def _2d(ite, dtype):
+    """Create 2d array."""
+    _shape = tuple([len(ite), len(ite[0])][::-1])
+    _return = np.zeros(_shape, dtype=dtype)
+    for i, x in enumerate(ite):
+        if typecheck(x):
+            for j, y in enumerate(x):
+                _return[j, i] = y
+        else:
+            for j in range(_shape[0]):
+                _return[j, i] = x
+    return _return
+
+
+def _list_array(ite, dtype=np.float64):
+    """Transform list to numpy array of dtype."""
+    assert typecheck(ite)
+    inner = typecheck(ite[0])
+    if inner:
+        try:
+            _return = _2d(ite, dtype)
+        except TypeError as te:
+            print(str(te) + '\nNot a 2D array...')
+            _return = _1d(ite, dtype)
+    else:
+        _return = _1d(ite, dtype)
+    print('Converted to shape with:', _return.shape)
+    return _return
+
+
+def gaussian_sample(lower_bound, upper_bound, size=100, scale=None):
+    """Sample from a gaussian given limits."""
+    loc = (lower_bound + upper_bound) / 2.
+    if scale is None:
+        scale = (upper_bound - lower_bound) / 2.
+    results = []
+    while len(results) < size:
+        samples = np.random.normal(loc=loc, scale=scale,
+                                   size=size - len(results))
+        results += [sample for sample in samples
+                    if lower_bound <= sample <= upper_bound]
+    return results
 
 
 def linear(x, a, b):
@@ -82,10 +242,10 @@ def inner_angle(v, w):
     return rad * 180. / pi  # returns degrees
 
 
-def angle_clockwise(A, B):
+def angle_clockwise(a, b):
     """Determine the angle clockwise between vecs."""
-    inner = inner_angle(A, B)
-    det = determinant(A, B)
+    inner = inner_angle(a, b)
+    det = determinant(a, b)
     if det > 0:  # this is a property of the det.
         # If the det < 0 then B is clockwise of A
         return inner
@@ -168,5 +328,31 @@ def listinvert(total, msk_array):
     mask = np.delete(mask_tot, mask_inv)
     mask = [int(x) for x in mask]
     return mask
+
+
+def rotate_points(origin, point, angle):
+    """Rotate a point counterclockwise by a given angle around a given origin."""
+    """
+    The angle should be given in radians.
+    """
+    ox, oy = origin
+    px, py = point
+
+    qx = ox + np.cos(angle) * (px - ox) - np.sin(angle) * (py - oy)
+    qy = oy + np.sin(angle) * (px - ox) + np.cos(angle) * (py - oy)
+    return qx, qy
+
+
+def rotate_matrix(origin, matrix, angle):
+    """Rotate a matrix counterclockwise by a given angle around a given origin."""
+    """
+    The angle should be given in radians.
+    """
+    ox, oy = origin
+    px, py = matrix[:, 0], matrix[:, 1]
+
+    qx = ox + np.cos(angle) * (px - ox) - np.sin(angle) * (py - oy)
+    qy = oy + np.sin(angle) * (px - ox) + np.cos(angle) * (py - oy)
+    return np.concatenate((qx.reshape(qx.shape[0], 1),qy.reshape(qy.shape[0], 1)), axis=1)
 
 # end of file

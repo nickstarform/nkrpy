@@ -1,85 +1,29 @@
-"""Find Keplerian Parameters. orbital_params(lsma,usma,le,ue,li,ui,mass,size)."""
+"""Find Keplerian Parameters."""
 
-"""Use orbital_params or orbital_2_xyz as the main function call.
-For former: input distribution params and generates a gaussian distribution of 
-orbital params in both cartesian and the orbital elements.
-The orbital_2_xyz converts orbital elements to xyz components.
-Keep everything in AU, days, solar masses, radians"""
-
-
-import numpy as np
-from nkrpy.constants import pi
+# standard modules
 try:
     from collections.abc import Iterable
 except:
     from collections import Iterable
 
-__all__ = ['orbital_params', 'orbital_2_xyz']
+# external modules
+import numpy as np
+
+# relative modules
+from .constants import pi
+from .functions import typecheck
+from .miscmath import gaussian_sample, _1d, _2d, _list_array
+
+__all__ = ('orbital_params', 'orbital_2_xyz')
+
+__doc__ = """orbital_params(lsma,usma,le,ue,li,ui,mass,size). Use orbital_params or orbital_2_xyz as the main function call.
+For former: input distribution params and generates a gaussian distribution of 
+orbital params in both cartesian and the orbital elements.
+The orbital_2_xyz converts orbital elements to xyz components.
+Keep everything in AU, days, solar masses, radians"""
 
 # Acceptable Numerical Error
 eps = 1E-12
-
-
-def typecheck(obj):
-    """Check if object is iterable (array,list,tuple) and not string."""
-    return not isinstance(obj, str) and isinstance(obj, Iterable)
-
-
-def _2d(ite, dtype):
-    """Create 2d array."""
-    _shape = tuple([len(ite), len(ite[0])][::-1])
-    _return = np.zeros(_shape, dtype=dtype)
-    for i, x in enumerate(ite):
-        if typecheck(x):
-            for j, y in enumerate(x):
-                _return[j, i] = y
-        else:
-            for j in range(_shape[0]):
-                _return[j, i] = x
-    return _return
-
-
-def _1d(ite, dtype):
-    """Create 1d array."""
-    _shape = len(ite)
-    _return = np.zeros(_shape, dtype=dtype)
-    for i, x in enumerate(ite):
-        if typecheck(x):
-            _return[i] = x[0]
-        else:
-            _return[i] = x
-    return _return
-
-
-def _list_array(ite, dtype=np.float64):
-    """Transform list to numpy array of dtype."""
-    assert typecheck(ite)
-    inner = typecheck(ite[0])
-    if inner:
-        try:
-            _return = _2d(ite, dtype)
-        except TypeError as te:
-            print(str(te) + '\nNot a 2D array...')
-            _return = _1d(ite, dtype)
-    else:
-        _return = _1d(ite, dtype)
-    print('Converted to shape with:', _return.shape)
-    return _return
-
-
-def gaussian_sample(lower_bound, upper_bound, size=100, scale=None):
-    """Sample from a gaussian given limits."""
-    loc = (lower_bound + upper_bound) / 2.
-    if scale is None:
-        scale = (upper_bound - lower_bound) / 2.
-    results = []
-    while len(results) < size:
-        samples = np.random.normal(loc=loc, scale=scale,
-                                   size=size - len(results))
-        results += [sample for sample in samples
-                    if lower_bound <= sample <= upper_bound]
-    return results
-
 
 def ecc(a, b):
     """Determine eccentricity given semi-major and semi-minor."""
