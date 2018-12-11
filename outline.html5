@@ -576,9 +576,12 @@ a { text-decoration: none; }
 <dd class="author-web"><p><a class="reference external" href="reynolds.oucreate.com">reynolds.oucreate.com</a></p>
 </dd>
 <dt class="date">Date</dt>
-<dd class="date">2018-12-10 23:23:34.625807</dd>
+<dd class="date">2018-12-11 11:03:16.404460</dd>
 <dt class="description">Description</dt>
 <dd class="description"><p>This file fully explores all directories of the module <cite>nkrpy</cite>.</p>
+</dd>
+<dt class="desc-cont">Desc. Cont...</dt>
+<dd class="desc-cont"><p>This file is auto-generated</p>
 </dd>
 </dl>
 <ul class="simple">

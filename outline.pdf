@@ -85,7 +85,7 @@ endobj
 endobj
 13 0 obj
 <<
-/Author (Nickalas Reynolds <nickalaskreynolds@gmail.com>) /CreationDate (D:20181210232335+06'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20181210232335+06'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
+/Author (Nickalas Reynolds <nickalaskreynolds@gmail.com>) /CreationDate (D:20181211110317+06'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20181211110317+06'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
   /Subject (\(unspecified\)) /Title (Outline) /Trapped /False
 >>
 endobj
@@ -96,7 +96,7 @@ endobj
 endobj
 15 0 obj
 <<
-/Length 12545
+/Length 12555
 >>
 stream
 1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
@@ -183,7 +183,7 @@ q
 1 0 0 1 91.03937 3 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (2018-12-10 23:23:34.625807) Tj T* ET
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (2018-12-11 11:03:16.404460) Tj T* ET
 Q
 Q
 q
@@ -210,36 +210,57 @@ q
 Q
 Q
 q
-1 0 0 1 42 688.7165 cm
+1 0 0 1 42 679.7165 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL 9.13937 0 Td (Desc. Cont...:) Tj T* -9.13937 0 Td ET
+Q
 Q
 q
-1 0 0 1 42 688.7165 cm
+1 0 0 1 91.03937 3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (This file is auto-generated) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 42 673.7165 cm
+Q
+q
+1 0 0 1 42 673.7165 cm
 Q
 q
 1 0 0 1 42 92.17323 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 581.5433 cm
+1 0 0 1 6 566.5433 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
 Q
 Q
 q
-1 0 0 1 23 581.5433 cm
+1 0 0 1 23 566.5433 cm
 q
 BT 1 0 0 1 0 2 Tm 12 TL /F2 10 Tf 0 0 0 rg (nkrpy/) Tj T* ET
 Q
 Q
 q
-1 0 0 1 23 575.5433 cm
+1 0 0 1 23 560.5433 cm
 Q
 q
-1 0 0 1 23 575.5433 cm
+1 0 0 1 23 560.5433 cm
 Q
 q
-1 0 0 1 23 563.5433 cm
+1 0 0 1 23 548.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -259,10 +280,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 557.5433 cm
+1 0 0 1 23 542.5433 cm
 Q
 q
-1 0 0 1 23 545.5433 cm
+1 0 0 1 23 530.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -282,10 +303,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 539.5433 cm
+1 0 0 1 23 524.5433 cm
 Q
 q
-1 0 0 1 23 527.5433 cm
+1 0 0 1 23 512.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -305,10 +326,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 521.5433 cm
+1 0 0 1 23 506.5433 cm
 Q
 q
-1 0 0 1 23 509.5433 cm
+1 0 0 1 23 494.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -328,10 +349,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 503.5433 cm
+1 0 0 1 23 488.5433 cm
 Q
 q
-1 0 0 1 23 491.5433 cm
+1 0 0 1 23 476.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -351,10 +372,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 485.5433 cm
+1 0 0 1 23 470.5433 cm
 Q
 q
-1 0 0 1 23 473.5433 cm
+1 0 0 1 23 458.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -374,10 +395,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 467.5433 cm
+1 0 0 1 23 452.5433 cm
 Q
 q
-1 0 0 1 23 455.5433 cm
+1 0 0 1 23 440.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -397,10 +418,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 449.5433 cm
+1 0 0 1 23 434.5433 cm
 Q
 q
-1 0 0 1 23 113.5433 cm
+1 0 0 1 23 98.54331 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -862,51 +883,28 @@ q
 Q
 Q
 q
-1 0 0 1 23 107.5433 cm
+1 0 0 1 23 92.54331 cm
 Q
 q
-1 0 0 1 23 -48.45669 cm
+1 0 0 1 23 -45.45669 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 141 cm
+1 0 0 1 6 123 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
 Q
 Q
 q
-1 0 0 1 23 141 cm
+1 0 0 1 23 123 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL (nkrpy/) Tj T* ET
 Q
 Q
 q
-1 0 0 1 23 135 cm
-Q
-q
-1 0 0 1 23 135 cm
-Q
-q
-1 0 0 1 23 123 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (constants.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
+1 0 0 1 23 117 cm
 Q
 q
 1 0 0 1 23 117 cm
@@ -925,7 +923,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (coordinates.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (constants.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -948,7 +946,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (error.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (coordinates.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -971,7 +969,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (functions.py <) Tj (--"""Just generic functions that I use a good bit.""") Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (error.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -994,7 +992,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (linelist.py <) Tj (--"""Main linelist for various wavelength bands. The main) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (functions.py <) Tj (--"""Just generic functions that I use a good bit.""") Tj T* ET
 Q
 Q
 q
@@ -1017,7 +1015,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (astro.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (linelist.py <) Tj (--"""Main linelist for various wavelength bands. The main) Tj T* ET
 Q
 Q
 q
@@ -1040,7 +1038,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (atomicline.py.new <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (astro.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1063,7 +1061,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (colours.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (atomicline.py.new <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1080,7 +1078,7 @@ endstream
 endobj
 16 0 obj
 <<
-/Length 9073
+/Length 9356
 >>
 stream
 1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
@@ -1090,10 +1088,33 @@ q
 BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 6 698.5433 Tm  T* ET
 q
-1 0 0 1 23 132.5433 cm
+1 0 0 1 23 114.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
-BT 1 0 0 1 6 563 Tm  T* ET
+BT 1 0 0 1 6 581 Tm  T* ET
+q
+1 0 0 1 23 585 cm
+Q
+q
+1 0 0 1 23 573 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (colours.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
 q
 1 0 0 1 23 567 cm
 Q
@@ -2213,16 +2234,16 @@ xref
 0000002004 00000 n 
 0000002316 00000 n 
 0000002390 00000 n 
-0000014988 00000 n 
-0000024113 00000 n 
-0000029355 00000 n 
-0000029414 00000 n 
-0000029448 00000 n 
-0000029482 00000 n 
+0000014998 00000 n 
+0000024406 00000 n 
+0000029648 00000 n 
+0000029707 00000 n 
+0000029741 00000 n 
+0000029775 00000 n 
 trailer
 <<
 /ID 
-[<420693bcd46d6053294aa72804f58fea><420693bcd46d6053294aa72804f58fea>]
+[<aa4ed5935a05ae06799a808d6b17e469><aa4ed5935a05ae06799a808d6b17e469>]
 % ReportLab generated PDF document -- digest (http://www.reportlab.com)
 
 /Info 13 0 R
@@ -2230,5 +2251,5 @@ trailer
 /Size 22
 >>
 startxref
-29516
+29809
 %%EOF
