@@ -7,6 +7,7 @@ try:
     from collections.abc import Iterable
 except ImportError:
     from collections import Iterable
+from IPython import embed
 
 # external modules
 import numpy as np
@@ -14,13 +15,35 @@ from scipy.optimize import curve_fit
 
 # relative modules
 
-# set the filename manually
+# global attributes
+__all__ = ('typecheck', 'addspace', 'between',
+           'find_nearest', 'find_nearest_above')
+__doc__ = """Just generic functions that I use a good bit."""
 __filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+__version__ = 0.1
 
 
 def typecheck(obj):
     """Check if object is iterable (array, list, tuple) and not string."""
     return not isinstance(obj, str) and isinstance(obj, Iterable)
+
+
+def list_comp(base, comp):
+    """Compare 2 lists, make sure purely unique. True if unique"""
+    l1 = set(comp)
+    l2 = set(base)
+    unique = True
+    for x in l1:
+        if x in l2:
+            unique=False
+            break
+        else:
+            for y in l2:
+                if x in y:
+                    unique=False
+                    break
+    return unique
 
 
 def addspace(arbin, spacing='auto'):
@@ -32,7 +55,7 @@ def addspace(arbin, spacing='auto'):
             return [_add(x, spacing) for x in arbin]
     else:
         arbin = str(arbin)
-        if spacing.lower() == 'auto':
+        if str(spacing).lower() == 'auto':
             spacing = len(arbin) + 1
             return _add(arbin, spacing)
         elif isinstance(spacing, int):
@@ -52,118 +75,21 @@ def _add(sstring, spacing=20):
             break
     return sstring + ' '
 
-def list_files(dir):
-    """List all the files within a directory."""
-    r = []
-    subdirs = [x[0] for x in os.walk(dir)]
-    for subdir in subdirs:
-        files = os.walk(subdir).next()[2]
-        if (len(files) > 0):
-            for file in files:
-                r.append(subdir + "/" + file)
-    return r
 
-
-def list_files2(startpath, ignore='', formatter=['  ', '| ', 1, '|--']):
-    """Intelligent directory stepper + ascii plotter."""
-    """
-    Will walk through directories starting at startpath
-    ignore is a csv string 'ignore1, ignore2, ignore3' that will ignore any
-        file or directory with same name
-    Formatter will format the output in:
-        [starting string for all lines,
-         the iterating level parameter,
-         the number of iterations for the level parameter per level,
-         the final string to denote the termination at file/directory]
-    example:
-    |--/
-    | |--CONTRIBUTING.md
-    | |--.gitignore
-    | |--LICENSE
-    | |--CODE_OF_CONDUCT.md
-    | |--README.md
-    | |--PULL_REQUEST_TEMPLATE.md
-    | |--refs/
-    | | |--heads/
-    | | | |--devel
-    """
-    s, a, b, c = formatter
-    full = []
-    for root, firs, files in os.walk(startpath):
-        level = root.replace(startpath, '').count(os.sep)
-        indent = s + a * b * level + c
-        full.append('{}{}/'.format(indent, os.path.basename(root)))
-        subindent = s + a * b * (level + 1) + c
-        for f in files:
-            if f.split('/')[-1] not in ignore.split(', '):
-                full.append('{}{}'.format(subindent, f))
-    """
-    master = os.walk(startpath)
-    step = 0
-    while step < len(master)-1:
-        root, dirs, files = master[step]
-        if root.split('/')[-1] not in ignore.split(', '):
-            level = root.replace(startpath, '').count(os.sep)
-            indent = s + a * b * (level) + c
-            full.append('{}{}/'.format(indent, os.path.basename(root)))
-            subindent = s + a * b * (level+1) + c
-            for f in files:
-                if f.split('/')[-1] not in ignore.split(', '):
-                    full.append('{}{}'.format(subindent, f))
-        step += 1
-    """
-    return full
-
-
-def equivalent_width(spectra, blf, xspec0, xspec1, fit='gauss',
-                     params=[1, 1, 1]):
-    """Compute spectral line eq. width."""
-    from .miscmath import gauss
-    """
-    finds equivalent width of line
-    spectra is the full 2d array (lam, flux)
-    blf is the baseline function
-    xspec0 (xspec1) is the start(end) of the spectral feature
-
-
-    # PROBABLY EASIER TO JUST ASSUME GAUSSIAN OR SIMPLE SUM
-
-
-    def gaussc(x, A, mu, sig, C):
-        return A*np.exp(-(x-mu)**2/2./sig**2) + C
-
-    from scipy.optimize import curve_fit
-
-    featx, featy = lam[featurei], flux[featurei]
-    expected1=[1.3, 2.165, 0.1, 1.]
-    params1, cov1=curve_fit(gaussc, featx, featy, expected1)
-    sigma=params1[-2]
-
-    # I(w) = cont + core * exp (-0.5*((w-center)/sigma)**2)
-    # sigma = dw / 2 / sqrt (2 * ln (core/Iw))
-    # fwhm = 2.355 * sigma = 2(2ln2)^0.5 * sigma
-    # flux = core * sigma * sqrt (2*pi)
-    # eq. width = abs (flux) / cont
-
-    fwhm = 2. * (2. * np.log(2.))**0.5 * sigma
-    core, center, nsig, cont = params1
-    flx = core * sigma * np.sqrt (2.*np.pi)
-    eqwidth = abs(flx) / cont
-    print(eqwidth)
-    print(fwhm)
-    """
-
-    specfeatxi = np.array(between(spectra, xspec0, xspec1))[:, 0]
-    specfeatxv = np.array(between(spectra, xspec0, xspec1))[:, 1]
-
-    if fit == 'gauss':
-        _params2, _cov2 = curve_fit(gauss, specfeatxv, spectra[specfeatxi, 1],
-                                    *params)
-        _sigma2 = np.sqrt(np.diag(_cov2))
-        function = gauss(specfeatxv, *_expected2)
+def _strip(array, var=''):
+    """Kind of a quick wrapper for stripping lists."""
+    if array is None:
         return
-    elif fit == 'ndgauss':
-        pass
+    elif isinstance(array, str):
+        return array.strip(var)
+    _t = []
+    for x in array:
+        x = x.strip(' ').strip('\n')
+        if var:
+            x = x.strip(var)
+        if x != '':
+            _t.append(x)
+    return tuple(_t)
 
 
 def between(l1, val1, val2):
@@ -185,3 +111,46 @@ def between(l1, val1, val2):
         if(i > low) and (i < high):
             l2.append([j, i])
     return l2
+
+
+def find_nearest(array, value):
+    """Find nearestvalue within array."""
+    if isinstance(array, np.ndarray):
+        idx = (np.abs(array - value)).argmin()
+    else:
+        argmin = (float('inf'), float('inf'))
+        for i, x in enumerate(array):
+            _tmp = np.abs(value - x)
+            if _tmp < argmin[1]:
+                argmin = (i, _tmp)
+        idx = argmin[0]
+    return idx, array[idx]
+
+def find_nearest_above(my_array, target):
+    if not isinstance(my_array, np.ndarray):
+        my_array = np.array(my_array)
+    diff = my_array - target
+    mask = np.ma.less_equal(diff, 0)
+    # We need to mask the negative differences and zero
+    # since we are looking for values above
+    if np.all(mask):
+        return find_nearest(my_array, target) 
+    masked_diff = np.ma.masked_array(diff, mask)
+    i = masked_diff.argmin()
+    if i is None:
+        return find_nearest(my_array, target)
+    else:
+        return i, my_array[i]
+
+def test():
+    """Testing function for module."""
+    pass
+
+if __name__ == "__main__":
+    """Directly Called."""
+
+    print('Testing module')
+    test()
+    print('Test Passed')
+
+# end of code

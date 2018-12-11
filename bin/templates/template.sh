@@ -1,8 +1,8 @@
 #!/usr/bin/bash
-# Name
-# Doc
-# Nickalas Reynolds
-# Date
+# FNAME: 
+# DOC: 
+# AUTHOR: Nickalas Reynolds
+# DATE: 
 
 # globals
 

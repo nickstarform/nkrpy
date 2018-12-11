@@ -4,14 +4,16 @@
 class ConfigError(Exception):
     """Configuration Error."""
 
-    def __init__(self, message, errors):
+    def __init__(self, message=None, targets=None):
         """Initialization Magic Method."""
         # Call the base class constructor with the parameters it needs
+        if not message:
+            message = 'Configuration Mismatch'
         super().__init__(message)
 
         # Now for your custom code...
         self.message = message
-        self.errors = errors
+        self.params = targets
 
     def __repr__(self):
         """Representation Magic Method."""

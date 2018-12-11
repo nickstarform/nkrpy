@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+
+# make this file kosher
+
+# also make a config initializer that input dictionary of keys and values are of type.
+
+
+
 """
 Name    : Config, config.py
 Author  : Nickalas Reynolds

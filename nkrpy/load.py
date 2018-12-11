@@ -1,4 +1,4 @@
-"""This code finds the jacobi constant from given files."""
+"""This code manipulates loading of files."""
 
 # standard modules
 import os
@@ -9,24 +9,55 @@ from sys import version
 # relative Modules
 from .error import ConfigError
 from .decorators import deprecated
+from .colours import FAIL, _RST_, HEADER
+from .functions import typecheck
 
+# global attributes
+__all__ = ('test', 'main')
+__doc__ = """."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
 __version__ = float(version[0:3])
 __cpath__ = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-
 __cwd__ = os.getcwd()
 
 
-def verify_dir(name):
+def verify_dir(name, create=False):
     """Wrapper for directories."""
     if not os.path.isdir(name):
-        os.mkdir(name)
+        if create:
+            os.mkdir(name)
+        else:
+            return False
+    return True
 
 
-def verify(target, comparison):
+def verify_param(target, comparison):
     """Verify parameters within file against a template."""
+    """All of comparison must be in target, not vice versa."""
     if isinstance(target, str):
         target = load_cfg(target)
-    raise ConfigError
+    if isinstance(comparison, str):
+        comparison = load_cfg(comparison)
+    if isinstance(target, dict):
+        _t = [x for x in target.keys() if '__' not in x]
+    elif typecheck(target):
+        _t = [x for x in target if '__' not in x]
+    else:
+        _t = [x for x in dir(target) if '__' not in x]
+    if isinstance(comparison, dict):
+        _c = [x for x in comparison.keys() if '__' not in x]
+    elif typecheck(comparison):
+        _c = [x for x in comparison if '__' not in x]
+    else:
+        _c = [x for x in dir(comparison) if '__' not in x]
+
+    for x in _c:
+        if x not in _t:
+            raise ConfigError(f'{FAIL}Parameters not found.{_RST_}',  # noqa
+                              (target, comparison))
+    else:
+        return True
 
 
 def load_cfg(fname):
@@ -46,10 +77,8 @@ def load_cfg(fname):
             import imp
             cf = imp.load_source('config', fname)
     except:
-        print('Failed. Cannot find file <{}> or the fallback <config.py>'
-              .format(fname))
-        print('Or invalid line found in file. Try using import <{}> yourself'
-              .format(fname[:-3]))
+        print(f'{FAIL}Failed.{_RST_}Cannot find file <{HEADER}{fname}{_RST_}> or the fallback config.py>')  # noqa
+        print(f'Or invalid line found in file. Try using import <{HEADER}{fname[:-3]}{_RST_}> yourself')  # noqa
         exit(1)
     return cf
 
@@ -60,6 +89,13 @@ def load_variables(mod):
     for k in dir(mod):
         if '__' not in k:
             globals()[k] = getattr(mod, k)
+
+
+@deprecated
+def load_func(my_func, *args, **kwargs):
+    """Wrapper to access functions."""
+    return locals()[my_func](*args, **kwargs)
+
 
 if __name__ == '__main__':
     print('Testing')

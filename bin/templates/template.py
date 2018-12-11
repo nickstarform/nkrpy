@@ -10,13 +10,14 @@
 __all__ = ('test', 'main')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
-__path__ = __file__.strip('.py').strip(__name__)
+__path__ = __file__.strip('.py').strip(__filename__)
 __version__ = 0.1
 
 
 def main():
     """Main caller function."""
     pass
+
 
 def test():
     """Testing function for module."""

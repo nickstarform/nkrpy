@@ -54,9 +54,31 @@ def checker(f):
     return wrap
 
 
+def debug(f):
+    def wrap(*args, **kwargs):
+        embed()
+        _t = f(*args, **kwargs)
+        embed()
+        return _t
+    return wrap
+
 #
 # -------------------/Smart deprecation warnings\-------------------#
 #
+
+def discontinued(func):
+    """This is a decorator which can be used to mark functions
+    as fully discontinued/jetisoned. It will result in a warning being emitted
+    when the function is used."""
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+        warnings.warn("Call to dicontinued function {}.".format(func.__name__),
+                      category=DeprecationWarning,
+                      stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning)  # reset filter
+        return
+    return new_func
 
 
 def deprecated(func):

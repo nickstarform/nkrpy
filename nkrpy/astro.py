@@ -10,6 +10,7 @@ from .constants import h, c, kb, jy, msun
 from .functions import typecheck
 from .dustmodels.kappa import *
 from .decorators import deprecated
+from .miscmath import gauss
 
 c = c * 1E8 # A/s
 h = h * 1E-7 # SI
@@ -327,6 +328,54 @@ def dustmass(dist, dist_unit, val, val_unit, flux, temp, model_name, beta):
     return toret, np.array(_ret)
 
 
+def equivalent_width(spectra, blf, xspec0, xspec1, fit='gauss',
+                     params=[1, 1, 1]):
+    """Compute spectral line eq. width."""
+    """
+    finds equivalent width of line
+    spectra is the full 2d array (lam, flux)
+    blf is the baseline function
+    xspec0 (xspec1) is the start(end) of the spectral feature
+
+
+    # PROBABLY EASIER TO JUST ASSUME GAUSSIAN OR SIMPLE SUM
+
+
+    def gaussc(x, A, mu, sig, C):
+        return A*np.exp(-(x-mu)**2/2./sig**2) + C
+
+    from scipy.optimize import curve_fit
+
+    featx, featy = lam[featurei], flux[featurei]
+    expected1=[1.3, 2.165, 0.1, 1.]
+    params1, cov1=curve_fit(gaussc, featx, featy, expected1)
+    sigma=params1[-2]
+
+    # I(w) = cont + core * exp (-0.5*((w-center)/sigma)**2)
+    # sigma = dw / 2 / sqrt (2 * ln (core/Iw))
+    # fwhm = 2.355 * sigma = 2(2ln2)^0.5 * sigma
+    # flux = core * sigma * sqrt (2*pi)
+    # eq. width = abs (flux) / cont
+
+    fwhm = 2. * (2. * np.log(2.))**0.5 * sigma
+    core, center, nsig, cont = params1
+    flx = core * sigma * np.sqrt (2.*np.pi)
+    eqwidth = abs(flx) / cont
+    print(eqwidth)
+    print(fwhm)
+    """
+
+    specfeatxi = np.array(between(spectra, xspec0, xspec1))[:, 0]
+    specfeatxv = np.array(between(spectra, xspec0, xspec1))[:, 1]
+
+    if fit == 'gauss':
+        _params2, _cov2 = curve_fit(gauss, specfeatxv, spectra[specfeatxi, 1],
+                                    *params)
+        _sigma2 = np.sqrt(np.diag(_cov2))
+        function = gauss(specfeatxv, *_expected2)
+        return
+    elif fit == 'ndgauss':
+        pass
 
 
 # end of file

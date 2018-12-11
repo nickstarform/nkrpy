@@ -72,6 +72,7 @@ def _raster_matrix_con(fov, cen=(0, 0), width=1, height=1, main='h', theta=0, h=
 
 
 def _plot_raster(matrix):
+    from IPython import embed
     """Plotter for the raster matrix."""
     plt.figure(figsize=[16, 16])
 
@@ -79,7 +80,8 @@ def _plot_raster(matrix):
     plt.plot(matrix[:, 0], matrix[:, 1], 'b.')
     plt.plot(matrix[0, 0], matrix[0, 1], '*', color='black', label='start')
     plt.plot(matrix[-1, 0], matrix[-1, 1], '*', color='purple', label='end')
-    plt.legend()
+    a = plt.legend()
+    embed()
     plt.title(f'Raster Scan: {matrix[0]} to {matrix[-1]}')
     plt.draw()
     plt.show()
@@ -173,20 +175,6 @@ def linear(x, a, b):
 def binning(data, width=3):
     """Bin the given data."""
     return data[:(data.size // width) * width].reshape(-1, width).mean(axis=1)
-
-
-def find_nearest(array, value):
-    """Find nearestvalue within array."""
-    if isinstance(array, np.ndarray):
-        idx = (np.abs(array - value)).argmin()
-    else:
-        argmin = (float('inf'), float('inf'))
-        for i, x in enumerate(array):
-            _tmp = np.abs(value - x)
-            if _tmp < argmin[1]:
-                argmin = (i, _tmp)
-        idx = i
-    return idx, array[idx]
 
 
 def cross(a, b):

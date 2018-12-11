@@ -1,16 +1,21 @@
 """Controls handling of the models."""
 
+# internal modules
+
 # external libs
 from numpy import array
 
 # import relative module
 from ..miscmath import find_nearest as nearest
 
+# global attributes
 __all__ = ('kappa','__models__')
-
+__doc__ = """Just generic functions that I use a good bit."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+__version__ = 0.1
 __models__ = ('oh1994',)
 
-__path__ = __file__.strip('.py').strip(__name__)
 
 def _find_model(model_name):
     """Given the model name, finds the model."""

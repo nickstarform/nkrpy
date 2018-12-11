@@ -6,7 +6,7 @@ loc=$(which template)
 loc="${loc%/template}/templates/"
 dest=$(pwd)
 
-possible_templates=('py' 'rst' 'md')
+possible_templates=('py' 'rst' 'md' 'sh')
 
 if [ -z "${OPT}" ]; then
     OPT="py,rst"
