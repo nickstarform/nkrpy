@@ -5,7 +5,7 @@ Outline
 :Web: `https://github.com/nickalaskreynolds/nkrpy`_
 :Author: `Nickalas Reynolds`_ <nickalaskreynolds@gmail.com>
 :Author Web: `reynolds.oucreate.com`_
-:Date: 2018-12-11 11:03:16.404460
+:Date: 2018-12-11 11:34:10.669382
 :Description: This file fully explores all directories of the module `nkrpy`.
 :Desc. Cont...: This file is auto-generated
 
@@ -22,10 +22,6 @@ Outline
   * outline.rst   <--
 
   * setup.py      <--
-
-  * outline.html5 <--
-
-  * outline.pdf   <--
 
   * makefile      <--
 

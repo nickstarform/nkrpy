@@ -576,7 +576,7 @@ a { text-decoration: none; }
 <dd class="author-web"><p><a class="reference external" href="reynolds.oucreate.com">reynolds.oucreate.com</a></p>
 </dd>
 <dt class="date">Date</dt>
-<dd class="date">2018-12-11 11:03:16.404460</dd>
+<dd class="date">2018-12-11 11:34:10.669382</dd>
 <dt class="description">Description</dt>
 <dd class="description"><p>This file fully explores all directories of the module <cite>nkrpy</cite>.</p>
 </dd>
@@ -591,8 +591,6 @@ a { text-decoration: none; }
 <li><p>README.md     &lt;--</p></li>
 <li><p>outline.rst   &lt;--</p></li>
 <li><p>setup.py      &lt;--</p></li>
-<li><p>outline.html5 &lt;--</p></li>
-<li><p>outline.pdf   &lt;--</p></li>
 <li><p>makefile      &lt;--</p></li>
 <li><p><strong>bin/</strong></p>
 <ul>
