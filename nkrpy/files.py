@@ -15,7 +15,7 @@ from .functions import typecheck, list_comp, addspace, _strip
 from . import check_file
 
 # global attributes
-__all__ = ('test', 'main', 'copytree', 'list_files', 'list_files_fmt')
+__all__ = ('test', 'main', 'copytree', 'list_files', 'list_files_fmt', 'freplace')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
@@ -23,6 +23,17 @@ __version__ = float(version[0:3])
 __cpath__ = '/'.join(os.path.realpath(__file__).split('/')[:-1])
 __cwd__ = os.getcwd()
 
+
+def freplace(filein, olddata, newdata):
+    """Replace a string in a file."""
+    with open(filein,'r') as f:
+        filedata = f.read()
+
+    newdata = filedata.replace(olddata, newdata)
+
+    with open(filein,'w') as f:
+        f.write(newdata)
+    pass
 
 def copytree(src, dst, symlinks=False, ignore=None):
     """Better wrapper for copying tree directives."""

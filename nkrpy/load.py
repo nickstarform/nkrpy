@@ -26,7 +26,7 @@ def verify_dir(name, create=False):
     """Wrapper for directories."""
     if not os.path.isdir(name):
         if create:
-            os.mkdir(name)
+            os.makedirs(name)
         else:
             return False
     return True

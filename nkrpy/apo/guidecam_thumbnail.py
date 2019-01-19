@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # relative modules
-from ..functions import list_files
+from ..files import list_files
 
 # global attributes
 __all__ = ('test', 'main', 'thumbnails')

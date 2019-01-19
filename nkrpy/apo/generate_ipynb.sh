@@ -1,10 +1,12 @@
 #!/usr/bin/bash
 
+# generic multi-order
 source='/home/reynolds/github/nickalaskreynolds/nkrpy/nkrpy/apo/combined_orders_template.ipynb'
 dest=($(echo "${source}" | tr "/" "\n"))
-len="${#dest[@]}"
 let 'len= len - 1'
 dest="${dest[${len}]}"
+fin_dest="${dest}"
+len="${#dest[@]}"
 
 files=(./*tellcor.fits)
 for f in "${files[@]}"; do
@@ -18,6 +20,10 @@ for f in "${files[@]}"; do
         fi
     fi
 done
+
+# generic single_order
+source='/home/reynolds/github/nickalaskreynolds/nkrpy/nkrpy/apo/single_order_template.ipynb'
+cp -n "${source}" "./"
 
 ls *.ipynb
 

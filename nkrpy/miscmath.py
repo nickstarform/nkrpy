@@ -172,6 +172,11 @@ def linear(x, a, b):
     return a * x + b
 
 
+def quad(x, a, b, c):
+    """Linear function."""
+    return a * x ** 2  + b * x + c
+
+
 def binning(data, width=3):
     """Bin the given data."""
     return data[:(data.size // width) * width].reshape(-1, width).mean(axis=1)
