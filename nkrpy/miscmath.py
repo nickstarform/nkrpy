@@ -145,7 +145,7 @@ def _2d(ite, dtype):
     return _return
 
 
-def _list_array(ite, dtype=np.float64):
+def _list_array(ite, dtype=np.float64, verbose=False):
     """Transform list to numpy array of dtype."""
     assert typecheck(ite)
     inner = typecheck(ite[0])
@@ -157,7 +157,8 @@ def _list_array(ite, dtype=np.float64):
             _return = _1d(ite, dtype)
     else:
         _return = _1d(ite, dtype)
-    print('Converted to shape with:', _return.shape)
+    if verbose:
+        print('Converted to shape with:', _return.shape)
     return _return
 
 
