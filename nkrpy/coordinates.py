@@ -38,8 +38,8 @@ def checkconv(coord, conv='deg'):
                         toret = coord
                         case = -1
                         break
-            if case == 2:
-                # now try via regex
+            elif case == 2:
+                # now try via regex with hms dms hm dm h d
                 for delim in (('h', 'm', 's'), ('d', 'm', 's'),
                               ('h', 'm'), ('d', 'm'),
                               ('h', ), ('d', )):
@@ -61,7 +61,18 @@ def checkconv(coord, conv='deg'):
                             toret = _tmp
                             case = -1
                             break
-            if case == 3:
+            elif case == 3:
+                # try via regex for #.#.#.decimal
+                regex = r'(\+?\-?\d*)\.?(\d*)?\.?(\d*\.?\d*)?'
+                # print(regex)
+                matches = re.finditer(regex, coord, re.MULTILINE)
+                matched = False
+                for match in matches:
+                    if len(match.group()) > 0:
+                        toret = list(match.groups())
+                        case = -1
+                        break
+            elif case == 4:
                 print('Failed')
                 exit()
             if case == -1:

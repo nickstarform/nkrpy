@@ -47,6 +47,7 @@ def timing(f):
 
 
 def checker(f):
+    """Wrapper function to check all inputs."""
     def wrap(*args, **kwargs):
         print(f'args: {args}')
         print(f'kwargs: {kwargs}')
@@ -55,6 +56,7 @@ def checker(f):
 
 
 def debug(f):
+    """Embeds IPython console for debug."""
     def wrap(*args, **kwargs):
         embed()
         _t = f(*args, **kwargs)
@@ -265,6 +267,17 @@ def info(fname, expected, actual, flag):
           + ("accepts", "returns")[flag] + " ({}), but ".format(expected)\
           + ("was given", "result is")[flag] + " ({})".format(actual)
     return msg
+
+def validate(func):
+    """Validate the inputs that only a single flag is used."""
+    def wrapper(f: str, a1: bool = False, a2: bool = False):
+        both_f_either_t = (a1 and a2) or not (a1 or a2)
+        if both_f_either_t:
+            raise Exception('Incorrect input.' +
+                            'Please select either Jy->K or K->Jy')
+        else:
+            return func(f, a1, a2)
+    return wrapper
 
 #
 # -------------------/CGI Method wrapper\-------------------#

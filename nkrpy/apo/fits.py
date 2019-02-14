@@ -2,11 +2,13 @@
 
 # internal modules
 import os
+import re
 
 # external modules
 from astropy.io import fits
 
 # relative modules
+from ..functions import typecheck
 
 # global attributes
 __all__ = ('read', 'write')
@@ -16,9 +18,21 @@ __path__ = __file__.strip('.py').strip(__filename__)
 __version__ = 0.1
 
 
-def header():
-    """Create header."""
-    pass
+def create_header(h):
+    """Create header from string."""
+    if isinstance(h, tuple) or isinstance(h, list) or isinstance(h, set):
+        return list(h)
+    if isinstance(h, str) or isinstance(h, fits.header.Header):
+        h = str(h)
+        regex = "(\S*\s*)(=)"
+        matches = re.finditer(regex, str(h), re.MULTILINE)
+        for num, match in enumerate(matches, start=1):
+            linestart = match.group()
+            h.replace(linestart, f';;;{linestart}')
+        tmp = [line for line in h.split(';;;')]
+        return tmp
+    else:
+        return None
 
 
 def read(fname):
@@ -32,23 +46,37 @@ def read(fname):
 
 def write(f, fname=None, header=None, data=None):
     """Open and read from the file."""
+    if not isinstance(header, fits.header.Header):
+        header = create_header(header)
+        if typecheck(header):
+            while len(header) < (36 * 4 - 1):
+                header.append('')  # Adds a blank card to the end
     if isinstance(f, str):
         # if string
+        print('Found string')
+        if isinstance(fname, str):
+            f = fname
         if os.path.isfile(f):
             # open and update
+            print('Updating File')
             with fits.open(f, mode='update') as hdul:
                 if header is not None:
                     header = hdul[0].header
                 if data is not None:
                     data = hdul[0].data
                 hdul.flush()
+            return
         else:
             # write new
-            hdu = fits.PrimaryHDU(data)
+            print('Making new file')
             if header is not None:
-                hdu.header = header
+                hdu = fits.PrimaryHDU(data, header)
+            else:
+                hdu = fits.PrimaryHDU(data)
             hdu.writeto(f)
+
     elif isinstance(f, fits.hdu.hdulist.HDUList):
+        print('Found HDUList')
         if header is not None:
             f[0].header = header
         if data is not None:
@@ -58,6 +86,7 @@ def write(f, fname=None, header=None, data=None):
         else:
             f.flush()
     elif isinstance(f, fits.hdu.image.PrimaryHDU):
+        print('Found PrimaryHDU')
         if header is not None:
             f.header = header
         if data is not None:

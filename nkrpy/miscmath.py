@@ -7,10 +7,18 @@ from copy import deepcopy
 # external modules
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import rv_continuous
 
 # relative modules
 from .constants import pi
 from .functions import typecheck
+
+# global attributes
+__all__ = ('',)
+__doc__ = """."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+__version__ = 0.1
 
 
 def _raster_matrix_con(fov, cen=(0, 0), width=1, height=1, main='h', theta=0, h='+',
@@ -155,6 +163,8 @@ def _list_array(ite, dtype=np.float64):
 
 def gaussian_sample(lower_bound, upper_bound, size=100, scale=None):
     """Sample from a gaussian given limits."""
+    if lower_bound == upper_bound:
+        scale = 0
     loc = (lower_bound + upper_bound) / 2.
     if scale is None:
         scale = (upper_bound - lower_bound) / 2.
@@ -167,6 +177,16 @@ def gaussian_sample(lower_bound, upper_bound, size=100, scale=None):
     return results
 
 
+def plummer_density(x, mass, a):
+    """Return Plummer density giving cirical radius and mass)."""
+    return 3. * mass / (4. * np.pi * a ** 3) * (1. + (x / a) ** 2)**(-5. / 2.)
+
+
+def plummer_mass(x, mass, a):
+    """Return the mass for a plummer sphere."""
+    return mass * x ** 3 / ((x ** 2 + a ** 2) ** (3. / 2.))
+
+
 def linear(x, a, b):
     """Linear function."""
     return a * x + b
@@ -174,7 +194,7 @@ def linear(x, a, b):
 
 def quad(x, a, b, c):
     """Linear function."""
-    return a * x ** 2  + b * x + c
+    return a * x ** 2 + b * x + c
 
 
 def binning(data, width=3):

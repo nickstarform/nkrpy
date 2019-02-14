@@ -6,7 +6,7 @@
 from numpy import array
 
 # import relative module
-from ..miscmath import find_nearest as nearest
+from ..functions import find_nearest as nearest
 
 # global attributes
 __all__ = ('kappa','__models__')
@@ -41,10 +41,12 @@ def _load_model(model_name):
                 # print(line)
                 if len(line) > 0:
                     model.append(array([float(j) for j in line.split(';') if j != '']))
-    return array(model)
+            elif not todo:
+                header_col = line
+    return header_col, array(model)
 
 
-def kappa(wav, model_name='oh1994', beta=1.7):
+def kappa(wav, model_name='oh1994', density=0, beta=1.7, quiet=True):
     """Dust opacity."""
     """ from Ossenkopf & Henning 1994
     kappa_lambda @ 1.3mm
@@ -61,9 +63,12 @@ def kappa(wav, model_name='oh1994', beta=1.7):
 
     # load the model
     if model_name:
-        model_l = _load_model(model_name)
+        h, model_l = _load_model(model_name)
 
+    model_l = model_l[model_l[:, 0] == density, :]
     found = model_l[nearest(model_l[:,1], wav)[0], :]
+    if not quiet:
+        print(f'Closest Kappa Model:\nColumn: {h}\nValues: {found}')
     _ret = tuple([scale(found[1], wav, x, beta) for x in found[2:len(found)]])
 
     return _ret

@@ -2,6 +2,7 @@
 
 # internal modules
 from math import cos, sin, acos, ceil
+from decimal import Decimal
 import os
 try:
     from collections.abc import Iterable
@@ -24,6 +25,15 @@ __path__ = __file__.strip('.py').strip(__filename__)
 __version__ = 0.1
 
 
+def format_decimal(x, prec=2):
+    x = Decimal(str(x))
+    tup = x.as_tuple()
+    digits = list(tup.digits[:prec + 1])
+    sign = '-' if tup.sign else '+'
+    dec = ''.join(str(i) for i in digits[1:])
+    exp = x.adjusted()
+    return f'{sign}{digits[0]}.{dec}D{exp}'
+                                 
 def typecheck(obj):
     """Check if object is iterable (array, list, tuple) and not string."""
     return not isinstance(obj, str) and isinstance(obj, Iterable)
@@ -141,6 +151,16 @@ def find_nearest_above(my_array, target):
         return find_nearest(my_array, target)
     else:
         return i, my_array[i]
+
+def find_max(a):
+    """Find max of n dimensional array."""
+    a = np.array(a)
+    shape = len(a.shape())
+    if shape == 0:
+        return
+    maxv = np.amax(a)
+    loca = np.array(np.where(a >= maxv))
+    return loca, maxv
 
 def test():
     """Testing function for module."""

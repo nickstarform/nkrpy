@@ -1,5 +1,20 @@
 """Various Sorting algorithms."""
 
+# internal modules
+
+# external modules
+import numpy as np
+
+# relative modules
+
+# global attributes
+__all__ = ('gravity', 'findLength', 'minv', 'maxv')
+__doc__ = """."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+__version__ = 0.1
+
+
 
 def gravity(obj):
     """Gravity Sort Method."""
@@ -86,6 +101,7 @@ def findLength(arr, n=0):
             j += 1
         i += 1
     # returns length, [min,max],[indexes]
-    return max_len, vals, [i for i, x in enumerate(arr) if (vals[0] <= x <= vals[ - 1]) ]
+    return max_len, vals, [i for i, x in enumerate(arr)
+                           if (vals[0] <= x <= vals[-1])]
 
 # end of file
