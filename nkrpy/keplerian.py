@@ -106,7 +106,6 @@ def orbital_params(lower_smajora, upper_smajora, lower_ecc, upper_ecc,
     sample_smajora = gaussian_sample(lower_smajora, upper_smajora, size)
     sample_inc = gaussian_sample(lower_inc, upper_inc, size)
     sample_ecc = gaussian_sample(lower_ecc, upper_ecc, size)
-    print(sample_smajora)
 
     # randomly sample other params
     sample_lan = gaussian_sample(0., 2. * pi, size)
