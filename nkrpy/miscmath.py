@@ -187,6 +187,9 @@ def plummer_mass(x, mass, a):
     """Return the mass for a plummer sphere."""
     return mass * x ** 3 / ((x ** 2 + a ** 2) ** (3. / 2.))
 
+def plummer_radius(mass_frac, a):
+    """Sampling function to evenly sample mass distribution."""
+    return a * ((1. / mass_frac) ** (2. / 3.) - 1.) ** (-0.5)
 
 def linear(x, a, b):
     """Linear function."""
