@@ -8,5 +8,6 @@
 
 # functions
 
-# end of file
+# end of code
 
+# end of file
