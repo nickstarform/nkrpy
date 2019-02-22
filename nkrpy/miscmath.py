@@ -162,7 +162,7 @@ def _list_array(ite, dtype=np.float64, verbose=False):
     return _return
 
 
-def gaussian_sample(lower_bound, upper_bound, size=100, scale=None):
+def gaussian_sample(lower_bound, upper_bound, size: int=100, scale=None):
     """Sample from a gaussian given limits."""
     if lower_bound == upper_bound:
         scale = 0
@@ -176,6 +176,15 @@ def gaussian_sample(lower_bound, upper_bound, size=100, scale=None):
         results += [sample for sample in samples
                     if lower_bound <= sample <= upper_bound]
     return results
+
+
+def sample(*args, sampler: str='gaussian', **kwargs):
+    sampler = sampler.lower()
+    if sampler == 'gaussian' or 'normal':
+        return gaussian_sample(*args, **kwargs)
+    elif sampler == 'uniform':
+        return np.random.uniform(*args, **kwargs)
+    pass
 
 
 def plummer_density(x, mass, a):
