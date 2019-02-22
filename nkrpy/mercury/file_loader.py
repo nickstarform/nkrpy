@@ -44,7 +44,8 @@ def parse_aei(fname):
             elif not_found(row)[0]:
                 count += 1
             elif count == 2:
-                _t = np.array([float(x) for x in row.split(' ')
+                row = row.lower().replace('infinity', '1E81')
+                _t = np.array([np.float(x) for x in row.split(' ')
                                if x.strip(' ') != ''])
                 data.append(_t)
     toret = np.array(data)
