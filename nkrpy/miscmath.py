@@ -177,26 +177,40 @@ def gaussian_sample(lower_bound, upper_bound, size: int=100, scale=None):
                     if lower_bound <= sample <= upper_bound]
     return results
 
+def _sample(*args, sampler, **kwargs):
+    if sampler == 'gaussian' or 'normal':
+        ret = gaussian_sample(*args, **kwargs)
+    elif sampler == 'uniform':
+        ret = np.random.uniform(*args, **kwargs)
+    return ret
+
 
 def sample(*args, sampler: str='gaussian', resample=False,
            lim=None, logic=None, **kwargs):
     sampler = sampler.lower()
-    ret = None
-    count = 0
-    while resample or (count==0):
-        if sampler == 'gaussian' or 'normal':
-            ret = gaussian_sample(*args, **kwargs)
-        elif sampler == 'uniform':
-            ret = np.random.uniform(*args, **kwargs)
-        count = 1
+    ret = np.array(_sample(*args, sampler=sampler, **kwargs))
+    dshape = ret.shape
+    fine=np.zeros(1)
+    while resample:
+        gatherl = np.where(ret < lim)[0]
+        gatherg = np.where(ret > lim)[0]
+        if (('<' in logic) and (len(gatherl) < dshape[0])) or \
+            (('>' in logic) and (len(gatherg) < dshape[0])):
+            resample = True
+        else:
+            resample = False
+        if ('>' in logic):
+            gather = gatherg
+        else:
+            gather = gatherl
+        ret = ret[gather]
         if resample:
-            if ('<' in logic) and (len(np.where(ret<lim)) >= 1):
+            if gather.shape[0] < dshape[0]:
+                new = np.array(_sample(*args, sampler=sampler, **kwargs))
+                ret = np.concatenate([ret, new])
+            else:
                 resample = False
-            if ('>' in logic) and (len(np.where(ret>lim)) >= 1):
-                resample = False
-            if ('=' in logic) and (len(np.where(ret==lim)) >= 1):
-                resample = False
-    return ret
+    return ret[:dshape[0]]
 
 
 def plummer_density(x, mass, a):
@@ -365,7 +379,7 @@ def listinvert(total, msk_array):
     mask_tot = np.linspace(0, len(total) - 1, num=len(total))
     mask = np.delete(mask_tot, mask_inv)
     mask = [int(x) for x in mask]
-    return mask
+    return np.array(mask)
 
 
 def rotate_points(origin, point, angle):
