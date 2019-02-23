@@ -82,6 +82,13 @@ def load_cfg(fname):
         exit(1)
     return cf
 
+def mod_2_dict(mod):
+    cfg = {}
+    for x in dir(mod):
+        if '__' in x:
+            continue
+        cfg[x] = getattr(mod, x)
+    return cfg
 
 @deprecated
 def load_variables(mod):

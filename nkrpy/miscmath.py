@@ -178,13 +178,25 @@ def gaussian_sample(lower_bound, upper_bound, size: int=100, scale=None):
     return results
 
 
-def sample(*args, sampler: str='gaussian', **kwargs):
+def sample(*args, sampler: str='gaussian', resample=False,
+           lim=None, logic=None, **kwargs):
     sampler = sampler.lower()
-    if sampler == 'gaussian' or 'normal':
-        return gaussian_sample(*args, **kwargs)
-    elif sampler == 'uniform':
-        return np.random.uniform(*args, **kwargs)
-    pass
+    ret = None
+    count = 0
+    while resample or (count==0):
+        if sampler == 'gaussian' or 'normal':
+            ret = gaussian_sample(*args, **kwargs)
+        elif sampler == 'uniform':
+            ret = np.random.uniform(*args, **kwargs)
+        count = 1
+        if resample:
+            if ('<' in logic) and (len(np.where(ret<lim)) >= 1):
+                resample = False
+            if ('>' in logic) and (len(np.where(ret>lim)) >= 1):
+                resample = False
+            if ('=' in logic) and (len(np.where(ret==lim)) >= 1):
+                resample = False
+    return ret
 
 
 def plummer_density(x, mass, a):
