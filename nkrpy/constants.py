@@ -1,3 +1,4 @@
+# flake8: noqa
 # %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
 # CGS PHYSICAL CONSTANTS
 # %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
@@ -19,6 +20,7 @@ pi   = 3.14159265358979
 hour = 3.6e3              # s
 day  = 8.64e4             # s
 year = 3.1557600e7        # s
+
 # %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
 # ASTRONOMICAL CONSTANTS
 # %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
@@ -37,6 +39,7 @@ rearth  = 6.378137e8        # earth's radius CGS
 medd    = 3.60271e+34       # Eddington mass CGS
 j2000   = 2451545           # Julian date start j2000
 kzen    = 0.17              # typical zenith extinction
+kepler  = 7.495E-6          # [AU^3/day^2/Msun] kepler's constant
 
 # %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&
 # ASTRONOMICAL CONSTANTS
