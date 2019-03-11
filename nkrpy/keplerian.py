@@ -1,33 +1,46 @@
 """Find Keplerian Parameters."""
 
 # standard modules
-try:
-    from collections.abc import Iterable
-except:
-    from collections import Iterable
+
 
 # external modules
 import numpy as np
+from numpy import arccos as acos
+from numpy.linalg import norm
 
 # relative modules
 from .constants import pi
 from .functions import typecheck
-from .miscmath import gaussian_sample, _1d, _2d, _list_array
+from .miscmath import gaussian_sample, _1d, _2d, _list_array, cross, dot, radians, deg, mag
 
 __all__ = ('orbital_params', 'orbital_2_xyz')
 
-__doc__ = """orbital_params(lsma,usma,le,ue,li,ui,mass,size). Use orbital_params or orbital_2_xyz as the main function call.
-For former: input distribution params and generates a gaussian distribution of 
+__doc__ = """orbital_params(lsma,usma,le,ue,li,ui,mass,size).
+Use orbital_params or orbital_2_xyz as the main function call.
+For former: input distribution params and generates a gaussian distribution of
 orbital params in both cartesian and the orbital elements.
 The orbital_2_xyz converts orbital elements to xyz components.
 Keep everything in AU, days, solar masses, radians"""
 
 # Acceptable Numerical Error
-eps = 1E-12
+eps = 1E-15
+
 
 def ecc(a, b):
     """Determine eccentricity given semi-major and semi-minor."""
     return (1. - ((a ** 2) / (b ** 2))) ** 0.5
+
+
+def eccentricity_vector(position, velocity, mu):
+    """Return eccentricity vector.
+
+    :param position: Position (r) [AU]
+    :param velocity: Velocity (v) [AU/day]
+    :return: Eccentricity vector (ev) [-]
+    """
+
+    ev = 1. / mu * ((norm(velocity) ** 2 - mu / norm(position)) * position - dot(position, velocity) * velocity)
+    return ev
 
 
 def mean_anomoly(ecc, tan):
@@ -65,17 +78,6 @@ def _a2ecc(sma, ecc=0):
     """Given semi major axis and eccentricity, yield semi, minor axis."""
     return ((sma ** 2) / (1. - (ecc ** 2))) ** 0.5
 
-
-def radians(d):
-    """Convert degrees to radians."""
-    return d / 180. * pi
-
-
-def deg(r):
-    """Convert radians to degrees."""
-    return r * 180. / pi
-
-
 def rad(a, ecc, nu):
     """Compute the distance given the semi-major, ecc, and true anomoly."""
     """nu should be in degrees."""
@@ -87,13 +89,6 @@ def velocity(r, a, mu):
     """Given distance, semimajor and standard grav param, give the velocity."""
     return (mu * ((2. / r) - (1. / a))) ** 0.5
 
-
-def mag(a):
-    """Compute the magnitude of a vector."""
-    ret = 0
-    for x in a:
-        ret += x
-    return x
 
 
 def orbital_params(lower_smajora, upper_smajora, lower_ecc, upper_ecc,
@@ -119,15 +114,16 @@ def orbital_params(lower_smajora, upper_smajora, lower_ecc, upper_ecc,
     keplerian = _list_array([sample_smajora, sample_inc, sample_ecc,
                  sample_lan, sample_aop, sample_tan, mu], float)
 
-    cartesian = np.zeros((keplerian.shape[0], 6), dtype=float)
+    cartesian = np.zeros((keplerian.shape[0], 7), dtype=float)
     for i in range(size):
-        cartesian[i] = orbital_2_xyz(sample_smajora[i], sample_inc[i],
+        cartesian[i] = np.array([sample_smajora[i], sample_inc[i],
                                      sample_ecc[i], sample_lan[i],
-                                     sample_aop[i], sample_tan[i], mu)
+                                     sample_aop[i], sample_tan[i], mu])
+    cartesian = orbital_2_xyz(cartesian)
     return keplerian, cartesian
 
 
-def orbital_2_xyz(a, inc, ecc, lan, aop, tan, mu):
+def orbital_2_xyz(params):
     """Function to change orbital elements."""
     """Semi major axis, eccentricity, inclination
     logitude of accending node, argument of pericenter
@@ -137,41 +133,144 @@ def orbital_2_xyz(a, inc, ecc, lan, aop, tan, mu):
     returns in AU and AU/day
     """
     # Find Eccentric Anomaly
-    ecc_an = ecc_anomoly(ecc, tan)
+    params = np.array(params)
+    assert len(params.shape) == 2
+    assert params.shape[-1] == 7
+    ret = np.zeros([params.shape[0], 6], dtype=float)
 
-    nu = 2. * np.arctan(np.sqrt((1. + ecc) / (1. - ecc)) * np.tan(ecc_an / 2.))
-    rn = a * (1. - ecc * np.cos(ecc_an))
-    h = np.sqrt(mu * a * (1. - (ecc ** 2)))
+    for i, x in enumerate(params):
+        a, inc, ecc, lan, aop, tan, mu = x
+        ecc_an = ecc_anomoly(ecc, tan)
 
-    # find cartesian components of position
-    x = rn * ((np.cos(lan) * np.cos(aop + nu)) -
-              np.sin(lan) * np.sin(aop + nu) * np.cos(inc))
-    y = rn * ((np.sin(lan) * np.cos(aop + nu)) +
-              np.cos(lan) * np.sin(aop + nu) * np.cos(inc))
-    z = rn * (np.sin(inc) * np.sin(aop + nu))
+        nu = 2. * np.arctan(np.sqrt((1. + ecc) / (1. - ecc)) * np.tan(ecc_an / 2.))
+        rn = a * (1. - ecc * np.cos(ecc_an))
+        h = np.sqrt(mu * a * (1. - (ecc ** 2)))
 
-    # find cartesian components of velocity
-    vx = ((x * h * ecc / (rn * a * (1. - ecc ** 2)) * np.sin(nu)) -
-          h / rn * (np.cos(lan) * np.sin(aop + nu) +
-                    np.sin(lan) * np.cos(aop + nu) * np.cos(inc)))
-    vy = ((y * h * ecc / (rn * a * (1. - ecc ** 2)) * np.sin(nu)) -
-          h / rn * (np.sin(lan) * np.sin(aop + nu) -
-                    np.cos(lan) * np.cos(aop + nu) * np.cos(inc)))
-    vz = ((z * h * ecc / (rn * a * (1. - ecc ** 2)) * np.sin(nu)) +
-          h / rn * np.sin(inc) * np.cos(aop + nu))
+        # find cartesian components of position
+        x = rn * ((np.cos(lan) * np.cos(aop + nu)) -
+                  np.sin(lan) * np.sin(aop + nu) * np.cos(inc))
+        y = rn * ((np.sin(lan) * np.cos(aop + nu)) +
+                  np.cos(lan) * np.sin(aop + nu) * np.cos(inc))
+        z = rn * (np.sin(inc) * np.sin(aop + nu))
 
-    return x, y, z, vx, vy, vz
+        # find cartesian components of velocity
+        vx = ((x * h * ecc / (rn * a * (1. - ecc ** 2)) * np.sin(nu)) -
+              h / rn * (np.cos(lan) * np.sin(aop + nu) +
+                        np.sin(lan) * np.cos(aop + nu) * np.cos(inc)))
+        vy = ((y * h * ecc / (rn * a * (1. - ecc ** 2)) * np.sin(nu)) -
+              h / rn * (np.sin(lan) * np.sin(aop + nu) -
+                        np.cos(lan) * np.cos(aop + nu) * np.cos(inc)))
+        vz = ((z * h * ecc / (rn * a * (1. - ecc ** 2)) * np.sin(nu)) +
+              h / rn * np.sin(inc) * np.cos(aop + nu))
+
+        ret[i] =  np.array([x, y, z, vx, vy, vz])
+    return ret
 
 
-if __name__ == '__main__':
+def specific_orbital_energy(position, velocity, mu):
+    """Return specific orbital energy.
+
+    :param position: Position (r) [AU]
+    :param velocity: Velocity (v) [AU/day]
+    :param mass: Central mass [Msun]
+    :return: Specific orbital energy (E) [J/kg]
+    """
+    return norm(velocity) ** 2 / 2. - mu / norm(position)
+
+
+def xyz_2_orbital(params, mass=None):
+    """Function to change orbital elements."""
+    """
+    :param x,y,z: Position vector [AU]
+    :param vx,vy,vz: Velocity vector [AU/day]
+    :param mass: Central mass [Msun]
+    :return a, e, i, lan, aop, f, mu
+    """
+    params = np.array(params)
+    assert len(params.shape) == 2
+    assert params.shape[-1] >= 6
+    ret = np.zeros([params.shape[0], 7], dtype=float)
+    for ite, p in enumerate(params):
+        if p.shape == 7:
+            x, y, z, vx, vy, vz, mass = p
+        else:
+            x, y, z, vx, vy, vz = p
+        r, v = np.array([x, y, z]), np.array([vx, vy, vz])
+        mu = grav_param(mass)
+        h = cross(r, v)
+        n = cross([0, 0, 1], h)
+        ev = eccentricity_vector(r, v, mu)
+        E = specific_orbital_energy(r, v, mu)
+        a = -mu / (2. * E)
+        e = norm(ev)
+        # Inc.: angle between the angular momentum and its z component.
+        i = acos(h[-1] / norm(h))
+
+        if abs(i - 0) < eps:
+            # For non-inclined orbits, raan is undefined;
+            # set to zero by convention
+            raan = 0
+            if abs(e - 0) < eps:
+                # For circular orbits, place periapsis
+                # at ascending node by convention
+                aop = 0
+            else:
+                # Argument of periapsis is the angle between
+                # eccentricity vector and its x component.
+                aop = acos(ev[0] / norm(ev))
+        else:
+            # Right ascension of ascending node is the angle
+            # between the node vector and its x component.
+            raan = acos(n[0] / norm(n))
+            if n[1] < 0:
+                raan = 2. * pi - raan
+
+            # Argument of periapsis is angle between
+            # node and eccentricity vectors.
+            try:
+                aop = acos(dot(n, ev) / (norm(n) * norm(ev)))
+            except:
+                aop = 0.0
+
+        if abs(e - 0) < eps:
+            if abs(i - 0) < eps:
+                # True anomaly is angle between position
+                # vector and its x component.
+                f = acos(r[0] / norm(r))
+                if v[0] > 0:
+                    f = 2. * pi - f
+            else:
+                # True anomaly is angle between node
+                # vector and position vector.
+                f = acos(dot(n, r) / (norm(n) * norm(r)))
+                if dot(n, v) > 0:
+                    f = 2. * pi - f
+        else:
+            if ev[-1] < 0:
+                aop = 2. * pi - aop
+
+            # True anomaly is angle between eccentricity
+            # vector and position vector.
+            f = acos(dot(ev, r) / (norm(ev) * norm(r)))
+
+            if dot(r, v) < 0:
+                f = 2. * pi - f
+
+        ret[ite] = np.nan_to_num(np.array([a, i, e, raan, aop, f, mu]))
+    return ret
+
+
+def test():
     print('Testing')
     _t = 3.1415926535
     testing1, testing2 = orbital_params(1, 10, 0.1, 0.9, _t / 2., 3. * _t / 4., size=2)
+    testing3 = xyz_2_orbital(testing2, mass=1.)
 
     assert testing1.shape[-1] == 7
     assert testing2.shape[-1] == 6
-    print(f'Orbital Params:\nsma, inc, ecc, lan, aop, tan, mu\n{testing1}')
-    print(f'Orbital Params (Cart):\nx, y, z, vx, vy, vz\n{testing2}')
+    print(f'Orbital Params (Natural):\nsma, inc, ecc, lan, aop, tan, mu\n{testing1}')
+    print(f'Orbital Params (to State):\nx, y, z, vx, vy, vz\n{testing2}')
+    print(f'Orbital Params (State to Orbital):\nsma, inc, ecc, lan, aop, tan, mu\n{testing3}')
     print('Testing complete')
 
 # end of file
