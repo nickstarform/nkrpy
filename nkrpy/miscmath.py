@@ -184,7 +184,6 @@ def _sample(*args, sampler, **kwargs):
         ret = np.random.uniform(*args, **kwargs)
     return ret
 
-
 def sample(*args, sampler: str='gaussian', resample=False,
            lim=None, logic=None, **kwargs):
     sampler = sampler.lower()
@@ -253,12 +252,23 @@ def cross(a, b):
     return c
 
 
-def dot_product(a, b):
+def dot(a, b):
     """Compute dot product between a and b."""
     ret = 0
     for i in range(len(a)):
         ret += a[i] * b[i]
     return ret
+
+
+def radians(d):
+    """Convert degrees to radians."""
+    return d / 180. * pi
+
+
+def deg(r):
+    """Convert radians to degrees."""
+    return r * 180. / pi
+
 
 
 def mag(a):
@@ -287,7 +297,7 @@ def determinant(v, w):
 
 def inner_angle(v, w):
     """Calculate inner angle between two vecs."""
-    cosx = dot_product(v, w) / (length(v) * length(w))
+    cosx = dot(v, w) / (length(v) * length(w))
     while np.abs(cosx) >= 1:
         cosx = cosx / (np.abs(cosx) * 1.001)
     rad = acos(cosx)  # in radians
