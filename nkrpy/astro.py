@@ -68,7 +68,7 @@ def dustmass(dist=100, dist_unit='pc', val=0.1,
              val_unit='cm', flux=0, temp=20,
              model_name='oh1994', beta=1.7, gas_density=0):
     """Calculate dust mass.
-    @param dist, dist_unit, val, val_unit, flux, temp,model,beta"""
+    @param dist, dist_unit, wavelength, wavelength_unit, flux, temp,model,beta"""
     """Assuming temp in Kelvin, flux in Janskys"""
     dist = Units(unit=dist_unit, vals=dist)('cm')  # to match the opacity units
     wav = Units(unit=val_unit, vals=val)('microns')  # to search opcaity models
