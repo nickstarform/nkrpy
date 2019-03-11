@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 # relative modules
 
+fontConv = 3. / 0.04167  # pts/inche
 
 def set_style():
     """Setting the style."""
