@@ -6,6 +6,7 @@
 import numpy as np
 
 # relative modules
+from ..functions import typecheck
 
 
 def parse_aei(fname):
@@ -50,5 +51,36 @@ def parse_aei(fname):
                 data.append(_t)
     toret = np.array(data)
     return name, header, toret
+
+
+def parse_in(fname, ftype='param', params=None):
+    """Parsing Input Files."""
+    f = open(fname, 'r')
+    ret = []
+    for line in f:
+        if ')' == line[0]:
+            continue
+        if ftype == 'param':
+            temp = [x.strip(' ') for x in line.split('=')]
+        elif ftype == 'body':
+            if '=' not in line:
+                continue
+            t = line.split(' ')
+            d = []
+            d.append(t[0])
+            for p in t[1:]:
+                k, v = p.split('=')
+                if typecheck(params):
+                    if k.lower() not in params:
+                        continue
+                d.append(v)
+            ret.append(d)
+            continue
+        temp[0] = '_'.join(temp[0].split(' '))
+        if typecheck(params):
+            if temp[0].lower() not in params:
+                continue
+        ret.append(temp)
+    return ret
 
 # end of file
