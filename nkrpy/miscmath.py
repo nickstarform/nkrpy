@@ -185,12 +185,13 @@ def _sample(*args, sampler, **kwargs):
     return ret
 
 def sample(*args, sampler: str='gaussian', resample=False,
-           lim=None, logic=None, **kwargs):
+           lim=None, logic=None, resample_n=100, **kwargs):
     sampler = sampler.lower()
     ret = np.array(_sample(*args, sampler=sampler, **kwargs))
     dshape = ret.shape
     fine=np.zeros(1)
-    while resample:
+    i = 0
+    while resample and (i < resample_n):
         gatherl = np.where(ret < lim)[0]
         gatherg = np.where(ret > lim)[0]
         if (('<' in logic) and (len(gatherl) < dshape[0])) or \
@@ -209,6 +210,7 @@ def sample(*args, sampler: str='gaussian', resample=False,
                 ret = np.concatenate([ret, new])
             else:
                 resample = False
+        i += 1
     return ret[:dshape[0]]
 
 
