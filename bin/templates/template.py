@@ -16,7 +16,23 @@ __version__ = 0.1
 
 
 def main():
-    """Main caller function."""
+    """
+    Summary line.
+
+    Extended description of function.
+
+    Parameters
+    ----------
+    arg1 : int
+        Description of arg1
+    arg2 : str
+        Description of arg2
+
+    Returns
+    -------
+    int
+        Description of return value
+    """
     pass
 
 
