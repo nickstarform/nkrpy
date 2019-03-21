@@ -1,9 +1,24 @@
-"""Provides common functions for reducing TSPEC data."""
+"""Provides common functions for reducing TSPEC data.
 
 # fit continuum
 # fit line
 # eqwidth
 # pretty plotting
+"""
+
+# internal modules
+
+# external modules
+import numpy as np
+
+# relative modules
+
+# global attributes
+__all__ = ('tspec_orders', 'determine_order_tspec',)
+__doc__ = """."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+__version__ = 0.1
 
 
 # make class per target
@@ -11,19 +26,61 @@
 # save to output file for quick load without loading fits again
 
 
-def plotting(ax,xmin,xmax,x,y,tempsource,line,count,start=False):
-    colours = ['orange','black','blue','red',\
-              'green','grey','purple']
-    colour = colours[count%len(colours)]
+tspec_orders = ((1.8817574977874756, 2.4708425998687744),  # 3
+                (1.4136823415756226, 1.855783462524414),  # 4
+                (1.1322344541549683, 1.4863981008529663),  # 5
+                (0.9442158341407776, 1.240115761756897),  # 6
+                (0.9101794362068176, 1.064332127571106))  # 7
+
+
+def determine_order_tspec(wav):
+    """
+    Determine order given wavelength range.
+
+    Specifically for APO Tspec instrument, try
+    to determine the order of a wavelength range.
+    If no order found, returns -1.
+
+    Parameters
+    ----------
+    wav : iterable
+        Wavelength range with at least 2 elements.
+        These should be increasing lower->higher
+
+    Returns
+    -------
+    list
+        List of all the orders spanned
+    """
+    assert wav[0] < wav[-1]
+    eva = [i for i, x in enumerate(tspec_orders) if wav[0] > x[0]]
+    if len(eva) == 0:
+        upper = 4
+    else:
+        upper = min(eva)
+    eva = [i for i, x in enumerate(tspec_orders) if wav[-1] < x[1]]
+    if len(eva) == 0:
+        lower = 0
+    else:
+        lower = max(eva)
+    if lower == upper:
+        return [upper + 3]
+    ret = [x + 3 for x in range(lower, upper + 1)]
+    return ret
+
+
+def plotting(ax, xmin, xmax, x, y, tempsource, line, count, start=False):
+    colours = ['orange', 'black', 'blue', 'red',
+               'green', 'grey', 'purple']
+    colour = colours[count % len(colours)]
     y = np.array(y)
     x = np.array(x)
     origx = x.copy()
     origy = y.copy()
     x = x[~np.isnan(origy)]
     y = y[~np.isnan(origy)]
-     
     print("Count: {},Before: {},{}".format(count,x.shape,y.shape))
-    if start == False:
+    if not start:
         temp = []
         if count == 0:
             for i,j in enumerate(x):
@@ -80,7 +137,7 @@ def plotting(ax,xmin,xmax,x,y,tempsource,line,count,start=False):
                 if pj > 100:
                     pj = pj/10000
                 val = int(int(min(range(len(x)),key=lambda i:abs(x[i]-pj))))
-                if (xmin <= pj <= xmax )and (min(x) <= pj <= max(x) ):
+                if (xmin <= pj <= xmax ) and (min(x) <= pj <= max(x) ):
                     if 10<=val<len(x)-11:
                         region=y[val-10:val+10] 
                     elif val > 0:
@@ -94,10 +151,24 @@ def plotting(ax,xmin,xmax,x,y,tempsource,line,count,start=False):
                     except ValueError:
                         linepos = 5*np.nanmean(x)
                     ax.text(pj, linepos*1.05, naming,
-                        verticalalignment='bottom',
-                        horizontalalignment='center',
-                        fontsize=10, color='red',rotation='vertical')
+                            verticalalignment='bottom',
+                            horizontalalignment='center',
+                            fontsize=10, color='red',rotation='vertical')
 
                     ax.plot((pj,pj),(linepos,linepos*1.05),'r-')
+
+def test():
+    """Testing function for module."""
+    pass
+
+
+if __name__ == "__main__":
+    """Directly Called."""
+
+    print('Testing module')
+    test()
+    print('Test Passed')
+
+# end of code
 
 # end of file

@@ -3,6 +3,7 @@
 # standard modules
 from math import ceil, cos, sin, acos
 from copy import deepcopy
+from itertools import chain
 
 # external modules
 import numpy as np
@@ -177,6 +178,7 @@ def gaussian_sample(lower_bound, upper_bound, size: int=100, scale=None):
                     if lower_bound <= sample <= upper_bound]
     return results
 
+
 def _sample(*args, sampler, **kwargs):
     if sampler == 'gaussian' or 'normal':
         ret = gaussian_sample(*args, **kwargs)
@@ -184,18 +186,19 @@ def _sample(*args, sampler, **kwargs):
         ret = np.random.uniform(*args, **kwargs)
     return ret
 
+
 def sample(*args, sampler: str='gaussian', resample=False,
            lim=None, logic=None, resample_n=100, **kwargs):
     sampler = sampler.lower()
     ret = np.array(_sample(*args, sampler=sampler, **kwargs))
     dshape = ret.shape
-    fine=np.zeros(1)
+    fine = np.zeros(1)
     i = 0
     while resample and (i < resample_n):
         gatherl = np.where(ret < lim)[0]
         gatherg = np.where(ret > lim)[0]
         if (('<' in logic) and (len(gatherl) < dshape[0])) or \
-            (('>' in logic) and (len(gatherg) < dshape[0])):
+           (('>' in logic) and (len(gatherg) < dshape[0])):
             resample = True
         else:
             resample = False
@@ -212,6 +215,10 @@ def sample(*args, sampler: str='gaussian', resample=False,
                 resample = False
         i += 1
     return ret[:dshape[0]]
+
+def flatten(inputs) -> list:
+    ret = list(chain.from_iterable(inputs))
+    return ret
 
 
 def plummer_density(x, mass, a):
