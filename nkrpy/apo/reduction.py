@@ -26,11 +26,16 @@ __version__ = 0.1
 # save to output file for quick load without loading fits again
 
 
-tspec_orders = ((1.8817574977874756, 2.4708425998687744),  # 3
-                (1.4136823415756226, 1.855783462524414),  # 4
-                (1.1322344541549683, 1.4863981008529663),  # 5
-                (0.9442158341407776, 1.240115761756897),  # 6
-                (0.9101794362068176, 1.064332127571106))  # 7
+tspec_orders = ((1.88, 2.47),  # 3
+                (1.40, 1.88),  # 4
+                (1.13, 1.49),  # 5
+                (0.94, 1.241),  # 6
+                (0.91, 1.065))  # 7
+tspec_noisy_region = ((2.4, 9),
+                      (1.81, 1.94),
+                      (1.35, 1.425),
+                      (1.11, 1.16),
+                      (-1, 0.96))
 
 
 def determine_order_tspec(wav):
@@ -53,20 +58,25 @@ def determine_order_tspec(wav):
         List of all the orders spanned
     """
     assert wav[0] < wav[-1]
-    eva = [i for i, x in enumerate(tspec_orders) if wav[0] > x[0]]
+    eva = [i for i, x in enumerate(tspec_orders) if wav[0] >= x[0]]
     if len(eva) == 0:
         upper = 4
     else:
         upper = min(eva)
-    eva = [i for i, x in enumerate(tspec_orders) if wav[-1] < x[1]]
+    eva = [i for i, x in enumerate(tspec_orders) if wav[-1] <= x[1]]
     if len(eva) == 0:
         lower = 0
     else:
         lower = max(eva)
     if lower == upper:
         return [upper + 3]
+    if lower > upper:
+        return [lower + 3]
     ret = [x + 3 for x in range(lower, upper + 1)]
+    if len(ret) == 0:
+        print(lower, upper, wav[0], wav[-1])
     return ret
+
 
 
 def plotting(ax, xmin, xmax, x, y, tempsource, line, count, start=False):

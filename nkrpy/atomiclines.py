@@ -304,10 +304,10 @@ atomiclines={\
         "Ar III":{'val':[7137.8,7753.2],'unit':'angstroms'},\
         r'Br $\gamma$':{'val':[2.16611],'unit':'micrometers'},'Br5-4':{'val':[4.05226],'unit':'micrometers'},'Br6-4':{'val':[2.62587],'unit':'micrometers'},\
         'Br8-4':{'val':[1.94509],'unit':'micrometers'},'Br9-4':{'val':[1.81791],'unit':'micrometers'},'Br10-4':{'val':[1.73669],'unit':'micrometers'},\
-        'Br11-4':{'val':[1.68111],'unit':'micrometers'},'Br12-4':{'val':[1.64117],'unit':'micrometers'},'Br13-4':{'val':[1.61137],'unit':'micrometers'},\
-        'Br14-4':{'val':[1.58849],'unit':'micrometers'},'Br15-4':{'val':[1.57050],'unit':'micrometers'},'Br16-4':{'val':[1.55607],'unit':'micrometers'},\
+        #'Br11-4':{'val':[1.68111],'unit':'micrometers'},'Br12-4':{'val':[1.64117],'unit':'micrometers'},'Br13-4':{'val':[1.61137],'unit':'micrometers'},\
+        #'Br14-4':{'val':[1.58849],'unit':'micrometers'},'Br15-4':{'val':[1.57050],'unit':'micrometers'},'Br16-4':{'val':[1.55607],'unit':'micrometers'},\
         'Br17-4':{'val':[1.54431],'unit':'micrometers'},'Br18-4':{'val':[1.53460],'unit':'micrometers'},'Br19-4':{'val':[1.52647],'unit':'micrometers'},\
-        'Br20-4':{'val':[1.51960],'unit':'micrometers'},'Br21-4':{'val':[1.51374],'unit':'micrometers'},\
+        #'Br20-4':{'val':[1.51960],'unit':'micrometers'},'Br21-4':{'val':[1.51374],'unit':'micrometers'},\
         "Ca I":{'val':[1.9442,1.9755,2.2605,2.263,2.266],'unit':'micrometers'},\
         #"Ca II":{'val':[3933.663,3968.468,8500.36, 8544.44,8664.52],'unit':'angstroms'},\
         "CO":{'val':[2.2925,2.3440,2.414,2.322,2.352,2.383],'unit':'micrometers'},\

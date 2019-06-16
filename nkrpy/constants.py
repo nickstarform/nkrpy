@@ -13,6 +13,7 @@ ev   =  1.60217733e-12    # Electron volt CGS
 na   =  6.0221367e23      # Avagadro's Number
 me   =  9.1093897e-28     # electron mass CGS
 mp   =  1.6726231e-24     # proton mass CGS
+mh2  = 3.3476e-24         # molecular hydrogen mass
 mn   = 1.674929e-24       # neutron mass CGS
 mh   = 1.673534e-24       # hydrogen mass CGS
 amu  =  1.6605402e-24     # atomic mass unit CGS

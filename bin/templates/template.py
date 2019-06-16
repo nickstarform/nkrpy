@@ -21,6 +21,8 @@ def main():
 
     Extended description of function.
 
+    >>> main()
+
     Parameters
     ----------
     arg1 : int

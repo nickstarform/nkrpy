@@ -6,6 +6,7 @@ import re
 
 # external modules
 from astropy.io import fits
+import numpy as np
 
 # relative modules
 from ..functions import typecheck
@@ -28,7 +29,7 @@ def create_header(h):
         matches = re.finditer(regex, str(h), re.MULTILINE)
         for num, match in enumerate(matches, start=1):
             linestart = match.group()
-            h.replace(linestart, f';;;{linestart}')
+        h = h.replace(linestart, f';;;{linestart}')
         tmp = [line for line in h.split(';;;')]
         return tmp
     else:
@@ -37,10 +38,14 @@ def create_header(h):
 
 def read(fname):
     """Read in the file and neatly close."""
-    header, data = None, None
+    header, data = [], []
     with fits.open(fname) as hdul:
-        header = hdul[0].header
-        data = hdul[0].data.astype(float)
+        for h in hdul:
+            if 'XTENSION' in list(map(lambda x: x.upper(), h.header.keys())):
+                if h.header['XTENSION'].upper() == 'BINTABLE':
+                    continue
+            header.append(h.header)
+            data.append(h.data.astype(float))
     return header, data
 
 
@@ -96,6 +101,37 @@ def write(f, fname=None, header=None, data=None):
         else:
             f.flush()
     return True
+
+
+def make_nan(filename: str):
+    header, data = read(filename)
+    data[:] = np.nan
+    write(f'nan_{filename}', header=header, data=data)
+
+def make_zero(filename: str):
+    header, data = read(filename)
+    data[:] = 0
+    write(f'zero_{filename}', header=header, data=data)
+
+def header_radec(header: dict):
+    # check for hese headers CRTYPE, CRPIX, CRVAL, CDELT/CD
+    size = (header['NAXIS1'], header['NAXIS2'])
+    ra_pix = header['CRPIX1']
+    dec_pix = header['CRPIX2']
+    ra_val = header['CRVAL1']
+    dec_val = header['CRVAL2']
+    if 'CDELT1' in header.keys():
+        ra_del = header['CDELT1']
+        dec_del = header['CDELT2']
+    else:
+        ra_del = header['CD1_1']
+        dec_del = header['CD2_2']
+    ra_begin = ra_val - ra_pix * ra_del
+    dec_begin = dec_val - dec_pix * dec_del
+    rapix = np.arange(0, size[0], 1) * ra_del + ra_begin
+    decpix = np.arange(0, size[1], 1) * dec_del + dec_begin
+    return rapix, decpix
+
 
 
 def main():

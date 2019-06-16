@@ -15,7 +15,6 @@ from .constants import pi
 from .functions import typecheck
 
 # global attributes
-__all__ = ('',)
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
@@ -425,5 +424,42 @@ def rotate_matrix(origin, matrix, angle):
     qx = ox + np.cos(angle) * (px - ox) - np.sin(angle) * (py - oy)
     qy = oy + np.sin(angle) * (px - ox) + np.cos(angle) * (py - oy)
     return np.concatenate((qx.reshape(qx.shape[0], 1),qy.reshape(qy.shape[0], 1)), axis=1)
+
+
+def apply_window(ilist: list, window: float):
+    """Apply a given constant window to a list.
+
+    Parameters
+    ----------
+    ilist: list
+        list of values to apply window to
+    window: float
+        value in the same units as the list. Will return
+        a list where any values within a window will be
+        averaged together and returned
+
+    Return
+    ------
+    list
+        windowed list
+
+    """
+    ret = []
+    i = 0
+    current = ilist[0]
+    tmp = []
+    while i < len(ilist):
+        if (ilist[i] - current) < window:
+            tmp.append(ilist[i])
+        elif (i <= len(ilist) - 1):
+            ret.append(sum(tmp)/len(tmp))
+            tmp = [ilist[i]]
+            current = ilist[i]
+        i += 1
+        if i == len(ilist):
+            tmp.append(ilist[i-1])
+            ret.append(sum(tmp)/len(tmp))
+
+    return ret
 
 # end of file
