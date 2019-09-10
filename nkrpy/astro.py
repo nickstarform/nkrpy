@@ -149,7 +149,7 @@ def true_emissive_mass(flux=None,freq=None,lam=None,distance=None,Tex=None):
     N_mol_h2=N_mol*abun_ratio_c17o_h2
     #print('N_mol_h2: ', N_mol_h2)
 
-    mol_mass = 2.71*1.67E-24*pixelarea # mean mol mass / avogadro #3.34E-24  # grams per H2 molecule
+    mol_mass = 2.71*mh*pixelarea # mean mol mass / avogadro #3.34E-24  # grams per H2 molecule
     #print('pixelarea: ',pixelarea)
     Mass_h2 = N_mol_h2 * mol_mass    
     mass = Mass_h2 
