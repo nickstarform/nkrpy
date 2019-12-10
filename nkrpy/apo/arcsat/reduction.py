@@ -21,8 +21,8 @@ from matplotlib.font_manager import FontProperties
 # relative modules
 from ..fits import read as nkrpy_read
 from ..fits import write as nkrpy_write
-from ..fits import header as nkrpy_header
-from ...functions import list_files, find_nearest_above
+from ...files import list_files
+from ...functions import find_nearest_above
 from ...load import load_cfg, verify_param, verify_dir
 from ...decorators import timing
 
@@ -108,18 +108,18 @@ def plot_image(image, title, fig, ax, color=False):
     med = np.nanmedian(image)
     std = np.nanstd(image)
     img1 = ax.imshow(np.log10(oimage), vmin=np.log10(med - std),
-                     vmax=np.log10(med + 5. * std), origin='lower')
+                     vmax=np.log10(maxi*0.95), origin='lower')
     fig.colorbar(img1, ax=ax)
     fig.savefig(title + 'log10.png', dpi=600)
     fig.clear()
 
     img1 = ax.imshow(np.sqrt(oimage), vmin=np.sqrt(med - std),
-                     vmax=np.sqrt(med + 5. * std), origin='lower')
+                     vmax=np.sqrt(maxi*0.95), origin='lower')
     fig.colorbar(img1, ax=ax)
     plt.savefig(title + 'sqrt.png', dpi=600)
 
     img1 = ax.imshow(oimage, vmin=med - std,
-                     vmax=med + 5. * std, origin='lower')
+                     vmax=maxi*0.95, origin='lower')
     fig.colorbar(img1, ax=ax)
     plt.savefig(title + '.png', dpi=600)
     fig.clear()
@@ -146,7 +146,7 @@ def flats(files, header=None, bias_image=None, darks=None):
 
         fdata = np.zeros((header['NAXIS1'], header['NAXIS2'], len(files)))
         for i, f in enumerate(files):
-            ignored, fdata[:, :, i] = nkrpy_read(f)
+            ignored, fdata[:, :, i] = list(map(lambda x: x[0], nkrpy_read(f)))
             if dark_image is not None:
                 fdata[:, :, i] -= dark_image
             if bias_image is not None:
@@ -171,7 +171,7 @@ def bias(files, header=None):
 
         bdata = np.zeros((header['NAXIS1'], header['NAXIS2'], len(files)))
         for i, f in enumerate(files):
-            ignored, bdata[:, :, i] = nkrpy_read(f)
+            ignored, bdata[:, :, i] = list(map(lambda x: x[0], nkrpy_read(f)))
         bias_comb = np.median(bdata, axis=2)
     else:
         bias_comb = None
@@ -190,7 +190,7 @@ def darks(files, header=None, bias_image=None):
         ddata = np.zeros((header['NAXIS1'], header['NAXIS2']))
 
         for i, f in enumerate(files):
-            ignored, ddata[:, :] = nkrpy_read(f)
+            ignored, ddata[:, :] = list(map(lambda x: x[0], nkrpy_read(f)))
             exptime = ignored['EXPTIME'] if ignored['EXPTIME'] \
                 else ignored['EXPOSURE']
             if bias_image is not None:
@@ -240,7 +240,7 @@ def cal(cfg, science, bias_image, darks, flats):
             files = [x for x in al_science if filt in x]
             files.sort()
             for i, f in enumerate(files):
-                header, data = nkrpy_read(f)
+                header, data = list(map(lambda x: x[0], nkrpy_read(f)))
                 exptime = header['EXPTIME'] if header['EXPTIME'] \
                     else header['EXPOSURE']
                 if darks is not None:
@@ -258,7 +258,7 @@ def cal(cfg, science, bias_image, darks, flats):
                     while not nkrpy_write(f'{_temp}', header=header,
                                           data=data):
                         continue
-                
+
                 if cfg.createplot:
                     os.chdir(os.path.join(cfg._cwd,
                                           cfg.destination))
@@ -276,6 +276,18 @@ def cal(cfg, science, bias_image, darks, flats):
                                ax, color=False)
                 os.chdir(cfg._cwd)
     pass
+
+
+def _check(cfg, dtype):
+    master = None
+    if os.path.isdir(cfg.calibration):
+        if os.path.isfile(f'master{dtype}.fits'):
+            _, data = list(map(lambda x: x[0], nkrpy_read(f)))
+            master = data
+        else:
+            bias_i = glob(f'{getattr(cfg, dtype)}/*.fits')
+            master = bias(bias_i)
+
 
 
 def main(cfgname, clear=False):
@@ -313,7 +325,7 @@ def main(cfgname, clear=False):
 
     os.chdir(os.path.join(cfg._cwd, cfg.calibration))
     if cfg.createfits:
-        while not nkrpy_write(f'master_bias.fits', header=None,
+        while not nkrpy_write(f'masterbias.fits', header=None,
                               data=masterbias):
             continue
         for x in masterdarks:

@@ -6,11 +6,12 @@
 import numpy as np
 
 # relative modules
-from .constants import h, c, kb, msun
+from .constants import h, c, kb, msun, jy
 from .dustmodels.kappa import kappa
 from .decorators import deprecated
 from .miscmath import gauss
 from .unit import Units
+from .functions import between
 
 # global attributes
 __all__ = ('dustmass', 'planck_nu', 'planck_wav')
@@ -23,8 +24,7 @@ c = c * 1E8  # A/s
 h = h * 1E-7  # SI
 kb = kb * 1E-7  # SI
 
-
-
+"""
 def Keplerian_Rotation(mass, velocity, Distance, inclination):
     radii_return =  np.sin(inclination)**2*const.G.value*mass*const.M_sun.value/(velocity*1000)/(velocity*1000)/(Distance*u.pc.to(u.m))*u.rad.to(u.arcsec) 
     #All the positive radii.
@@ -32,18 +32,17 @@ def Keplerian_Rotation(mass, velocity, Distance, inclination):
     #We also have some negative radii, so thats why we have to do this.
     radii_negative = -1*radii_return[velocity > 0]
     return radii_positive, radii_negative
-
+"""
 def planck_wav(temp=None, val=None, unit=None):
     """Plank Function in wavelength."""
     _c = Units(unit='angstroms', vals=c)('meters')
     _h = h
-
     wav = Units(unit=unit, vals=val)('meters')
     a = 2.0 * _h * _c ** 2
     b = _h * _c / (wav * kb * temp)
     intensity = a / ((wav ** 5) * (np.exp(b) - 1.0))
-    # returns in units of watts/ m^2 / steradian / inputunit
-    return intensity * Units(unit='meters', vals=1)(unit)
+    # returns in units of watts/ m^2 / steradian / Hz
+    return intensity * Units(unit='meters', vals=1)('hz')
 
 
 def planck_nu(temp=None, val=None, unit=None):
@@ -66,15 +65,19 @@ def planck():
 
 def dustmass(dist=100, dist_unit='pc', val=0.1,
              val_unit='cm', flux=0, temp=20,
-             model_name='oh1994', beta=1.7, gas_density=0):
+             model_name='oh1994', beta=1.7, gas_density=0, opacity=-1):
     """Calculate dust mass.
-    @param dist, dist_unit, wavelength, wavelength_unit, flux, temp,model,beta"""
-    """Assuming temp in Kelvin, flux in Janskys"""
+
+    @param dist, dist_unit, wavelength, wavelength_unit, flux, temp,model,beta, opacity
+    Assuming temp in Kelvin, flux in Janskys"""
     dist = Units(unit=dist_unit, vals=dist)('cm')  # to match the opacity units
     wav = Units(unit=val_unit, vals=val)('microns')  # to search opcaity models
     intensity = planck_nu(temp, Units(unit=val_unit, vals=val)('hz'), 'hz') *\
         1.E26  # in jansky
-    opacity = kappa(wav, model_name=model_name, density=gas_density, beta=beta)  # cm^2/g
+    if not opacity:
+        opacity = kappa(wav, model_name=model_name, density=gas_density, beta=beta)  # cm^2/g
+    else:
+        opacity = [opacity]
     toret = 'For the various opacities:\n(cm^2/g)...(Msun)\n'
     _ret = []
     for x in opacity:
@@ -151,15 +154,15 @@ def true_emissive_mass(flux=None,freq=None,lam=None,distance=None,Tex=None):
 
     mol_mass = 2.71*mh*pixelarea # mean mol mass / avogadro #3.34E-24  # grams per H2 molecule
     #print('pixelarea: ',pixelarea)
-    Mass_h2 = N_mol_h2 * mol_mass    
+    Mass_h2 = N_mol_h2 * mol_mass
     mass = Mass_h2 
     return mass # grams
 
 def equivalent_width(spectra, blf, xspec0, xspec1, fit='gauss',
                      params=[1, 1, 1]):
-    """Compute spectral line eq. width."""
-    """
-    finds equivalent width of line
+    """Compute spectral line eq. width.
+
+    Finds equivalent width of line
     spectra is the full 2d array (lam, flux)
     blf is the baseline function
     xspec0 (xspec1) is the start(end) of the spectral feature

@@ -30,12 +30,32 @@ tspec_orders = ((1.88, 2.47),  # 3
                 (1.40, 1.88),  # 4
                 (1.13, 1.49),  # 5
                 (0.94, 1.241),  # 6
-                (0.91, 1.065))  # 7
+                (0.94, 1.065))  # 7
 tspec_noisy_region = ((2.4, 9),
                       (1.81, 1.94),
                       (1.35, 1.425),
-                      (1.11, 1.16),
                       (-1, 0.96))
+tspec_resolution = 3500.
+
+
+def split_into_tspec_orders(wav: np.ndarray, conserve: bool=True):
+    """Split an array of wavelengths into orders.
+
+    wav must be a numpy array. Will return a list
+    of boolean arrays that denote what indexes are
+    per order. If conserve is set, will favour long
+    wavelength orders more, otherwise will simply yield
+    wavelengths in those ranges.
+    """
+    orders = []
+    ind = np.full(wav.shape, False, dtype=bool)
+    for order in tspec_orders:
+        od_ind = (wav > order[0]) & (wav < order[-1])
+        if conserve:
+            od_ind = od_ind & (~ind)
+        ind += od_ind
+        orders.append(od_ind)
+    return orders
 
 
 def determine_order_tspec(wav):

@@ -36,8 +36,14 @@ def create_header(h):
         return None
 
 
-def read(fname):
-    """Read in the file and neatly close."""
+def read(fname: str):
+    """Read in the file and neatly close.
+
+    Parameters
+    ----------
+    fname: str
+        filename
+    """
     header, data = [], []
     with fits.open(fname) as hdul:
         for h in hdul:
@@ -50,7 +56,23 @@ def read(fname):
 
 
 def write(f, fname=None, header=None, data=None):
-    """Open and read from the file."""
+    """Open and read from the file.
+
+    If the file exists, will attempt to update either
+    and or both the header and data. Otherwise creates
+    the file.
+
+    Parameters
+    ----------
+    f: str
+        file. Can be a filename or an HDU object If it is a string, will set fname = f unless fname is set.
+    fname: str
+        filename
+    header: dict
+        hduheader
+    data: numpy.array
+        Data to write
+    """
     if not isinstance(header, fits.header.Header):
         header = create_header(header)
         if typecheck(header):

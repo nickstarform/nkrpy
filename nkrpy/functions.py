@@ -102,55 +102,46 @@ def _strip(array, var=''):
     return tuple(_t)
 
 
-def between(l1, val1, val2):
-    """Find values between bounds, exclusively."""
-    """Return the value and index for everything in iterable
+def between(l1, lower, upper, exclusive_lower: bool=True, exclusive_upper: bool=True):
+    """Find values between bounds, exclusively.
+
+    Return the index and value for everything in iterable
     between v1 and v2, exclusive."""
-    if val1 > val2:
-        low = val2
-        high = val1
-    elif val1 < val2:
-        low = val1
-        high = val2
+    if (len(l1) == 0) or (lower == upper):
+        return
+    if not isinstance(l1, np.ndarray):
+        l1 = np.array(l1, dtype=type(l.__next__()))
+    if exclusive_lower:
+        upper_mask = l1 > lower
     else:
-        print('Values are the same')
-        return []
+        upper_mask = l1 >= lower
+    if exclusive_upper:
+        lower_mask = l1 < lower
+    else:
+        lower_mask = l1 <= upper
 
-    l2 = []
-    for j, i in enumerate(l1):
-        if(i > low) and (i < high):
-            l2.append([j, i])
-    return l2
+    mask = lower_mask and upper_mask
+
+    return mask
 
 
-def find_nearest(array, value):
-    """Find nearestvalue within array."""
-    if isinstance(array, np.ndarray):
+def find_nearest(array, value, lower: bool=False, upper: bool=False):
+    """Find nearest value within array."""
+    if not isinstance(array, np.ndarray):
+        array = np.array(array)
+    if (not lower and not upper) or (lower and upper):
         idx = (np.abs(array - value)).argmin()
-    else:
-        argmin = (float('inf'), float('inf'))
-        for i, x in enumerate(array):
-            _tmp = np.abs(value - x)
-            if _tmp < argmin[1]:
-                argmin = (i, _tmp)
-        idx = argmin[0]
+    elif upper:
+        temparray = (array - value)
+        comp = temparray >= 0
+        idx = (temparray[comp]).argmin()
+        idx = np.where(array == temparray[comp][idx] + value)[0]
+    elif lower:
+        temparray = (array - value)
+        comp = temparray <= 0
+        idx = (np.abs(temparray[comp])).argmin()
+        idx = np.where(array == temparray[comp][idx] + value)[0]
     return idx, array[idx]
-
-def find_nearest_above(my_array, target):
-    if not isinstance(my_array, np.ndarray):
-        my_array = np.array(my_array)
-    diff = my_array - target
-    mask = np.ma.less_equal(diff, 0)
-    # We need to mask the negative differences and zero
-    # since we are looking for values above
-    if np.all(mask):
-        return find_nearest(my_array, target) 
-    masked_diff = np.ma.masked_array(diff, mask)
-    i = masked_diff.argmin()
-    if i is None:
-        return find_nearest(my_array, target)
-    else:
-        return i, my_array[i]
 
 def find_max(a):
     """Find max of n dimensional array."""

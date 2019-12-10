@@ -8,7 +8,9 @@ from itertools import chain
 # external modules
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import rv_continuous
+from scipy.optimize import curve_fit
+from scipy.stats import rv_continuous, norm
+from IPython import embed
 
 # relative modules
 from .constants import pi
@@ -19,6 +21,164 @@ __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 __version__ = 0.1
+
+
+def fit_conf(x, y, func, opt, ci: float=0.95):
+    # Define confidence interval.
+    ci = 0.95
+    # Convert to percentile point of the normal distribution.
+    # See: https://en.wikipedia.org/wiki/Standard_score
+    pp = (1. + ci) / 2.
+    # Convert to number of standard deviations.
+    nstd = norm.ppf(pp)
+    #func = np.poly1d(opt)
+    from IPython import embed
+    #embed()
+
+    # Find best fit.
+    popt, pcov = curve_fit(func, x, y, p0=opt)
+    # Standard deviation errors on the parameters.
+    perr = np.sqrt(np.diag(pcov))
+    # Add nstd standard deviations to parameters to obtain the upper confidence
+    # interval.
+    popt_up = popt + nstd * perr
+    popt_dw = popt - nstd * perr
+    return (popt_up, popt_dw)
+
+"""
+from nkrpy.miscmath import sigma_clip_fit, binning
+import matplotlib.pyplot as plt
+import numpy as np
+import inspect
+
+d = '/home/reynolds/local/APO/further_analysis/hops370'
+f = ('lam.npy','flux.npy')
+xdo,ydo = map(lambda g: np.loadtxt(f'{d}/{g}'), f)
+#ydo *= -1. * ydo
+
+def func(x, a,b,c,d,e,f,g,h, i):
+    return i * x ** 8 +\
+        h * x ** 7 +\
+        g * x ** 6 +\
+        f * x ** 5 +\
+        e * x ** 4 +\
+        d * x ** 3 +\
+        c * x ** 2 +\
+        b * x + a
+
+
+p0 = (np.full(len(inspect.signature(func).parameters.values()) - 1, 1, dtype=np.float)).tolist()
+
+xd, yd = map(lambda x: binning(x, 1), [xdo,ydo])
+s = sigma_clip_fit(xd, yd, func, p0, 3, 2)
+print(s)
+
+plt.figure()
+plt.scatter(xdo, ydo, color='black', marker='.', lw=1)
+plt.plot(xdo, func(xdo, *s[1]), color='blue', lw=1)
+plt.scatter(xdo[s[0]], ydo[s[0]], color='red', marker='.', lw=1)
+plt.show()
+
+plt.figure()
+plt.scatter(nx, ny, color='black', marker='.', lw=1)
+plt.plot(nx, func(nx, *p0), color='blue', lw=1)
+plt.scatter(nx[mask], ny[mask], color='red', marker='.', lw=1)
+plt.show()
+
+plt.figure()
+plt.scatter(nx, np.abs(y - 1.), color='black', marker='.', lw=1)
+for i, sig in enumerate(rolling_sigma):
+    plt.hlines(sigma_clip * sig, nx[0], nx[-1], color='red', alpha=0.5 + (i / max_iterations)**2)
+plt.show()
+
+plt.figure()
+iq = y.shape[0] // 2
+plt.scatter(nx[iq], y[iq], color='black', marker='.', lw=1)
+plt.show()
+"""
+
+def sigma_clip_fit(xdata, ydata, func, p0, sigma_clip: int=5, max_iterations: int=5):
+    """Fit data with arbitrary function and sigma_clip.
+
+    Parameters
+    ----------
+    xdata: Iterable
+        Iterable of the xdata (1D)
+    ydata: Iterable
+        Iterable of the ydata (1D)
+    func: function
+        Arbitrary function to fit. Must be of form func(x, p1,p2 ...)
+    p0: Iterable
+        The starting parameters for the above function. This will help converge results
+    sigma_clip: int
+        The sigma level to clip data when applying fit
+    max_iterations: int
+        The number of times to perform the fit. Setting this higher takes longer but is more accurate.
+
+    Returns
+    -------
+    p0: Iterable
+        The converged parameters for the above function.
+    err: float
+        The sigma clipped error for the data.
+
+    Usage
+    -----
+    '''
+    def func(x, a,b,c):
+        return b * x + c
+    x = some wavelength values
+    y = some flux values
+    x, y are 1D and are roughly linear with some error and really large emission/absorption
+    '''
+
+    sigma_clip_fit(x, y, func, [1], sigma_clip: int=5, max_iterations: int=5)
+    """
+    if not isinstance(xdata, np.ndarray):
+        xdata = np.array(xdata)
+    if not isinstance(ydata, np.ndarray):
+        ydata = np.array(ydata)
+    if xdata.shape[0] < 3:
+        return
+    xd, yd = map(lambda x: binning(x, 3), [xdata, ydata])
+    ind = np.argsort(xd)
+    nx, ny = map(lambda x: x[ind], [xd, yd])
+    mask = np.full(nx.shape[0], False, dtype=bool)
+    chk_last_mask = np.full(nx.shape[0], True, dtype=bool)
+    rolling_sigma = []
+    for i in range(max_iterations):
+        if np.array_equal(chk_last_mask, mask):
+            continue
+        else:
+            chk_last_mask = np.copy(mask)
+        popt, pcov = curve_fit(func, nx[~mask], ny[~mask], p0=p0)
+        p0 = popt
+        fn = func(nx, *p0)
+        y = ny / fn
+        tempy = y[: y.shape[0] // 2]
+        tmp_mask = np.copy(mask)
+        '''
+        tmp_mask[: y.shape[0] // 2] = np.abs(tempy - 1) > sigma_clip * tempy.std()
+        tempy = y[y.shape[0] // 2 :]
+        tmp_mask[y.shape[0] // 2:] = np.abs(tempy - 1) > sigma_clip * tempy.std()
+        '''
+        rolling_sigma.append(y[~(mask + tmp_mask)].std())
+        mask = ((np.abs(y - 1.) > sigma_clip * rolling_sigma[-1]) + mask + tmp_mask)
+
+    embed()
+    finfn = func(xdata, *p0)
+    finy = ydata / finfn
+    finmask = np.abs(finy - 1.) > rolling_sigma[-1]
+    err = (ydata[~finmask] - func(xdata[~finmask], *p0)).std()
+    return (finmask, p0, err)
+
+
+def scientific_format(num, precision: int=3):
+    form = '{:0.' + f'{precision}' + 'e}'
+    num = form.format(num)
+    ret = 'x10$^{'.join(num.split('e'))
+    ret = f'{ret}' + '}$'
+    return ret
 
 
 def _raster_matrix_con(fov, cen=(0, 0), width=1, height=1, main='h', theta=0, h='+',
@@ -245,6 +405,8 @@ def quad(x, a, b, c):
 
 def binning(data, width=3):
     """Bin the given data."""
+    if width == 1:
+        return data[:]
     return data[:(data.size // width) * width].reshape(-1, width).mean(axis=1)
 
 
@@ -336,6 +498,15 @@ def gen_angles(start, end, resolution=1, direction='+'):
     return final
 
 
+def voigt(x, mu, alpha, gamma):
+    """
+    Voigt Profile x, alpha, gamma
+    """
+    from scipy.special import wofz
+    sigma = alpha / np.sqrt(2. * np.log(2))
+    return np.real(wofz((x - mu + 1.j * gamma) / sigma / np.sqrt(2.))) / sigma / np.sqrt(2.*np.pi)
+
+
 def gauss(x, mu, sigma, a):
     """Define a single gaussian."""
     return a * np.exp(-(x - mu) ** 2 / 2. / sigma**2)
@@ -391,13 +562,9 @@ def listinvert(total, msk_array):
     """
     msk_array must be the index values
     """
-    mask_inv = []
-    for i in range(len(msk_array)):
-        mask_inv = np.append(mask_inv, np.where(total == msk_array[i]))
-    mask_tot = np.linspace(0, len(total) - 1, num=len(total))
-    mask = np.delete(mask_tot, mask_inv)
-    mask = [int(x) for x in mask]
-    return np.array(mask)
+    mask_tot = np.full(total.shape, True, dtype=bool)
+    mask_tot[msk_array] = False
+    return mask_tot
 
 
 def rotate_points(origin, point, angle):

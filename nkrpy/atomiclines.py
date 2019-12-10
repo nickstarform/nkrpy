@@ -55,19 +55,19 @@ class lines(object):
         """
         self.c     = 2.99792458e18       # speed of light AGS
 
-        self.units = {\
-                         'bananas'    : {'vals':['b','banana'],'type':'wave','fac':2.032*10**9},\
-                         'angstroms'  : {'vals':['ang','a','angs','angstrom'],'type':'wave','fac':1.},\
-                         'micrometers': {'vals':['microns','micron','mu','micrometres','micrometre','micrometer'],'type':'wave','fac':10**4},\
-                         'millimeters': {'vals':['mm','milli','millimetres','millimetre','millimeter'],'type':'wave','fac':10**7},\
-                         'centimeters': {'vals':['cm','centi','centimetres','centimetre','centimeter'],'type':'wave','fac':10**8},\
-                         'meters'     : {'vals':['m','metres','meter','metre'],'type':'wave','fac':10**10},\
-                         'kilometers' : {'vals':['km','kilo','kilometres','kilometre','kilometer'],'type':'wave','fac':10**13},\
-                         'hz'         : {'vals':['hertz','h'],'type':'freq','fac':1.},\
-                         'khz'        : {'vals':['kilohertz','kilo-hertz','kh'],'type':'freq','fac':10**3},\
-                         'mhz'        : {'vals':['megahertz','mega-hertz','mh'],'type':'freq','fac':10**6},\
-                         'ghz'        : {'vals':['gigahertz','giga-hertz','gh'],'type':'freq','fac':10**9},\
-                         'thz'        : {'vals':['terahertz','tera-hertz','th'],'type':'freq','fac':10**12},\
+        self.units = {
+                         'bananas'    : {'vals':['b','banana'],'type':'wave','fac':2.032*10**9},
+                         'angstroms'  : {'vals':['ang','a','angs','angstrom'],'type':'wave','fac':1.},
+                         'micrometers': {'vals':['microns','micron','mu','micrometres','micrometre','micrometer'],'type':'wave','fac':10**4},
+                         'millimeters': {'vals':['mm','milli','millimetres','millimetre','millimeter'],'type':'wave','fac':10**7},
+                         'centimeters': {'vals':['cm','centi','centimetres','centimetre','centimeter'],'type':'wave','fac':10**8},
+                         'meters'     : {'vals':['m','metres','meter','metre'],'type':'wave','fac':10**10},
+                         'kilometers' : {'vals':['km','kilo','kilometres','kilometre','kilometer'],'type':'wave','fac':10**13},
+                         'hz'         : {'vals':['hertz','h'],'type':'freq','fac':1.},
+                         'khz'        : {'vals':['kilohertz','kilo-hertz','kh'],'type':'freq','fac':10**3},
+                         'mhz'        : {'vals':['megahertz','mega-hertz','mh'],'type':'freq','fac':10**6},
+                         'ghz'        : {'vals':['gigahertz','giga-hertz','gh'],'type':'freq','fac':10**9},
+                         'thz'        : {'vals':['terahertz','tera-hertz','th'],'type':'freq','fac':10**12},
                          }
 
         self.types = atomiclines.keys()
@@ -117,17 +117,55 @@ class lines(object):
             regen = False
         return self
 
-    def return_lines(self):
+    def select_lines(self, choose=[]):
+        choose = list(map(lambda x: x.lower().replace(' ','').replace('.','').replace('-','').replace('(','').replace(')',''), choose))
+        if len(choose) != 0:
+            for xo in list(self.fulllines.keys()):
+                x = xo.lower().replace(' ','').replace('.','').replace('-','').replace('(','').replace(')','')
+                if x in choose:
+                    self.fulllines.pop(xo)
+        return self
+
+    def remove_regions(self, choose=[]):
+        """
+        Choose is a 2d array of (wav1, wav2) where
+        any lines between wav1 and wav2 are removed.
+        """
+        if len(choose) != 0:
+            for x in choose:
+                self.find_regions(x[0],x[1])
+                for key in self.region:
+                    line = self.fulllines[key]
+                    for i in self.region[key]:
+                        del line[line.index(i)]
+                    if len(line) == 0:
+                        self.fulllines.pop(key)
+                    else:
+                        self.fulllines[key] = line
+        return self
+
+
+    def return_lines(self, choose=[]):
         """
         Returns all lines
         """
-        return self.fulllines
+        return self.fulllines            
 
     def return_regions(self):
         """
         Returns all lines within region <= all lines
         """
         return self.region
+
+    def return_label(self):
+        """
+        Returns all the lines with new label positions given an aperture
+        """
+        if 'label' in dir(self):
+            return self.label
+        else:
+            print('Please call the aperture method')
+            return None
 
     def get_functions(self):
         """
@@ -214,7 +252,7 @@ class lines(object):
         """
         Returns the dictionary of all converted types
         """
-        self.fulllines = self.alllines
+        self.fulllines = deepcopy(self.alllines)
         # iterating through all lines in a type
         for i in self.alllines:
             # Type of line from atomicline list     unit,type
@@ -252,32 +290,39 @@ class lines(object):
             if ind.shape[0] != 0:
                 self.region[key] = a[ind].tolist()
 
-    def aperture(self):
+    def aperture(self, ap: float):
         """
-        returns a new key value pair dictionary
-        where the new data is suppressed 
-        psuedo kmeans cluster
-        First we calculate an average difference between sequential elements 
-        and then group together elements whose difference is less than average.
+        returns a new key value pair dictionary of the line label locations
         """
         tmp = {}
+
         for linenam in self.fulllines:
             d = sorted(self.fulllines[linenam])
+            tmp[linenam] = []
             if len(d)>1:
-                diff = [d[i+1]-d[i] for i in range(len(d)-1)]#[y - x for x, y in zip(*[iter(d)] * 2)]
-                avg = sum(diff) / len(diff)
-
-                m = [[d[0]]]
-
-                for x in d[1:]:
-                    if x - m[-1][-1] < avg:#x - m[-1][0] < avg:
-                        m[-1].append(x)
+                final = []
+                slist = [float('nan')]
+                while len(d) > 0:
+                    x = d[-1]
+                    del d[d.index(x)]
+                    t = np.array(d)
+                    try:
+                        _ = np.min(t)
+                    except:
+                        t = np.array([-np.inf])
+                    if np.min(np.abs(t - x)) < ap:
+                        slist.append(x)
+                    elif np.min(np.abs(np.array(slist) - x)) < ap:
+                        slist.append(x)
+                        m = np.mean(slist)
+                        slist = [float('nan')]
+                        tmp[linenam].append(m)
                     else:
-                        m.append([x])
+                        slist = [float('nan')]
+                        tmp[linenam].append(x)
             else:
-                m = d
-            tmp[linenam] = [np.mean(x) for x in m]  
-        self.fulllines = tmp
+                tmp[linenam].append(d[0])
+        self.label = tmp
         return self
 
 
@@ -298,90 +343,90 @@ class lines(object):
 #  These are a list of lines that can be used with above code
 # ^-----------------------------------------------------------^
 
-atomiclines={\
-    'nir':{\
-        "Al I":{'val':[1.3115,1.67],'unit':'micrometers'},\
-        "Ar III":{'val':[7137.8,7753.2],'unit':'angstroms'},\
-        r'Br $\gamma$':{'val':[2.16611],'unit':'micrometers'},'Br5-4':{'val':[4.05226],'unit':'micrometers'},'Br6-4':{'val':[2.62587],'unit':'micrometers'},\
-        'Br8-4':{'val':[1.94509],'unit':'micrometers'},'Br9-4':{'val':[1.81791],'unit':'micrometers'},'Br10-4':{'val':[1.73669],'unit':'micrometers'},\
-        #'Br11-4':{'val':[1.68111],'unit':'micrometers'},'Br12-4':{'val':[1.64117],'unit':'micrometers'},'Br13-4':{'val':[1.61137],'unit':'micrometers'},\
-        #'Br14-4':{'val':[1.58849],'unit':'micrometers'},'Br15-4':{'val':[1.57050],'unit':'micrometers'},'Br16-4':{'val':[1.55607],'unit':'micrometers'},\
-        'Br17-4':{'val':[1.54431],'unit':'micrometers'},'Br18-4':{'val':[1.53460],'unit':'micrometers'},'Br19-4':{'val':[1.52647],'unit':'micrometers'},\
-        #'Br20-4':{'val':[1.51960],'unit':'micrometers'},'Br21-4':{'val':[1.51374],'unit':'micrometers'},\
-        "Ca I":{'val':[1.9442,1.9755,2.2605,2.263,2.266],'unit':'micrometers'},\
-        #"Ca II":{'val':[3933.663,3968.468,8500.36, 8544.44,8664.52],'unit':'angstroms'},\
-        "CO":{'val':[2.2925,2.3440,2.414,2.322,2.352,2.383],'unit':'micrometers'},\
-        #"Fe I":{'val':[1.1880,1.1970],'unit':'micrometers'},\
-        "Fe II":{'val':[1.688,1.742],'unit':'micrometers'},\
-        "Fe2.a4d7-a6d9":{'val':[1.257],'unit':'micrometers'},"Fe2.a4d7-a6d7":{'val':[1.321],'unit':'micrometers'},"Fe2.a4d7-a4d9":{'val':[1.644],'unit':'micrometers'},\
-        "FeH":{'val':[0.9895],'unit':'micrometers'},\
-        #"H2.0-0.S(0)":{'val':[28.221],'unit':'micrometers'}, "H2.0-0.S(1)":{'val':[17.035],'unit':'micrometers'}, "H2.0-0.S(2)":{'val':[12.279],'unit':'micrometers'},\
-        #"H2.0-0.S(3)":{'val':[9.6649],'unit':'micrometers'}, "H2.0-0.S(4)":{'val':[8.0258],'unit':'micrometers'}, "H2.0-0.S(5)":{'val':[6.9091],'unit':'micrometers'},\
-        #"H2.0-0.S(6)":{'val':[6.1088],'unit':'micrometers'}, "H2.0-0.S(7)":{'val':[5.5115],'unit':'micrometers'}, "H2.0-0.S(8)":{'val':[5.0529],'unit':'micrometers'},\
-        #"H2.0-0.S(9)":{'val':[4.6947],'unit':'micrometers'}, "H2.0-0.S(10)":{'val':[4.4096],'unit':'micrometers'}, "H2.0-0.S(11)":{'val':[4.1810],'unit':'micrometers'},\
-        #"H2.0-0.S(12)":{'val':[3.9947],'unit':'micrometers'}, "H2.0-0.S(13)":{'val':[3.8464],'unit':'micrometers'}, "H2.0-0.S(14)":{'val':[3.724],'unit':'micrometers'},\
-        #"H2.0-0.S(15)":{'val':[3.625],'unit':'micrometers'}, "H2.0-0.S(16)":{'val':[3.547],'unit':'micrometers'}, "H2.0-0.S(17)":{'val':[3.485],'unit':'micrometers'},\
-        #"H2.0-0.S(18)":{'val':[3.438],'unit':'micrometers'}, "H2.0-0.S(19)":{'val':[3.404],'unit':'micrometers'}, "H2.0-0.S(20)":{'val':[3.380],'unit':'micrometers'},\
-        #"H2.0-0.S(21)":{'val':[3.369],'unit':'micrometers'}, "H2.0-0.S(22)":{'val':[3.366],'unit':'micrometers'}, "H2.0-0.S(23)":{'val':[3.372],'unit':'micrometers'},\
-        "H2.1-0.S(0)":{'val':[2.2235],'unit':'micrometers'}, "H2.1-0.S(1)":{'val':[2.1218],'unit':'micrometers'}, "H2.1-0.S(2)":{'val':[2.0338],'unit':'micrometers'},\
-        #"H2.1-0.S(3)":{'val':[1.9576],'unit':'micrometers'}, "H2.1-0.S(4)":{'val':[1.8920],'unit':'micrometers'}, "H2.1-0.S(5)":{'val':[1.8358],'unit':'micrometers'},\
-        #"H2.1-0.S(6)":{'val':[1.7880],'unit':'micrometers'}, "H2.1-0.S(7)":{'val':[1.7480],'unit':'micrometers'}, "H2.1-0.S(8)":{'val':[1.7147],'unit':'micrometers'},\
-        #"H2.1-0.S(10)":{'val':[1.6665],'unit':'micrometers'}, "H2.1-0.S(11)":{'val':[1.6504],'unit':'micrometers'},\
-        "H2.1-0.Q(1)":{'val':[2.4066],'unit':'micrometers'}, "H2.1-0.Q(2)":{'val':[2.4134],'unit':'micrometers'}, "H2.1-0.Q(3)":{'val':[2.4237],'unit':'micrometers'},\
-        "H2.1-0.Q(4)":{'val':[2.4375],'unit':'micrometers'}, "H2.1-0.Q(5)":{'val':[2.4548],'unit':'micrometers'}, "H2.1-0.Q(6)":{'val':[2.4756],'unit':'micrometers'},\
-        #"H2.1-0.Q(7)":{'val':[2.5001],'unit':'micrometers'}, "H2.1-0.O(2)":{'val':[2.6269],'unit':'micrometers'}, "H2.1-0.O(3)":{'val':[2.8025],'unit':'micrometers'},\
-        #"H2.1-0.O(4)":{'val':[3.0039],'unit':'micrometers'}, "H2.1-0.O(5)":{'val':[3.2350],'unit':'micrometers'}, "H2.1-0.O(6)":{'val':[3.5007],'unit':'micrometers'},\
-        #"H2.1-0.O(7)":{'val':[3.8075],'unit':'micrometers'}, "H2.1-0.O(8)":{'val':[4.1625],'unit':'micrometers'}, "H2.2-1.S(0)":{'val':[2.3556],'unit':'micrometers'},\
-        #"H2.2-1.S(1)":{'val':[2.2477],'unit':'micrometers'}, "H2.2-1.S(2)":{'val':[2.1542],'unit':'micrometers'}, "H2.2-1.S(3)":{'val':[2.0735],'unit':'micrometers'},\
-        #"H2.2-1.S(4)":{'val':[2.0041],'unit':'micrometers'}, "H2.2-1.S(5)":{'val':[1.9449],'unit':'micrometers'}, "H2.2-1.O(2)":{'val':[2.7862],'unit':'micrometers'},\
-        #"H2.2-1.O(3)":{'val':[2.9741],'unit':'micrometers'}, "H2.2-1.O(4)":{'val':[3.1899],'unit':'micrometers'}, "H2.2-1.O(5)":{'val':[3.4379],'unit':'micrometers'},\
-        #"H2.2-1.O(6)":{'val':[3.7236],'unit':'micrometers'}, "H2.2-1.O(7)":{'val':[4.0540],'unit':'micrometers'}, "H2.3-2.S(0)":{'val':[2.5014],'unit':'micrometers'},\
-        #"H2.3-2.S(1)":{'val':[2.3864],'unit':'micrometers'}, "H2.3-2.S(2)":{'val':[2.2870],'unit':'micrometers'},\
-        "H2.3-2.S(4)":{'val':[2.1280],'unit':'micrometers'}, "H2.3-2.S(5)":{'val':[2.0656],'unit':'micrometers'}, "H2.3-2.S(6)":{'val':[2.0130],'unit':'micrometers'},\
-        #"H2.3-2.S(7)":{'val':[1.9692],'unit':'micrometers'}, "H2.3-2.O(2)":{'val':[2.9620],'unit':'micrometers'}, "H2.3-2.O(3)":{'val':[3.1637],'unit':'micrometers'},\
-        #"H2.3-2.O(4)":{'val':[3.3958],'unit':'micrometers'}, "H2.3-2.O(5)":{'val':[3.6630],'unit':'micrometers'}, "H2.3-2.O(6)":{'val':[3.9721],'unit':'micrometers'},\
-        #"H2.2-0.S(1)":{'val':[1.1622],'unit':'micrometers'}, "H2.2-0.S(2)":{'val':[1.1382],'unit':'micrometers'},\
-        #"H2.2-0.S(3)":{'val':[1.1175],'unit':'micrometers'}, "H2.2-0.S(4)":{'val':[1.0998],'unit':'micrometers'}, "H2.2-0.S(5)":{'val':[1.0851],'unit':'micrometers'},\
-        #"H2.2-9.Q(1)":{'val':[1.2383],'unit':'micrometers'}, "H2.2-0.Q(2)":{'val':[1.2419],'unit':'micrometers'}, "H2.2-0.Q(3)":{'val':[1.2473],'unit':'micrometers'},\
-        "H2.2-0.Q(4)":{'val':[1.2545],'unit':'micrometers'}, "H2.2-0.Q(5)":{'val':[1.2636],'unit':'micrometers'}, "H2.2-0.O(2)":{'val':[1.2932],'unit':'micrometers'},\
-        #"H2.2-0.O(3)":{'val':[1.3354],'unit':'micrometers'}, "H2.2-0.O(4)":{'val':[1.3817],'unit':'micrometers'}, "H2.2-0.O(5)":{'val':[1.4322],'unit':'micrometers'},\
-        #"H2.4-3.S(3)":{'val':[2.3446],'unit':'micrometers'}, "H2.3-2.S(3)":{'val':[2.2014],'unit':'micrometers'},"H2.1-0.S(9)":{'val':[1.6877],'unit':'micrometers'},\
-        "H12":{'val':[3751.22],'unit':'angstroms'},"H11":{'val':[3771.70],'unit':'angstroms'},"H10":{'val':[3798.98],'unit':'angstroms'},"H9":{'val':[3836.48],'unit':'angstroms'},\
-        "H8":{'val':[3890.15],'unit':'angstroms'},"Hep":{'val':[3971.19],'unit':'angstroms'},"Hdel":{'val':[4102.92],'unit':'angstroms'},"Hgam":{'val':[4341.69],'unit':'angstroms'},\
-        r'H $\beta$':{'val':[4862.69],'unit':'angstroms'},r'H $\alpha$':{'val':[6564.61],'unit':'angstroms'},\
-        "He I":{'val':[0.388975,0.587730,0.6679996,1.0833],'unit':'micrometers'},\
-        'Humphreys10-6':{'val':[5.12865,4.67251,4.17080,4.02087,3.90755,3.81945,3.74940,3.69264,3.64593,\
-                                3.60697,3.57410,3.54610,3.52203,3.50116,3.48296],'unit':'micrometers'},\
-        "K I":{'val':[1.1682,1.1765,1.2518,1.2425,1.5152],'unit':'micrometers'},\
-        "O I":{'val':[1.129,0.630204,0.5578887],'unit':'micrometers'},\
-        "O II":{'val':[3726,3727.09,3729,3729.88],'unit':'micrometers'},\
-        "O III":{'val':[5008.24,4960.30,4364.44],'unit':'angstroms'},\
-        "N II":{'val':[6549.84, 6585.23, 5756.24],'unit':'angstroms'},\
-        "Mg":{'val':[5167.321,5172.684, 5183.604],'unit':'angstroms'},\
-        "Mg I":{'val':[1.1820,1.4872,1.5020,1.5740,1.7095],'unit':'micrometers'},\
-        "Na I":{'val':[0.589158,0.589755,0.818,1.1370,2.2040,2.206,2.208],'unit':'micrometers'},\
-        "Ne II":{'val':[6585.23,6549.84,5756.24],'unit':'angstroms'},\
-        "Ne III":{'val':[0.386981,0.396853],'unit':'micrometers'},\
-        "S II":{'val':[6718.32,6732.71],'unit':'angstroms'},\
-        "S III":{'val':[6313.8],'unit':'angstroms'},\
-        "S III":{'val':[9071.1,9533.2],'unit':'angstroms'},\
-        "Si I":{'val':[1.5875],'unit':'micrometers'},\
-        "P11":{'val':[8865.217],'unit':'angstroms'},\
-        "P10":{'val':[9017.385],'unit':'angstroms'},\
-        "P9":{'val':[9231.547],'unit':'angstroms'},\
-        "P8":{'val':[9548.590],'unit':'angstroms'},\
-        "P7":{'val':[10052.128],'unit':'angstroms'},\
-        r'Pa $\alpha$':{'val':[1.875613],'unit':'micrometers'},r'Pa $\beta$':{'val':[1.28216],'unit':'micrometers'},r'Pa $\gamma$':{'val':[1.0941091],'unit':'micrometers'},\
-        'Pa7-3':{'val':[1.00521],'unit':'micrometers'},'Pa8-3':{'val':[0.95486],'unit':'micrometers'},'Pa9-3':{'val':[0.92315],'unit':'micrometers'},\
-        'Pa10-3':{'val':[0.90174],'unit':'micrometers'},\
-        'Pfund':{'val':[4.65378,3.74056,3.29699,3.03920,2.87300,2.87300,2.75827,2.67513,2.61265,2.56433,\
-                        2.52609,2.49525,2.46999,2.44900,2.43136,2.41639,2.40355,2.39248,2.38282,2.37438,\
-                        2.36694,2.36035,2.35448,2.34924,2.34453,2.34028,2.33644,2.33296,2.32979],'unit':'micrometers'}\
-    },\
-    'radio':{\
-    },\
-    'xray':{\
-    },\
-    'gamma':{\
+atomiclines={
+    'nir':{
+        "Al I":{'val':[1.3115,1.67],'unit':'micrometers'},
+        "Ar III":{'val':[7137.8,7753.2],'unit':'angstroms'},
+        r'Br $\gamma$':{'val':[2.16611],'unit':'micrometers'},'Br5-4':{'val':[4.05226],'unit':'micrometers'},'Br6-4':{'val':[2.62587],'unit':'micrometers'},
+        'Br8-4':{'val':[1.94509],'unit':'micrometers'},'Br9-4':{'val':[1.81791],'unit':'micrometers'},'Br10-4':{'val':[1.73669],'unit':'micrometers'},
+        'Br11-4':{'val':[1.68111],'unit':'micrometers'},'Br12-4':{'val':[1.64117],'unit':'micrometers'},'Br13-4':{'val':[1.61137],'unit':'micrometers'},
+        'Br14-4':{'val':[1.58849],'unit':'micrometers'},'Br15-4':{'val':[1.57050],'unit':'micrometers'},'Br16-4':{'val':[1.55607],'unit':'micrometers'},
+        'Br17-4':{'val':[1.54431],'unit':'micrometers'},'Br18-4':{'val':[1.53460],'unit':'micrometers'},'Br19-4':{'val':[1.52647],'unit':'micrometers'},
+        'Br20-4':{'val':[1.51960],'unit':'micrometers'},'Br21-4':{'val':[1.51374],'unit':'micrometers'},
+        "Ca I":{'val':[1.9442,1.9755,2.2605,2.263,2.266],'unit':'micrometers'},
+        "Ca II":{'val':[3933.663,3968.468,8500.36, 8544.44,8664.52],'unit':'angstroms'},
+        "CO":{'val':[2.2925,2.3440,2.414,2.322,2.352,2.383],'unit':'micrometers'},
+        "Fe I":{'val':[1.1880,1.1970],'unit':'micrometers'},
+        "Fe II":{'val':[1.688,1.742],'unit':'micrometers'},
+        "Fe2.a4d7-a6d9":{'val':[1.257],'unit':'micrometers'},"Fe2.a4d7-a6d7":{'val':[1.321],'unit':'micrometers'},"Fe2.a4d7-a4d9":{'val':[1.644],'unit':'micrometers'},
+        "FeH":{'val':[0.9895],'unit':'micrometers'},
+        "H2.0-0.S(0)":{'val':[28.221],'unit':'micrometers'}, "H2.0-0.S(1)":{'val':[17.035],'unit':'micrometers'}, "H2.0-0.S(2)":{'val':[12.279],'unit':'micrometers'},
+        "H2.0-0.S(3)":{'val':[9.6649],'unit':'micrometers'}, "H2.0-0.S(4)":{'val':[8.0258],'unit':'micrometers'}, "H2.0-0.S(5)":{'val':[6.9091],'unit':'micrometers'},
+        "H2.0-0.S(6)":{'val':[6.1088],'unit':'micrometers'}, "H2.0-0.S(7)":{'val':[5.5115],'unit':'micrometers'}, "H2.0-0.S(8)":{'val':[5.0529],'unit':'micrometers'},
+        "H2.0-0.S(9)":{'val':[4.6947],'unit':'micrometers'}, "H2.0-0.S(10)":{'val':[4.4096],'unit':'micrometers'}, "H2.0-0.S(11)":{'val':[4.1810],'unit':'micrometers'},
+        "H2.0-0.S(12)":{'val':[3.9947],'unit':'micrometers'}, "H2.0-0.S(13)":{'val':[3.8464],'unit':'micrometers'}, "H2.0-0.S(14)":{'val':[3.724],'unit':'micrometers'},
+        "H2.0-0.S(15)":{'val':[3.625],'unit':'micrometers'}, "H2.0-0.S(16)":{'val':[3.547],'unit':'micrometers'}, "H2.0-0.S(17)":{'val':[3.485],'unit':'micrometers'},
+        "H2.0-0.S(18)":{'val':[3.438],'unit':'micrometers'}, "H2.0-0.S(19)":{'val':[3.404],'unit':'micrometers'}, "H2.0-0.S(20)":{'val':[3.380],'unit':'micrometers'},
+        "H2.0-0.S(21)":{'val':[3.369],'unit':'micrometers'}, "H2.0-0.S(22)":{'val':[3.366],'unit':'micrometers'}, "H2.0-0.S(23)":{'val':[3.372],'unit':'micrometers'},
+        "H2.1-0.S(0)":{'val':[2.2235],'unit':'micrometers'}, "H2.1-0.S(1)":{'val':[2.1218],'unit':'micrometers'}, "H2.1-0.S(2)":{'val':[2.0338],'unit':'micrometers'},
+        "H2.1-0.S(3)":{'val':[1.9576],'unit':'micrometers'}, "H2.1-0.S(4)":{'val':[1.8920],'unit':'micrometers'}, "H2.1-0.S(5)":{'val':[1.8358],'unit':'micrometers'},
+        "H2.1-0.S(6)":{'val':[1.7880],'unit':'micrometers'}, "H2.1-0.S(7)":{'val':[1.7480],'unit':'micrometers'}, "H2.1-0.S(8)":{'val':[1.7147],'unit':'micrometers'},
+        "H2.1-0.S(10)":{'val':[1.6665],'unit':'micrometers'}, "H2.1-0.S(11)":{'val':[1.6504],'unit':'micrometers'},
+        "H2.1-0.Q(1)":{'val':[2.4066],'unit':'micrometers'}, "H2.1-0.Q(2)":{'val':[2.4134],'unit':'micrometers'}, "H2.1-0.Q(3)":{'val':[2.4237],'unit':'micrometers'},
+        "H2.1-0.Q(4)":{'val':[2.4375],'unit':'micrometers'}, "H2.1-0.Q(5)":{'val':[2.4548],'unit':'micrometers'}, "H2.1-0.Q(6)":{'val':[2.4756],'unit':'micrometers'},
+        "H2.1-0.Q(7)":{'val':[2.5001],'unit':'micrometers'}, "H2.1-0.O(2)":{'val':[2.6269],'unit':'micrometers'}, "H2.1-0.O(3)":{'val':[2.8025],'unit':'micrometers'},
+        "H2.1-0.O(4)":{'val':[3.0039],'unit':'micrometers'}, "H2.1-0.O(5)":{'val':[3.2350],'unit':'micrometers'}, "H2.1-0.O(6)":{'val':[3.5007],'unit':'micrometers'},
+        "H2.1-0.O(7)":{'val':[3.8075],'unit':'micrometers'}, "H2.1-0.O(8)":{'val':[4.1625],'unit':'micrometers'}, "H2.2-1.S(0)":{'val':[2.3556],'unit':'micrometers'},
+        "H2.2-1.S(1)":{'val':[2.2477],'unit':'micrometers'}, "H2.2-1.S(2)":{'val':[2.1542],'unit':'micrometers'}, "H2.2-1.S(3)":{'val':[2.0735],'unit':'micrometers'},
+        "H2.2-1.S(4)":{'val':[2.0041],'unit':'micrometers'}, "H2.2-1.S(5)":{'val':[1.9449],'unit':'micrometers'}, "H2.2-1.O(2)":{'val':[2.7862],'unit':'micrometers'},
+        "H2.2-1.O(3)":{'val':[2.9741],'unit':'micrometers'}, "H2.2-1.O(4)":{'val':[3.1899],'unit':'micrometers'}, "H2.2-1.O(5)":{'val':[3.4379],'unit':'micrometers'},
+        "H2.2-1.O(6)":{'val':[3.7236],'unit':'micrometers'}, "H2.2-1.O(7)":{'val':[4.0540],'unit':'micrometers'}, "H2.3-2.S(0)":{'val':[2.5014],'unit':'micrometers'},
+        "H2.3-2.S(1)":{'val':[2.3864],'unit':'micrometers'}, "H2.3-2.S(2)":{'val':[2.2870],'unit':'micrometers'},
+        "H2.3-2.S(4)":{'val':[2.1280],'unit':'micrometers'}, "H2.3-2.S(5)":{'val':[2.0656],'unit':'micrometers'}, "H2.3-2.S(6)":{'val':[2.0130],'unit':'micrometers'},
+        "H2.3-2.S(7)":{'val':[1.9692],'unit':'micrometers'}, "H2.3-2.O(2)":{'val':[2.9620],'unit':'micrometers'}, "H2.3-2.O(3)":{'val':[3.1637],'unit':'micrometers'},
+        "H2.3-2.O(4)":{'val':[3.3958],'unit':'micrometers'}, "H2.3-2.O(5)":{'val':[3.6630],'unit':'micrometers'}, "H2.3-2.O(6)":{'val':[3.9721],'unit':'micrometers'},
+        "H2.2-0.S(1)":{'val':[1.1622],'unit':'micrometers'}, "H2.2-0.S(2)":{'val':[1.1382],'unit':'micrometers'},
+        "H2.2-0.S(3)":{'val':[1.1175],'unit':'micrometers'}, "H2.2-0.S(4)":{'val':[1.0998],'unit':'micrometers'}, "H2.2-0.S(5)":{'val':[1.0851],'unit':'micrometers'},
+        "H2.2-9.Q(1)":{'val':[1.2383],'unit':'micrometers'}, "H2.2-0.Q(2)":{'val':[1.2419],'unit':'micrometers'}, "H2.2-0.Q(3)":{'val':[1.2473],'unit':'micrometers'},
+        "H2.2-0.Q(4)":{'val':[1.2545],'unit':'micrometers'}, "H2.2-0.Q(5)":{'val':[1.2636],'unit':'micrometers'}, "H2.2-0.O(2)":{'val':[1.2932],'unit':'micrometers'},
+        "H2.2-0.O(3)":{'val':[1.3354],'unit':'micrometers'}, "H2.2-0.O(4)":{'val':[1.3817],'unit':'micrometers'}, "H2.2-0.O(5)":{'val':[1.4322],'unit':'micrometers'},
+        "H2.4-3.S(3)":{'val':[2.3446],'unit':'micrometers'}, "H2.3-2.S(3)":{'val':[2.2014],'unit':'micrometers'},"H2.1-0.S(9)":{'val':[1.6877],'unit':'micrometers'},
+        "H12":{'val':[3751.22],'unit':'angstroms'},"H11":{'val':[3771.70],'unit':'angstroms'},"H10":{'val':[3798.98],'unit':'angstroms'},"H9":{'val':[3836.48],'unit':'angstroms'},
+        "H8":{'val':[3890.15],'unit':'angstroms'},"Hep":{'val':[3971.19],'unit':'angstroms'},"Hdel":{'val':[4102.92],'unit':'angstroms'},"Hgam":{'val':[4341.69],'unit':'angstroms'},
+        r'H $\beta$':{'val':[4862.69],'unit':'angstroms'},r'H $\alpha$':{'val':[6564.61],'unit':'angstroms'},
+        "He I":{'val':[0.388975,0.587730,0.6679996,1.0833],'unit':'micrometers'},
+        'Humphreys10-6':{'val':[5.12865,4.67251,4.17080,4.02087,3.90755,3.81945,3.74940,3.69264,3.64593,
+                                3.60697,3.57410,3.54610,3.52203,3.50116,3.48296],'unit':'micrometers'},
+        "K I":{'val':[1.1682,1.1765,1.2518,1.2425,1.5152],'unit':'micrometers'},
+        "O I":{'val':[1.129,0.630204,0.5578887],'unit':'micrometers'},
+        "O II":{'val':[3726,3727.09,3729,3729.88],'unit':'angstroms'},
+        "O III":{'val':[5008.24,4960.30,4364.44],'unit':'angstroms'},
+        "N II":{'val':[6549.84, 6585.23, 5756.24],'unit':'angstroms'},
+        "Mg":{'val':[5167.321,5172.684, 5183.604],'unit':'angstroms'},
+        "Mg I":{'val':[1.1820,1.4872,1.5020,1.5740,1.7095],'unit':'micrometers'},
+        "Na I":{'val':[0.589158,0.589755,0.818,1.1370,2.2040,2.206,2.208],'unit':'micrometers'},
+        "Ne II":{'val':[6585.23,6549.84,5756.24],'unit':'angstroms'},
+        "Ne III":{'val':[0.386981,0.396853],'unit':'micrometers'},
+        "S II":{'val':[6718.32,6732.71],'unit':'angstroms'},
+        "S III":{'val':[6313.8],'unit':'angstroms'},
+        "S III":{'val':[9071.1,9533.2],'unit':'angstroms'},
+        "Si I":{'val':[1.5875],'unit':'micrometers'},
+        "P11":{'val':[8865.217],'unit':'angstroms'},
+        "P10":{'val':[9017.385],'unit':'angstroms'},
+        "P9":{'val':[9231.547],'unit':'angstroms'},
+        "P8":{'val':[9548.590],'unit':'angstroms'},
+        "P7":{'val':[10052.128],'unit':'angstroms'},
+        r'Pa $\alpha$':{'val':[1.875613],'unit':'micrometers'},r'Pa $\beta$':{'val':[1.28216],'unit':'micrometers'},r'Pa $\gamma$':{'val':[1.0941091],'unit':'micrometers'},
+        'Pa7-3':{'val':[1.00521],'unit':'micrometers'},'Pa8-3':{'val':[0.95486],'unit':'micrometers'},'Pa9-3':{'val':[0.92315],'unit':'micrometers'},
+        'Pa10-3':{'val':[0.90174],'unit':'micrometers'},
+        'Pfund':{'val':[4.65378,3.74056,3.29699,3.03920,2.87300,2.87300,2.75827,2.67513,2.61265,2.56433,
+                        2.52609,2.49525,2.46999,2.44900,2.43136,2.41639,2.40355,2.39248,2.38282,2.37438,
+                        2.36694,2.36035,2.35448,2.34924,2.34453,2.34028,2.33644,2.33296,2.32979],'unit':'micrometers'}
+    },
+    'radio':{
+    },
+    'xray':{
+    },
+    'gamma':{
     }
 }

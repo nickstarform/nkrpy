@@ -9,7 +9,7 @@ from numpy import array
 from ..functions import find_nearest as nearest
 
 # global attributes
-__all__ = ('kappa','__models__')
+__all__ = ('kappa','__models__', 'scale')
 __doc__ = """Just generic functions that I use a good bit."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
@@ -46,6 +46,11 @@ def _load_model(model_name):
     return header_col, array(model)
 
 
+def scale(wav0, wav1, kappa0, beta):
+    """Scale closest opacities."""
+    return (wav0 / wav1) ** beta * kappa0
+
+
 def kappa(wav, model_name='oh1994', density=0, beta=1.7, quiet=True):
     """Dust opacity."""
     """ from Ossenkopf & Henning 1994
@@ -57,16 +62,16 @@ def kappa(wav, model_name='oh1994', density=0, beta=1.7, quiet=True):
     beta=1.7 good for s
     """
 
-    def scale(wav0, wav1, kappa0, beta):
-        """Scale closest opacities."""
-        return (wav0 / wav1) ** beta * kappa0
-
     # load the model
     if model_name:
         h, model_l = _load_model(model_name)
 
     model_l = model_l[model_l[:, 0] == density, :]
-    found = model_l[nearest(model_l[:,1], wav)[0], :]
+    found = model_l[nearest(model_l[:,1], wav, True, False)[0], :]
+    from IPython import embed
+    embed()
+    print(model_l)
+    print(found)
     if not quiet:
         print(f'Closest Kappa Model:\nColumn: {h}\nValues: {found}')
     _ret = tuple([scale(found[1], wav, x, beta) for x in found[2:len(found)]])
