@@ -10,7 +10,7 @@ from .constants import h, c, kb, msun, jy
 from .dustmodels.kappa import kappa
 from .decorators import deprecated
 from .miscmath import gauss
-from .unit import Units
+from .unit import Unit
 from .functions import between
 
 # global attributes
@@ -88,7 +88,6 @@ def dustmass(dist=100, dist_unit='pc', val=0.1,
     return toret, np.array(_ret)
 
 
-@deprecated
 def emissive_mass(flux=0, dist=100, dist_unit='pc', wav=0.1,
                   wav_unit='cm', temp=20,
                   model_name='oh1994', beta=1.7,
@@ -97,15 +96,15 @@ def emissive_mass(flux=0, dist=100, dist_unit='pc', wav=0.1,
     @param dist, dist_unit, val, val_unit, flux, temp,model,beta, dgr"""
     """Assuming temp in Kelvin, flux in Janskys"""
     flux = flux * 1E-23
-    dist = Units(unit=dist_unit, vals=dist)('cm')  # to match the opacity units
-    wav = Units(vals=wav, unit=wav_unit)
+    dist = Unit(baseunit=dist_unit, vals=dist)('cm')  # to match the opacity units
+    wav = Unit(baseunit=wav_unit, vals=wav)
     wavl = wav('microns')  # to search opcaity models
     opacity = kappa(wavl, model_name=model_name, density=gas_density,
                     beta=beta, quiet=True)  # cm^2/g
     toret = 'For the various opacities:\n(cm^2/g)...(g)\n'
     _ret = []
     for x in opacity:
-        _tmp = (dist * wav(unit='cm')) ** 2 * flux / (2. * x * kb * 1E7) * dgr / temp  # noqa in grams units (no ISM assump.)
+        _tmp = (dist * wav('cm')) ** 2 * flux / (2. * x * kb * 1E7) * dgr / temp  # noqa in grams units (no ISM assump.)
         # print(x, dist, flux, intensity, _tmp)
         toret += '{}...{}\n'.format(x, _tmp)
         _ret.append(np.array([x, _tmp]))

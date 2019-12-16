@@ -67,15 +67,10 @@ def kappa(wav, model_name='oh1994', density=0, beta=1.7, quiet=True):
         h, model_l = _load_model(model_name)
 
     model_l = model_l[model_l[:, 0] == density, :]
-    found = model_l[nearest(model_l[:,1], wav, True, False)[0], :]
-    from IPython import embed
-    embed()
-    print(model_l)
-    print(found)
+    found = model_l[nearest(model_l[:,1], wav, True, False)[0], :][0]
     if not quiet:
         print(f'Closest Kappa Model:\nColumn: {h}\nValues: {found}')
     _ret = tuple([scale(found[1], wav, x, beta) for x in found[2:len(found)]])
-
     return _ret
 
 # end of file

@@ -1,17 +1,21 @@
 """Unit conversion."""
 
 # internal modules
+from collections.abc import (MutableSequence, MutableSet, MutableMapping)
+from inspect import isclass
 
 # external modules
+from numpy import ndarray
 
 # relative modules
 from .functions import typecheck
-from .constants import h, c, kb
+from .constants import h, c, kb  # imported as cgs
+from ._unit import units
 
 # global attributes
-__all__ = ('Units', 'test', 'main')
-__doc__ = """Convert supported units all to anstroms and hz
-    to add new units have to correct self.units and resolve_units
+__all__ = ('Unit',)
+__doc__ = """Convert supported units all to angstroms and hz
+    to add new units have to correct self.__units and resolve_units
     To setup, just initialize and call with units /  values to convert
     Holds values to quick accessing later
 
@@ -19,270 +23,306 @@ __doc__ = """Convert supported units all to anstroms and hz
     """
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
-__version__ = 0.1
+
+c = c * 1E8  # A/s
+h = h * 1E-7  # SI
+kb = kb * 1E-7  # SI
 
 
-c = c * 1E8 # A/s
-h = h * 1E-7 # SI
-kb = kb * 1E-7 #SI
+def checknum(num):
+    try:
+        _ = float(num)
+        return True
+    except Exception:
+        return False
 
-class Units(object):
+
+class BaseUnit(object):
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
+    def values(self):
+        return self.__dict__.values()
+    def items(self):
+        return self.__dict__.items()
+    def keys(self):
+        return self.__dict__.keys()
+    def __iter__(self):
+        return self.__dict__.items().__iter__()
+    def __getitem__(self, key):
+        return getattr(self, key)
+    def __next__(self):
+        pass
+    def __setattr__(self):
+        pass
+    def __delattr__(self):
+        pass
+
+
+class Unit(object):
     """Convert between major unit types."""
 
-    def __init__(self, unit=None, vals=None):
-        """Setup the class with loading copy."""
-        """
-        units{} defines all units that can be used
-        Dictionary is as follows:
-        key = master name
-        vals = possible aliases to resolve
-        type = specifies either wavelength or frequency
-        fac = the conversion factor to Ang(Hz) for wavelen(freq)
+    def __init__(self, baseunit: str=None, convunit: str=None, vals=None):
+        """Main unit building.
+
+        Parameters
+        ----------
+        baseunit: str
+            The base unit to convert from.
+        convunit: str
+            The unit to convert to. Not Required.
+        vals: number | numpy.ndarray
+            The numbers to convert. Not Required.
         """
 
-        self.units = {
-            'j': {'vals': ('j', 'joules', 'joule'),
-                   'type': 'energy',
-                   'fac': 1.},
-            'ev': {'vals': ('ev', 'electronvolt', 'evs', 'electronvolts'),
-                   'type': 'energy',
-                   'fac': 1.6021766208E-19},
-            'kev': {'vals': ('kev', 'kiloelectronvolt','kevs','kiloelectronvolts', 'kiloev'),
-                   'type': 'energy',
-                   'fac': 1.E3 * 1.6021766208E-19},
-            'mev': {'vals': ('mev', 'megaelectronvolt','mevs','megaelectronvolts'),
-                   'type': 'energy',
-                   'fac': 1.E6 * 1.6021766208E-19},
-            'gev': {'vals': ('gev', 'gigaaelectronvolt','gevs','gigaelectronvolts'),
-                   'type': 'energy',
-                   'fac': 1.E9 * 1.6021766208E-19},
-            'bananas': {'vals': ('b', 'banana'),
-                        'type': 'wave',
-                        'fac': 2.032 * 10 ** 9},
-            'degrees': {'vals': ('deg', 'd', 'degree'),
-                          'type': 'angle',
-                          'fac': 3600.},
-            'hourangle': {'vals': ('ha', 'hourangles'),
-                          'type': 'angle',
-                          'fac': 3600. / 15.},
-            'arcmin': {'vals': ('am', 'arcmins'),
-                          'type': 'angle',
-                          'fac': 60.},
-            'arcsec': {'vals': ('as', 'arcsecs'),
-                          'type': 'angle',
-                          'fac': 1.},
-            'angstroms': {'vals': ('ang', 'a', 'angs', 'angstrom'),
-                          'type': 'wave',
-                          'fac': 1.},
-            'micrometers': {'vals': ('microns', 'micron', 'mu', 'micrometres',
-                                     'micrometre', 'micrometer'),
-                            'type': 'wave',
-                            'fac': 10 ** 4},
-            'millimeters': {'vals': ('mm', 'milli', 'millimetres',
-                                     'millimetre', 'millimeter'),
-                            'type': 'wave',
-                            'fac': 10 ** 7},
-            'centimeters': {'vals': ('cm', 'centi', 'centimetres',
-                                     'centimetre', 'centimeter'),
-                            'type': 'wave',
-                            'fac': 10 ** 8},
-            'meters': {'vals': ('m', 'metres', 'meter', 'metre'),
-                       'type': 'wave',
-                       'fac': 10 ** 10},
-            'kilometers': {'vals': ('km', 'kilo', 'kilometres', 'kilometre',
-                                    'kilometer'),
-                           'type': 'wave',
-                           'fac': 10 ** 13},
-            'lightyear': {'vals': ('lyr', 'lightyears'),
-                           'type': 'wave',
-                           'fac': 9.461E25},
-            'parcsec': {'vals': ('pc', 'parsecs'),
-                           'type': 'wave',
-                           'fac': 3.086E26},
-            'hz': {'vals': ('hertz', 'h'),
-                   'type': 'freq',
-                   'fac': 1.},
-            'khz': {'vals': ('kilohertz', 'kilo-hertz', 'kh'),
-                    'type': 'freq',
-                    'fac': 10 ** 3},
-            'mhz': {'vals': ('megahertz', 'mega-hertz', 'mh'),
-                    'type': 'freq',
-                    'fac': 10 ** 6},
-            'ghz': {'vals': ('gigahertz', 'giga-hertz', 'gh'),
-                    'type': 'freq',
-                    'fac': 10 ** 9},
-            'thz': {'vals': ('terahertz', 'tera-hertz', 'th'),
-                    'type': 'freq',
-                    'fac': 10 ** 12}}
+        self.__units = BaseUnit(**units)
         self.reset()
-        if unit:
-            self.current_unit = self._resolve_units(unit)
-        else:
-            self.current_unit = None
-        self.vals = vals
+        if baseunit is not None:
+            self.__current_unit = self.__resolve_units(baseunit)
+        if convunit is not None:
+            self.__final_unit = self.__resolve_units(convunit)
+        if baseunit is None and convunit is None:
+            return
+        self.__current_vals = vals
+        self.__final_vals = self.__return_vals(vals=vals)
 
-    def __call__(self, unit=None, vals=None):
-        """Standard call for resolving various conditions."""
-        """Allows repeat calls and inline calling of function.
+    def __call__(self, convunit: str=None, vals=None):
+        """Standard call for resolving various conditions.
+
+        Parameters
+        ----------
+        unit: str
+        vals: float | ndarray
+        Allows repeat calls and inline calling of function.
         Main process to gather all files
         This returns object of itself. Use return functions to get needed items
         """
-        try:
-            _t = float(unit)
-            vals = _t
-            unit = None
-        except:
-            pass
+        if not isinstance(vals, ndarray) and not checknum(vals) and (vals is not None):
+            return
 
-        if unit and vals:
-            # set new unit and new vals
-            # print(1)
-            self.current_unit = self._resolve_units(unit)
-            self.vals = vals
-            self.conv = (self.current_unit[2], self.current_unit[2])
-        elif unit and self.vals:
-            # set new unit and regen vals
-            # print(2)
-            _tmp = self._resolve_units(unit)
-            if self.current_unit[2] != _tmp[2]:
-                self.vals = self._return_vals(unit=_tmp)
-            else:
-                self.vals = self._return_vals()
-        elif vals and self.current_unit:
-            # set new values for current unit
-            # print(3)
-            self.vals = self._return_vals(vals=vals)
-        elif unit:
-            # only set the new unit
-            # print(4)
-            self.current_unit = self._resolve_units(unit)
-        elif vals:
-            # print(5)
-            self.vals = vals
-        return self._return_vals()
+        if isinstance(convunit, ndarray) or checknum(convunit):
+            vals = convunit
+            convunit = None
+
+        if vals is None and convunit is None:
+            unit = self.__current_unit
+        elif convunit is not None and vals is not None:
+            unit = self.__resolve_units(convunit)
+            self.__current_unit = unit
+            self.__final_unit = unit
+            self.__current_vals = vals
+        elif convunit is not None:
+            unit = self.__resolve_units(convunit)
+            vals = self.__current_vals
+        elif convunit is None:
+            unit = self.__final_unit
+        vals = self.__return_vals(unit=unit, vals=vals)
+        return vals
 
     def __repr__(self):
         """Representative Magic Method for calling."""
-        _t = self._return_vals()
+        self.__return_vals()
+        _t = self.__final_vals
         if typecheck(_t):
             return ', '.join(map(str,_t))
         else:
             return str(f'{_t}')
 
+    def __abs__(self):
+        return abs(self.__final_vals)
+
+    def __add__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals + value
+
+    def __radd__(self, *args, **kwargs):
+        return self.__add__(*args, **kwargs)
+
+    def __sub__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals - value
+
+    def __rsub__(self, *args, **kwargs):
+        return self.__sub__(*args, **kwargs)
+
+    def __divmod__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals / value
+
+    def __rdivmod__(self, *args, **kwargs):
+        return self.__divmod__(*args, **kwargs)
+
+    def __truediv__(self, *args, **kwargs):
+        return self.__divmod__(*args, **kwargs)
+
+    def __rtruediv__(self, *args, **kwargs):
+        return self.__truediv__(*args, **kwargs)
+
+    def __mul__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals * value
+
+    def __rmul__(self, *args, **kwargs):
+        return self.__mul__(*args, **kwargs)
+
+    def __pow__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals ** value
+
+    def __rpow__(self, *args, **kwargs):
+        return self.__pow__(*args, **kwargs)
+
+    def __mod__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals % value
+
+    def __rmod__(self, *args, **kwargs):
+        return self.__mod__(*args, **kwargs)
+
+    def __floordiv__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals // value
+
+    def __rfloordiv__(self, *args, **kwargs):
+        return self.__floordiv__(*args, **kwargs)
+
+    def __int__(self):
+        return int(self.__final_vals)
+
+    def __float__(self):
+        return float(self.__final_vals)
+
+    def __gt__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals > value
+
+    def __lt__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals < value
+
+    def __le__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals <= value
+
+    def __eq__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals == value
+
+    def __ge__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals >= value
+
+    def __ne__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return self.__final_vals != value
+
+    @property
+    def debug(self):
+        print(f"""
+            Current Unit: {self.__current_unit}\n
+            Current Values: {self.__current_vals}\n
+            Final Unit: {self.__final_unit}\n
+            Final Values: {self.__final_vals}""")
+
     def reset(self):
-        self.current_unit = None
-        self.vals = None
-        self.conv = (None, None)
+        self.__current_unit = None
+        self.__current_vals = None
+        self.__final_vals = None
+        self.__final_unit = None
+        self.__units = BaseUnit(**units)
 
     def set_base_unit(self, unit):
-        _tmp = self._resolve_units(unit)
-        self.current_unit = _tmp
-        self.vals = self._return_vals()
+        """Set the base unit, don't reset vals."""
+        _tmp = self.__resolve_units(unit)
+        self.__current_unit = _tmp
+        self.__return_vals()
 
-    def converting(self):
-        print(f'Converting from {self.conv[0]} to {self.conv[1]}')
+    @property
+    def get_base_val(self):
+        """Get the base val."""
+        return self.__current_vals
 
+    @property
     def get_units(self):
         """Return the units possible in the current setup."""
-        return self.units.keys()
+        return self.__units.keys()
 
-    def _resolve_units(self, bu):
-        """Resolve the units and conversion factor."""
-        tmp = self._resolve_name(bu)
-        if tmp[0]:
-            return tmp
-        else:
-            _u = self.get_units()
-            self._exit(f'Unit: <{bu}> was not found in list of units: {_u}')
-
-    def _resolve_name(self, bu):
+    def __resolve_units(self, bu):
         """Will resolve the name of the unit from known types."""
-        bu = bu.lower()
-        if bu not in self.get_units():
-            for i in self.units:
-                for k in self.units[i]['vals']:
-                    if bu == k:
-                        return True, bu, i, self.units[i]['type']
-            return False, False
+        bu = str(bu).lower()
+        if bu not in self.get_units:
+            for i in self.get_units:
+                if bu in self.__units[i]['vals']:
+                    return self.__units[i]
+            return None
         else:
-            return True, bu, bu, self.units[bu]['type']
+            return self.__units[bu]
 
-    def _conversion(self, init, ctype, fin, ftype, val):
-        """Return conversion factor needed."""
-        """ctype = current type (wavelength, frequency, energy)
+    def __conversion(self, vals = None):
+        """Return conversion factor needed.
+
+        Parameters
+        ----------
+        ctype = current type (wavelength, frequency, energy)
         ftype = final type to resolve to (wavelength, frequency, energy)
         init is the initial unit
         fin is the final unit
         This assumes everything has already been resolved with units
         """
+        if vals is None:
+            vals = self.__current_vals
         # converting between common types (wavelength->wavelength)
-        self.current_unit = self._resolve_name(fin)
-        self.conv = (init,fin)
+        if self.__current_unit is None or self.__final_unit is None:
+            return None
+        ctype, ftype = self.__current_unit['type'], self.__final_unit['type']
         if ctype == ftype:
-            scaled = val * self.units[init]['fac']
+            scaled = vals * self.__current_unit['fac']
         # converting from freq to wavelength
         elif ((ctype == 'freq') and (ftype == 'wave') or
               (ctype == 'wave') and (ftype == 'freq')):
-            # print(c,self.units[init]['fac'], self.units[fin]['fac'])
-            scaled = c / (val * self.units[init]['fac'])
+            # print(c,self.__units[init]['fac'], self.__units[fin]['fac'])
+            scaled = c / (vals * self.__current_unit['fac'])
         elif (ctype == 'energy') and (ftype == 'freq'):
-            scaled = val * self.units[init]['fac'] / h
+            scaled = vals * self.__current_unit['fac'] / h
         elif (ctype == 'freq') and (ftype == 'energy'):
-            scaled = h * val * self.units[init]['fac']
+            scaled = h * vals * self.__current_unit['fac']
         elif ((ctype == 'energy') and (ftype == 'wave') or
               (ctype == 'wave') and (ftype == 'energy')):
-            scaled = h * c / (val * self.units[init]['fac'])
+            scaled = h * c / (vals * self.__current_unit['fac'])
 
-        return scaled / self.units[fin]['fac']
+        return scaled / self.__final_unit['fac']
 
-    def _return_vals(self, vals=None, unit=None):
-        """Convert the values appropriately."""
-        """unit is the type _resolve_name output
+    def __return_vals(self, unit=None, vals=None):
+        """Convert the values appropriately.
+
+        unit is the type _resolve_name output
         vals can be either single values or iterable."""
         # print(vals, unit)
-        if isinstance(vals, str):
-            unit = vals
-            vals = None
-        if (unit and self.current_unit):
-            # print('first')
-            # convert list of self.vals to new unit
-            if vals:
-                _t = vals
-            else:
-                _t = self.vals
-            if typecheck(_t) and not isinstance(_t, np.ndarray):
-                for i in range(len(_t)):
-                    _tmp = _t[i]
-                    _t[i] = self._conversion(*self.current_unit[2:
-                                                              len(self.current_unit)],
-                                                    *unit[2:len(unit)], _tmp)
-            else:
-                _tmp = self.vals
-                _t = self._conversion(*self.current_unit[2:
-                                                          len(self.current_unit)],
-                                             *unit[2:len(unit)], _tmp)
-            return _t
-        elif vals:
-            return vals
+        if unit is None and vals is None:
+            if self.__final_unit is self.__current_unit:
+                self.__final_vals = self.__current_vals
+        if unit is not None:
+            self.__final_unit = unit
         else:
-            return self.vals
-
-    def _exit(self, exitcode, exitparam=0):
-        """Handles error codes and exits nicely."""
-        print(exitcode)
-        print('v--------Ignore exit codes below--------v')
-        if exitparam == 0:
-            return None
+            if self.__final_unit is None:
+                self.__final_unit = self.__current_unit
+        if vals is not None:
+            # convert from cu to fu with vals
+            return self.__conversion(vals)
         else:
-            from sys import exit
-            exit(0)
-
-
-if __name__ == "__main__":
-    """Directly Called."""
-
-    print('Testing module')
-    test()
-    print('Test Passed')
+            # convert from cu to fu with self.vals
+            self.__final_vals = self.__conversion()
 
 # end of code
