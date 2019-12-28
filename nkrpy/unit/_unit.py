@@ -1,5 +1,5 @@
 """Hold units for Unit class."""
-from .constants import ev, pi
+from ..constants import ev, pi
 
 units = {
     'j': {'vals': ('j', 'joules', 'joule'),

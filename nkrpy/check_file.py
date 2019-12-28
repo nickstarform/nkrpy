@@ -14,7 +14,6 @@ __all__ = ('test', 'main')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
-__version__ = 0.1
 
 __checks__ = {'.py': '_python',
               '.sh': '_sh'}

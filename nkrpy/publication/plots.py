@@ -1,8 +1,18 @@
-"""Common Nice plotting settings."""
+"""."""
+# flake8: noqa
 
-# standard modules
+# internal modules
 
 # external modules
+
+# relative modules
+
+# global attributes
+__all__ = ('set_style',)
+__doc__ = """."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+
 import matplotlib.pyplot as plt
 
 # relative modules
@@ -29,3 +39,8 @@ def set_style():
     plt.rcParams.update(params)
 
     return
+
+
+# end of code
+
+# end of file

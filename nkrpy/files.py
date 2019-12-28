@@ -2,38 +2,34 @@
 
 # standard modules
 import os
-from sys import version
 import shutil
 
 # external modules
 
 # relative Modules
-from .error import ConfigError
-from .decorators import deprecated
-from .colours import FAIL, _RST_, HEADER, OKBLUE
+from .colours import _RST_, OKBLUE
 from .functions import typecheck, list_comp, addspace, _strip
 from . import check_file
 
 # global attributes
-__all__ = ('test', 'main', 'copytree', 'list_files', 'list_files_fmt', 'freplace')
+__all__ = ('copytree', 'list_files',
+           'list_files_fmt', 'freplace')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
-__version__ = float(version[0:3])
-__cpath__ = '/'.join(os.path.realpath(__file__).split('/')[:-1])
-__cwd__ = os.getcwd()
 
 
 def freplace(filein, olddata, newdata):
     """Replace a string in a file."""
-    with open(filein,'r') as f:
+    with open(filein, 'r') as f:
         filedata = f.read()
 
     newdata = filedata.replace(olddata, newdata)
 
-    with open(filein,'w') as f:
+    with open(filein, 'w') as f:
         f.write(newdata)
     pass
+
 
 def copytree(src, dst, symlinks=False, ignore=None):
     """Better wrapper for copying tree directives."""
@@ -59,10 +55,10 @@ def list_files(dir):
 
 
 def list_files_fmt(startpath, ignore='',
-                formatter=['  ', '| ', 1, '|--', ''],
-                pad=False, append=False, docs=False, header_wrap=None):
-    """Intelligent directory stepper + ascii plotter."""
-    """
+                   formatter=['  ', '| ', 1, '|--', ''],
+                   pad=False, append=False, docs=False, header_wrap=None):
+    """Intelligent directory stepper + ascii plotter.
+
     Will walk through directories starting at startpath
     ignore is a csv string 'ignore1, ignore2...' that will ignore any
         file or directory with same name
@@ -107,6 +103,8 @@ def list_files_fmt(startpath, ignore='',
                     dir_base = f'{dir_base}{header_wrap[1]}'
             full.append(f'{indent}{dir_base}{e}')
             subindent = s + a * b * (level + 1) + c
+            if len(files) == 0:
+                continue
             len_lvl = max(list(map((lambda x: len(x)), files))) + 1
             for i, f in enumerate(files):
                 _f_ck = '/'.join(root) + f'/{f}'
@@ -121,5 +119,8 @@ def list_files_fmt(startpath, ignore='',
                         f += _f
                 if list_comp(_f_ck.split('/'), ignore):
                     full.append('{}{}{}'.format(subindent, f, e))
-
     return tuple(full)
+
+# end of code
+
+# end of file

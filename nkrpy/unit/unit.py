@@ -1,15 +1,13 @@
 """Unit conversion."""
 
 # internal modules
-from collections.abc import (MutableSequence, MutableSet, MutableMapping)
-from inspect import isclass
 
 # external modules
 from numpy import ndarray
 
 # relative modules
-from .functions import typecheck
-from .constants import h, c, kb  # imported as cgs
+from ..functions import typecheck
+from ..constants import h, c, kb  # imported as cgs
 from ._unit import units
 
 # global attributes
@@ -25,7 +23,6 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 c = c * 1E8  # A/s
-h = h * 1E-7  # SI
 kb = kb * 1E-7  # SI
 
 
@@ -40,20 +37,28 @@ def checknum(num):
 class BaseUnit(object):
     def __init__(self, **entries):
         self.__dict__.update(entries)
+
     def values(self):
         return self.__dict__.values()
+
     def items(self):
         return self.__dict__.items()
+
     def keys(self):
         return self.__dict__.keys()
+
     def __iter__(self):
         return self.__dict__.items().__iter__()
+
     def __getitem__(self, key):
         return getattr(self, key)
+
     def __next__(self):
         pass
+
     def __setattr__(self):
         pass
+
     def __delattr__(self):
         pass
 
@@ -61,7 +66,10 @@ class BaseUnit(object):
 class Unit(object):
     """Convert between major unit types."""
 
-    def __init__(self, baseunit: str=None, convunit: str=None, vals=None):
+    __units = BaseUnit(**units)
+
+    def __init__(self, baseunit: str = None,
+                 convunit: str = None, vals=None):
         """Main unit building.
 
         Parameters
@@ -74,7 +82,6 @@ class Unit(object):
             The numbers to convert. Not Required.
         """
 
-        self.__units = BaseUnit(**units)
         self.reset()
         if baseunit is not None:
             self.__current_unit = self.__resolve_units(baseunit)
@@ -85,18 +92,20 @@ class Unit(object):
         self.__current_vals = vals
         self.__final_vals = self.__return_vals(vals=vals)
 
-    def __call__(self, convunit: str=None, vals=None):
+    def __call__(self, convunit: str = None, vals=None):
         """Standard call for resolving various conditions.
+
+        Allows repeat calls and inline calling of function.
+        Main process to gather all files
+        This returns object of itself. Use return functions to get needed items
 
         Parameters
         ----------
         unit: str
         vals: float | ndarray
-        Allows repeat calls and inline calling of function.
-        Main process to gather all files
-        This returns object of itself. Use return functions to get needed items
         """
-        if not isinstance(vals, ndarray) and not checknum(vals) and (vals is not None):
+        if not isinstance(vals, ndarray) and\
+           not checknum(vals) and (vals is not None):
             return
 
         if isinstance(convunit, ndarray) or checknum(convunit):
@@ -123,9 +132,20 @@ class Unit(object):
         self.__return_vals()
         _t = self.__final_vals
         if typecheck(_t):
-            return ', '.join(map(str,_t))
+            return ', '.join(map(str, _t))
         else:
             return str(f'{_t}')
+
+    def __format__(self, formatstr: str = 's'):
+        if formatstr == 's':
+            return self.__repr__()
+        if '.' in formatstr:
+            fmt = '{0:' + formatstr + '}'
+            return fmt.format(self.__format__('f'))
+        if formatstr == 'f':
+            return float(self.__repr__())
+        if formatstr == 'd':
+            return int(self.__repr__())
 
     def __abs__(self):
         return abs(self.__final_vals)
@@ -151,14 +171,16 @@ class Unit(object):
             value = value.__final_vals
         return self.__final_vals / value
 
-    def __rdivmod__(self, *args, **kwargs):
-        return self.__divmod__(*args, **kwargs)
+    def __rdivmod__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return value / self.__final_vals
 
     def __truediv__(self, *args, **kwargs):
         return self.__divmod__(*args, **kwargs)
 
     def __rtruediv__(self, *args, **kwargs):
-        return self.__truediv__(*args, **kwargs)
+        return self.__rdivmod__(*args, **kwargs)
 
     def __mul__(self, value):
         if isinstance(value, Unit):
@@ -173,24 +195,30 @@ class Unit(object):
             value = value.__final_vals
         return self.__final_vals ** value
 
-    def __rpow__(self, *args, **kwargs):
-        return self.__pow__(*args, **kwargs)
+    def __rpow__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return value ** self.__final_vals
 
     def __mod__(self, value):
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals % value
 
-    def __rmod__(self, *args, **kwargs):
-        return self.__mod__(*args, **kwargs)
+    def __rmod__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return value % self.__final_vals
 
     def __floordiv__(self, value):
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals // value
 
-    def __rfloordiv__(self, *args, **kwargs):
-        return self.__floordiv__(*args, **kwargs)
+    def __rfloordiv__(self, value):
+        if isinstance(value, Unit):
+            value = value.__final_vals
+        return value // self.__final_vals
 
     def __int__(self):
         return int(self.__final_vals)
@@ -270,7 +298,7 @@ class Unit(object):
         else:
             return self.__units[bu]
 
-    def __conversion(self, vals = None):
+    def __conversion(self, vals=None):
         """Return conversion factor needed.
 
         Parameters

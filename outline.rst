@@ -2,170 +2,146 @@
 Outline
 =========
 
-:Web: `https://github.com/nickalaskreynolds/nkrpy`_
-:Author: `Nickalas Reynolds`_ <nickalaskreynolds@gmail.com>
-:Author Web: `reynolds.oucreate.com`_
-:Date: 2018-12-11 11:34:10.669382
-:Description: This file fully explores all directories of the module `nkrpy`.
-:Desc. Cont...: This file is auto-generated
+:Web: `nkrpy`_
+:Author: `Nickalas Reynolds`_ email@nickreynolds.xyz
+:Author Web: `http://nickreynolds.xyz`_
+:Date: 2019-12-27 19:59:47.984084
+:Description: This is my own personaly python files that can be useful. They are not guaranteed to work. Just things I tend to use a lot.
+:Desc. Cont...: This file is auto-generated from bin/outlinegen.py
 
-.. _`Nickalas Reynolds`: mailto:nickalaskreynolds@gmail.com
-.. _`reynolds.oucreate.com`: reynolds.oucreate.com
-.. _`https://github.com/nickalaskreynolds/nkrpy`: https://github.com/nickalaskreynolds/nkrpy
+.. _`Nickalas Reynolds`: mailto:email@nickreynolds.xyz
+.. _`http://nickreynolds.xyz`: http://nickreynolds.xyz
+.. _`nkrpy`: http://github.com/nickalaskreynolds/nkrpy
 
-* **nkrpy/**
+* nkrpy/
 
-  * .rst_pdf.json <--
+  * files.py           <--
 
-  * README.md     <--
+  * keplerian.py       <--
 
-  * outline.rst   <--
+  * colours.py         <--
 
-  * setup.py      <--
+  * check_file.py      <--
 
-  * makefile      <--
+  * sizeof.py          <--
 
-  * **bin/**
+  * decorators.py      <--
 
-    * template      <--
+  * load.py            <--
 
-    * outlinegen.py <--"""This file fully explores all directories of the module `nkrpy`."""
+  * convert_jy_to_k.py <--
 
-    * docgen.sh     <--
+  * stdio.py           <--
 
-    * **templates/**
+  * error.py           <--
 
-      * template.py  <--"""."""
+  * constants.py       <--
 
-      * template.md  <--
+  * config.py          <--
 
-      * template.rst <--
+  * radio_functions.py <--
 
-      * template.sh  <--
+  * sorting.py         <--
 
-    * **misc/**
+  * astro.py           <--
 
-      * paul_bootstrap.py          <--
+  * mp.py              <--
 
-      * arcsat_nightlog_creator.sh <--
+  * functions.py       <--
 
-      * submit_jobs.py             <--
+  * coordinates.py     <--
 
-      * matplotlib_colors.py       <--
+  * utilities.py       <--
 
-      * QL_ARCSAT.py               <--
+  * observing/
 
-      * fft_h370_example.ipynb     <--
+    * guidecam_thumbnail.py <--
 
-      * **tspec_analysis/**
+  * image/
 
-        * template_analysis.ipynb <--
+    * image_reproj.py <--
 
-        * README.md               <--
+    * image_interp.py <--
 
-  * **nkrpy/**
-
-    * constants.py      <--
-
-    * coordinates.py    <--
-
-    * error.py          <--
-
-    * functions.py      <--"""Just generic functions that I use a good bit."""
-
-    * linelist.py       <--"""Main linelist for various wavelength bands. The main
-
-    * astro.py          <--
+  * amlines/
 
     * atomicline.py.new <--
 
-    * colours.py        <--
-
-    * files.py          <--"""."""
-
-    * load.py           <--"""."""
-
-    * __info__.py       <--
-
-    * keplerian.py      <--"""orbital_params(lsma,usma,le,ue,li,ui,mass,size). Use orbital_params or orbital_2_xyz as the main function call.
-
-    * config.py         <--
-
-    * check_file.py     <--"""."""
-
-    * sorting.py        <--
-
     * atomiclines.py    <--
 
-    * sizeof.py         <--
+    * linelist.py       <--
 
-    * miscmath.py       <--
+  * dustmodels/
 
-    * decorators.py     <--"""Generalized decorators for common usage."""
+    * oh1994.tsb  <--
 
-    * stdio.py          <--
+    * kappa.py    <--
 
-    * **dustmodels/**
+    * README.md   <--
 
-      * oh1994.tsb <--
+  * check_file_templates/
 
-      * README.md  <--
+    * sh.py      <--
 
-      * kappa.py   <--"""Just generic functions that I use a good bit."""
+    * default.py <--
 
-    * **plot/**
+    * python.py  <--
 
-      * styles.py   <--
+  * publication/
 
-    * **mercury/**
+    * format.py   <--
 
-      * orbit.py           <--"""This packages tries to be fairly robust and efficient, utilizing the speedups offered via numpy where applicable and multicore techniques. To get started, simply need a config file and call orbit.main(config). Inside the config should be mostly 3 things: files<input file list> out_dir<outputdirectory> and out_name<unique output name>. A lot of files will be generated (sometimes tens of thousands). The end goal is matplotlib libraries are ineffient for animation creation, so static thumbnails are created and then a imagmagick shell script is created to utilize a more efficient program."""
+    * plots.py    <--
 
-      * config_orbit.py    <--
+  * reduction/
 
-      * config_plotting.py <--
+    * plottingtspec.py <--
 
-      * file_loader.py     <--
+    * apoexpcal.pro    <--
 
-      * plotting.py        <--
+    * reduction.py     <--
 
-    * **image/**
+    * arcsat/
 
-      * image_interp.py <--
+      * arcsat_file.py     <--
 
-      * image_reproj.py <--
+      * arcsat_mosaic.py   <--
 
-    * **apo/**
+      * reduction.py       <--
 
-      * combined_orders_template.ipynb <--
+      * template_config.py <--
 
-      * fits.py                        <--"""."""
+  * math/
 
-      * guidecam_thumbnail.py          <--"""Just call this module as a file while inside the directory of guidecam images."""
+    * fit.py      <--
 
-      * reduction.py                   <--
+    * image.py    <--
 
-      * apoexpcal.pro                  <--
+    * miscmath.py <--
 
-      * generate_ipynb.sh              <--
+    * sampler.py  <--
 
-      * **arcsat/**
+  * unit/
 
-        * template_config.py <--
+    * _unit.py    <--
 
-        * arcsat_file.py     <--"""."""
+    * unit.py     <--
 
-        * reduction.py       <--"""Handles bulk reduction for ARCSAT. Must have a config file defined and tries to do basic reduction quickly."""
+  * mercury/
 
-        * arcsat_mosaic.py   <--"""."""
+    * file_loader.py     <--
 
-    * **check_file_templates/**
+    * plotting.py        <--
 
-      * default.py <--
+    * config_orbit.py    <--
 
-      * sh.py      <--
+    * orbit.py           <--
 
-      * python.py  <--
+    * config_plotting.py <--
+
+  * fits/
+
+    * functions.py <--
 
 
 

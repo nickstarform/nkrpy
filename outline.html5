@@ -2,15 +2,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.15.2: http://docutils.sourceforge.net/" />
 <title>Outline</title>
-<meta name="author" content="Nickalas Reynolds &lt;nickalaskreynolds&#64;gmail.com&gt;" />
+<meta name="author" content="Nickalas Reynolds email&#64;nickreynolds.xyz" />
+<meta name="dcterms.date" content="2019-12-27 19:59:47.984084" />
+<link rel="schema.dcterms" href="http://purl.org/dc/terms/">
 <style type="text/css">
 
 /* Minimal style sheet for the HTML output of Docutils.                    */
 /*                                                                         */
 /* :Author: Günter Milde, based on html4css1.css by David Goodger          */
-/* :Id: $Id: minimal.css 8036 2017-02-14 13:05:46Z milde $               */
+/* :Id: $Id: minimal.css 8216 2018-06-05 13:37:44Z milde $               */
 /* :Copyright: © 2015 Günter Milde.                                        */
 /* :License: Released under the terms of the `2-Clause BSD license`_,      */
 /*    in short:                                                            */
@@ -103,9 +105,10 @@ dl.simple > dd, dl.compact > dd {
 
 /* Table of Contents */
 div.topic.contents { margin: 0; }
-ul.auto-toc {
+div.topic.contents ul {
   list-style-type: none;
-  padding-left: 1.5em; }
+  padding-left: 1.5em;
+}
 
 /* Enumerated Lists */
 ol.arabic     { list-style: decimal }
@@ -236,13 +239,14 @@ div.sidebar {
 }
 
 /* Text Blocks */
+blockquote,
 div.topic,
 pre.literal-block,
 pre.doctest-block,
 pre.math,
 pre.code {
-  margin-right: 40px;
-  margin-left: 40px;
+  margin-left: 1.5em;
+  margin-right: 1.5em
 }
 pre.code .ln { color: gray; } /* line numbers */
 
@@ -275,7 +279,7 @@ table.borderless td, table.borderless th {
 /* Rules for easy reading and pre-defined style variants.		   */
 /*                                                                         */
 /* :Author: Günter Milde, based on html4css1.css by David Goodger          */
-/* :Id: $Id: plain.css 8120 2017-06-22 21:02:40Z milde $               */
+/* :Id: $Id: plain.css 8229 2018-11-20 17:47:12Z milde $               */
 /* :Copyright: © 2015 Günter Milde.                                        */
 /* :License: Released under the terms of the `2-Clause BSD license`_,      */
 /*    in short:                                                            */
@@ -295,8 +299,8 @@ table.borderless td, table.borderless th {
 
 /* "page layout" */
 body {
-  padding: 0 5%;
-  margin: 8px 0;
+  margin: 0;
+  background-color: #dbdbdb;
 }
 div.document {
   line-height:1.3;
@@ -305,7 +309,9 @@ div.document {
   /* avoid long lines --> better reading */
   /* OTOH: lines should not be too short because of missing hyphenation, */
   max-width: 50em;
+  padding: 1px 2%; /* 1px on top avoids grey bar above title (mozilla) */
   margin: auto;
+  background-color: white;
 }
 
 /* Sections */
@@ -397,19 +403,9 @@ span.fn-backref {
 /* ============          */
 
 /* Literal Blocks           */
-pre.literal-block, pre.doctest-block,
-pre.math, pre.code {
-  margin-left: 1.5em;
-  margin-right: 1.5em
-}
 
 /* Block Quotes             */
 
-blockquote,
-div.topic {
-  margin-left: 1.5em;
-  margin-right: 1.5em
-}
 blockquote > table,
 div.topic > table {
   margin-top: 0;
@@ -504,6 +500,7 @@ div.sidebar {
 
 /* Code                     */
 
+pre.code { padding: 0.7ex }
 pre.code, code { background-color: #eeeeee }
 pre.code .ln { color: gray; } /* line numbers */
 /* basic highlighting: for a complete scheme, see */
@@ -565,138 +562,125 @@ a { text-decoration: none; }
 <body>
 <div class="document" id="outline">
 <h1 class="title">Outline</h1>
-
 <dl class="docinfo simple">
 <dt class="web">Web</dt>
-<dd class="web"><p><a class="reference external" href="https://github.com/nickalaskreynolds/nkrpy">https://github.com/nickalaskreynolds/nkrpy</a></p>
+<dd class="web"><p><a class="reference external" href="http://github.com/nickalaskreynolds/nkrpy">nkrpy</a></p>
 </dd>
 <dt class="author">Author</dt>
-<dd class="author"><p><a class="reference external" href="mailto:nickalaskreynolds&#64;gmail.com">Nickalas Reynolds</a> &lt;<a class="reference external" href="mailto:nickalaskreynolds&#64;gmail.com">nickalaskreynolds&#64;gmail.com</a>&gt;</p></dd>
+<dd class="author"><p><a class="reference external" href="mailto:email&#64;nickreynolds.xyz">Nickalas Reynolds</a> <a class="reference external" href="mailto:email&#64;nickreynolds.xyz">email&#64;nickreynolds.xyz</a></p></dd>
 <dt class="author-web">Author Web</dt>
-<dd class="author-web"><p><a class="reference external" href="reynolds.oucreate.com">reynolds.oucreate.com</a></p>
+<dd class="author-web"><p><a class="reference external" href="http://nickreynolds.xyz">http://nickreynolds.xyz</a></p>
 </dd>
 <dt class="date">Date</dt>
-<dd class="date">2018-12-11 11:34:10.669382</dd>
+<dd class="date">2019-12-27 19:59:47.984084</dd>
 <dt class="description">Description</dt>
-<dd class="description"><p>This file fully explores all directories of the module <cite>nkrpy</cite>.</p>
+<dd class="description"><p>This is my own personaly python files that can be useful. They are not guaranteed to work. Just things I tend to use a lot.</p>
 </dd>
 <dt class="desc-cont">Desc. Cont...</dt>
-<dd class="desc-cont"><p>This file is auto-generated</p>
+<dd class="desc-cont"><p>This file is auto-generated from bin/outlinegen.py</p>
 </dd>
 </dl>
 <ul class="simple">
-<li><p><strong>nkrpy/</strong></p>
+<li><p>nkrpy/</p>
 <ul>
-<li><p>.rst_pdf.json &lt;--</p></li>
-<li><p>README.md     &lt;--</p></li>
-<li><p>outline.rst   &lt;--</p></li>
-<li><p>setup.py      &lt;--</p></li>
-<li><p>makefile      &lt;--</p></li>
-<li><p><strong>bin/</strong></p>
+<li><p>files.py           &lt;--</p></li>
+<li><p>keplerian.py       &lt;--</p></li>
+<li><p>colours.py         &lt;--</p></li>
+<li><p>check_file.py      &lt;--</p></li>
+<li><p>sizeof.py          &lt;--</p></li>
+<li><p>decorators.py      &lt;--</p></li>
+<li><p>load.py            &lt;--</p></li>
+<li><p>convert_jy_to_k.py &lt;--</p></li>
+<li><p>stdio.py           &lt;--</p></li>
+<li><p>error.py           &lt;--</p></li>
+<li><p>constants.py       &lt;--</p></li>
+<li><p>config.py          &lt;--</p></li>
+<li><p>radio_functions.py &lt;--</p></li>
+<li><p>sorting.py         &lt;--</p></li>
+<li><p>astro.py           &lt;--</p></li>
+<li><p>mp.py              &lt;--</p></li>
+<li><p>functions.py       &lt;--</p></li>
+<li><p>coordinates.py     &lt;--</p></li>
+<li><p>utilities.py       &lt;--</p></li>
+<li><p>observing/</p>
 <ul>
-<li><p>template      &lt;--</p></li>
-<li><p>outlinegen.py &lt;--&quot;&quot;&quot;This file fully explores all directories of the module <cite>nkrpy</cite>.&quot;&quot;&quot;</p></li>
-<li><p>docgen.sh     &lt;--</p></li>
-<li><p><strong>templates/</strong></p>
-<ul>
-<li><p>template.py  &lt;--&quot;&quot;&quot;.&quot;&quot;&quot;</p></li>
-<li><p>template.md  &lt;--</p></li>
-<li><p>template.rst &lt;--</p></li>
-<li><p>template.sh  &lt;--</p></li>
+<li><p>guidecam_thumbnail.py &lt;--</p></li>
 </ul>
 </li>
-<li><p><strong>misc/</strong></p>
+<li><p>image/</p>
 <ul>
-<li><p>paul_bootstrap.py          &lt;--</p></li>
-<li><p>arcsat_nightlog_creator.sh &lt;--</p></li>
-<li><p>submit_jobs.py             &lt;--</p></li>
-<li><p>matplotlib_colors.py       &lt;--</p></li>
-<li><p>QL_ARCSAT.py               &lt;--</p></li>
-<li><p>fft_h370_example.ipynb     &lt;--</p></li>
-<li><p><strong>tspec_analysis/</strong></p>
-<ul>
-<li><p>template_analysis.ipynb &lt;--</p></li>
-<li><p>README.md               &lt;--</p></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>nkrpy/</strong></p>
-<ul>
-<li><p>constants.py      &lt;--</p></li>
-<li><p>coordinates.py    &lt;--</p></li>
-<li><p>error.py          &lt;--</p></li>
-<li><p>functions.py      &lt;--&quot;&quot;&quot;Just generic functions that I use a good bit.&quot;&quot;&quot;</p></li>
-<li><p>linelist.py       &lt;--&quot;&quot;&quot;Main linelist for various wavelength bands. The main</p></li>
-<li><p>astro.py          &lt;--</p></li>
-<li><p>atomicline.py.new &lt;--</p></li>
-<li><p>colours.py        &lt;--</p></li>
-<li><p>files.py          &lt;--&quot;&quot;&quot;.&quot;&quot;&quot;</p></li>
-<li><p>load.py           &lt;--&quot;&quot;&quot;.&quot;&quot;&quot;</p></li>
-<li><p>__info__.py       &lt;--</p></li>
-<li><p>keplerian.py      &lt;--&quot;&quot;&quot;orbital_params(lsma,usma,le,ue,li,ui,mass,size). Use orbital_params or orbital_2_xyz as the main function call.</p></li>
-<li><p>config.py         &lt;--</p></li>
-<li><p>check_file.py     &lt;--&quot;&quot;&quot;.&quot;&quot;&quot;</p></li>
-<li><p>sorting.py        &lt;--</p></li>
-<li><p>atomiclines.py    &lt;--</p></li>
-<li><p>sizeof.py         &lt;--</p></li>
-<li><p>miscmath.py       &lt;--</p></li>
-<li><p>decorators.py     &lt;--&quot;&quot;&quot;Generalized decorators for common usage.&quot;&quot;&quot;</p></li>
-<li><p>stdio.py          &lt;--</p></li>
-<li><p><strong>dustmodels/</strong></p>
-<ul>
-<li><p>oh1994.tsb &lt;--</p></li>
-<li><p>README.md  &lt;--</p></li>
-<li><p>kappa.py   &lt;--&quot;&quot;&quot;Just generic functions that I use a good bit.&quot;&quot;&quot;</p></li>
-</ul>
-</li>
-<li><p><strong>plot/</strong></p>
-<ul>
-<li><p>styles.py   &lt;--</p></li>
-</ul>
-</li>
-<li><p><strong>mercury/</strong></p>
-<ul>
-<li><p>orbit.py           &lt;--&quot;&quot;&quot;This packages tries to be fairly robust and efficient, utilizing the speedups offered via numpy where applicable and multicore techniques. To get started, simply need a config file and call orbit.main(config). Inside the config should be mostly 3 things: files&lt;input file list&gt; out_dir&lt;outputdirectory&gt; and out_name&lt;unique output name&gt;. A lot of files will be generated (sometimes tens of thousands). The end goal is matplotlib libraries are ineffient for animation creation, so static thumbnails are created and then a imagmagick shell script is created to utilize a more efficient program.&quot;&quot;&quot;</p></li>
-<li><p>config_orbit.py    &lt;--</p></li>
-<li><p>config_plotting.py &lt;--</p></li>
-<li><p>file_loader.py     &lt;--</p></li>
-<li><p>plotting.py        &lt;--</p></li>
-</ul>
-</li>
-<li><p><strong>image/</strong></p>
-<ul>
-<li><p>image_interp.py &lt;--</p></li>
 <li><p>image_reproj.py &lt;--</p></li>
+<li><p>image_interp.py &lt;--</p></li>
 </ul>
 </li>
-<li><p><strong>apo/</strong></p>
+<li><p>amlines/</p>
 <ul>
-<li><p>combined_orders_template.ipynb &lt;--</p></li>
-<li><p>fits.py                        &lt;--&quot;&quot;&quot;.&quot;&quot;&quot;</p></li>
-<li><p>guidecam_thumbnail.py          &lt;--&quot;&quot;&quot;Just call this module as a file while inside the directory of guidecam images.&quot;&quot;&quot;</p></li>
-<li><p>reduction.py                   &lt;--</p></li>
-<li><p>apoexpcal.pro                  &lt;--</p></li>
-<li><p>generate_ipynb.sh              &lt;--</p></li>
-<li><p><strong>arcsat/</strong></p>
-<ul>
-<li><p>template_config.py &lt;--</p></li>
-<li><p>arcsat_file.py     &lt;--&quot;&quot;&quot;.&quot;&quot;&quot;</p></li>
-<li><p>reduction.py       &lt;--&quot;&quot;&quot;Handles bulk reduction for ARCSAT. Must have a config file defined and tries to do basic reduction quickly.&quot;&quot;&quot;</p></li>
-<li><p>arcsat_mosaic.py   &lt;--&quot;&quot;&quot;.&quot;&quot;&quot;</p></li>
+<li><p>atomicline.py.new &lt;--</p></li>
+<li><p>atomiclines.py    &lt;--</p></li>
+<li><p>linelist.py       &lt;--</p></li>
 </ul>
 </li>
+<li><p>dustmodels/</p>
+<ul>
+<li><p>oh1994.tsb  &lt;--</p></li>
+<li><p>kappa.py    &lt;--</p></li>
+<li><p>README.md   &lt;--</p></li>
 </ul>
 </li>
-<li><p><strong>check_file_templates/</strong></p>
+<li><p>check_file_templates/</p>
 <ul>
-<li><p>default.py &lt;--</p></li>
 <li><p>sh.py      &lt;--</p></li>
+<li><p>default.py &lt;--</p></li>
 <li><p>python.py  &lt;--</p></li>
 </ul>
 </li>
+<li><p>publication/</p>
+<ul>
+<li><p>format.py   &lt;--</p></li>
+<li><p>plots.py    &lt;--</p></li>
+</ul>
+</li>
+<li><p>reduction/</p>
+<ul>
+<li><p>plottingtspec.py &lt;--</p></li>
+<li><p>apoexpcal.pro    &lt;--</p></li>
+<li><p>reduction.py     &lt;--</p></li>
+<li><p>arcsat/</p>
+<ul>
+<li><p>arcsat_file.py     &lt;--</p></li>
+<li><p>arcsat_mosaic.py   &lt;--</p></li>
+<li><p>reduction.py       &lt;--</p></li>
+<li><p>template_config.py &lt;--</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>math/</p>
+<ul>
+<li><p>fit.py      &lt;--</p></li>
+<li><p>image.py    &lt;--</p></li>
+<li><p>miscmath.py &lt;--</p></li>
+<li><p>sampler.py  &lt;--</p></li>
+</ul>
+</li>
+<li><p>unit/</p>
+<ul>
+<li><p>_unit.py    &lt;--</p></li>
+<li><p>unit.py     &lt;--</p></li>
+</ul>
+</li>
+<li><p>mercury/</p>
+<ul>
+<li><p>file_loader.py     &lt;--</p></li>
+<li><p>plotting.py        &lt;--</p></li>
+<li><p>config_orbit.py    &lt;--</p></li>
+<li><p>orbit.py           &lt;--</p></li>
+<li><p>config_plotting.py &lt;--</p></li>
+</ul>
+</li>
+<li><p>fits/</p>
+<ul>
+<li><p>functions.py &lt;--</p></li>
 </ul>
 </li>
 </ul>

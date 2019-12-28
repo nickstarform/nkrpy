@@ -35,27 +35,27 @@ def Keplerian_Rotation(mass, velocity, Distance, inclination):
 """
 def planck_wav(temp=None, val=None, unit=None):
     """Plank Function in wavelength."""
-    _c = Units(unit='angstroms', vals=c)('meters')
+    _c = Unit(baseunit='angstroms', vals=c)('meters')
     _h = h
-    wav = Units(unit=unit, vals=val)('meters')
+    wav = Unit(baseunit=unit, vals=val)('meters')
     a = 2.0 * _h * _c ** 2
     b = _h * _c / (wav * kb * temp)
     intensity = a / ((wav ** 5) * (np.exp(b) - 1.0))
     # returns in units of watts/ m^2 / steradian / Hz
-    return intensity * Units(unit='meters', vals=1)('hz')
+    return intensity * Unit(baseunit='meters', vals=1)('hz')
 
 
 def planck_nu(temp=None, val=None, unit=None):
     """Plank Function in frequency."""
-    _c = Units(unit='angstroms', vals=c)('meters')
+    _c = Unit(baseunit='angstroms', vals=c)('meters')
     _h = h
 
-    nu = Units(unit=unit, vals=val)('hz')
+    nu = Unit(baseunit=unit, vals=val)('hz')
     a = 2.0 * _h / _c ** 2
     b = _h * nu / (kb * temp)
     intensity = a * (nu ** 3) / (np.exp(b) - 1.0)
     # returns in units of watts/ m^2 / steradian / inputunit
-    return intensity * Units(unit='hz', vals=1)(unit)
+    return intensity * Unit(baseunit='hz', vals=1)(unit)
 
 
 @deprecated
@@ -65,15 +65,16 @@ def planck():
 
 def dustmass(dist=100, dist_unit='pc', val=0.1,
              val_unit='cm', flux=0, temp=20,
-             model_name='oh1994', beta=1.7, gas_density=0, opacity=-1):
+             model_name='oh1994', beta=1.7, gas_density=0, opacity=None):
     """Calculate dust mass.
 
     @param dist, dist_unit, wavelength, wavelength_unit, flux, temp,model,beta, opacity
     Assuming temp in Kelvin, flux in Janskys"""
-    dist = Units(unit=dist_unit, vals=dist)('cm')  # to match the opacity units
-    wav = Units(unit=val_unit, vals=val)('microns')  # to search opcaity models
-    intensity = planck_nu(temp, Units(unit=val_unit, vals=val)('hz'), 'hz') *\
-        1.E26  # in jansky
+    dist = float(Unit(baseunit=dist_unit, vals=dist)('cm'))  # to match the opacity units
+    wav = float(Unit(baseunit=val_unit, vals=val)('microns'))  # to search opcaity models
+    intensity = planck_nu(temp, float(Unit(baseunit=val_unit, vals=val)('hz')), 'hz') * 1.E26  # in jansky
+    from IPython import embed
+    #embed()
     if not opacity:
         opacity = kappa(wav, model_name=model_name, density=gas_density, beta=beta)  # cm^2/g
     else:
@@ -82,29 +83,6 @@ def dustmass(dist=100, dist_unit='pc', val=0.1,
     _ret = []
     for x in opacity:
         _tmp = dist**2 * flux / x / intensity / msun  # noqa in msun units (no ISM assump.)
-        # print(x, dist, flux, intensity, _tmp)
-        toret += '{}...{}\n'.format(x, _tmp)
-        _ret.append(np.array([x, _tmp]))
-    return toret, np.array(_ret)
-
-
-def emissive_mass(flux=0, dist=100, dist_unit='pc', wav=0.1,
-                  wav_unit='cm', temp=20,
-                  model_name='oh1994', beta=1.7,
-                  gas_density=0, dgr=1, quiet=False):
-    """Calculate emissive mass mass.
-    @param dist, dist_unit, val, val_unit, flux, temp,model,beta, dgr"""
-    """Assuming temp in Kelvin, flux in Janskys"""
-    flux = flux * 1E-23
-    dist = Unit(baseunit=dist_unit, vals=dist)('cm')  # to match the opacity units
-    wav = Unit(baseunit=wav_unit, vals=wav)
-    wavl = wav('microns')  # to search opcaity models
-    opacity = kappa(wavl, model_name=model_name, density=gas_density,
-                    beta=beta, quiet=True)  # cm^2/g
-    toret = 'For the various opacities:\n(cm^2/g)...(g)\n'
-    _ret = []
-    for x in opacity:
-        _tmp = (dist * wav('cm')) ** 2 * flux / (2. * x * kb * 1E7) * dgr / temp  # noqa in grams units (no ISM assump.)
         # print(x, dist, flux, intensity, _tmp)
         toret += '{}...{}\n'.format(x, _tmp)
         _ret.append(np.array([x, _tmp]))

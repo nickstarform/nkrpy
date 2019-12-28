@@ -12,29 +12,68 @@ import numpy as np
 from ..functions import typecheck
 
 # global attributes
-__all__ = ('read', 'write')
+__all__ = ('read', 'write', 'make_nan', 'make_zero',
+           'header_radec', 'create_header')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
-__version__ = 0.1
 
 
 def create_header(h):
-    """Create header from string."""
+    """Creater a header.
+
+    Take common types, recast to dict, create header.
+    Required that KEY is if you input a str or Iterable(str)
+    Feeding in a str is the most stable and tested method.
+
+    h = ('KEY= VALUE', ...)
+    h = {'KEY= VALUE', ...}
+    h = (('KEY', 'VALUE'), ...)
+    h = {KEY: VALUE, ...}
+    h = 'KEY= VALUE KEY= VALUE'
+
+    Parameters
+    ----------
+    h: iterable | str
+
+    Returns
+    -------
+    astropy.io.fits.header.Header | None
+        returns a header
+    """
+    CARD_MX_LEN = 22
+    if isinstance(h, fits.header.Header):
+        return h
     if isinstance(h, tuple) or isinstance(h, list) or isinstance(h, set):
-        return list(h)
-    if isinstance(h, str) or isinstance(h, fits.header.Header):
-        h = str(h)
-        regex = "(\S*\s*)(=)"
+        if typecheck(h[0]):
+            h = dict(h)
+        else:
+            h = dict(([x.split('=') for x in h]))
+    if isinstance(h, str):
+        ind0 = h.index('HISTORY')
+        h = [h[:ind0], h[len('history') + ind0 + 1:]]
+        h[-1] = h[-1].replace('HISTORY', ' ')
+        h = 'HISTORY= '.join(h)
+        regex = r"([A-Z,0-9,_]*\s*=)"
         matches = re.finditer(regex, str(h), re.MULTILINE)
         for num, match in enumerate(matches, start=1):
             linestart = match.group()
-        h = h.replace(linestart, f';;;{linestart}')
-        tmp = [line for line in h.split(';;;')]
-        return tmp
+            if linestart.replace(' ', '').replace('=', '') == '':
+                continue
+            h = h.replace(linestart, f';;;{linestart}')
+        tmp = []
+        for line in h.split(';;;'):
+            if line.replace(' ', '').replace('=', '') == '':
+                continue
+            ind0 = line.index('=')
+            key, value = line[:ind0], line[ind0 + 1:]
+            key = key.replace(' ', '')
+            value = ' / '.join([v.strip(' ').strip('"').strip("'").rjust(CARD_MX_LEN) for v in value.split('/')])
+            tmp.append((key, value))
+        ret = dict(tmp)
+        return fits.header.Header(ret)
     else:
         return None
-
 
 def read(fname: str):
     """Read in the file and neatly close.
@@ -126,17 +165,55 @@ def write(f, fname=None, header=None, data=None):
 
 
 def make_nan(filename: str):
+    """Convert a file to nan and save to nan_filename.
+
+    Will read in the file and convert the data to nan.
+
+    Parameters:
+    -----------
+    filename: str
+        name of the file to convert to nans
+
+    Returns
+    -------
+    """
     header, data = read(filename)
     data[:] = np.nan
     write(f'nan_{filename}', header=header, data=data)
 
 def make_zero(filename: str):
+    """Convert a file to zero and save to zero_filename.
+
+    Will read in the file and convert the data to zero.
+
+    Parameters:
+    -----------
+    filename: str
+        name of the file to convert to zeros
+
+    Returns
+    -------
+    """
     header, data = read(filename)
     data[:] = 0
     write(f'zero_{filename}', header=header, data=data)
 
+
 def header_radec(header: dict):
-    # check for hese headers CRTYPE, CRPIX, CRVAL, CDELT/CD
+    """Check for hese headers CRTYPE, CRPIX, CRVAL, CDELT/CD
+
+    Parameters:
+    -----------
+    header: dict
+        dictionary that holds radec conversions from fits
+
+    Returns
+    -------
+    rapix: numpy.ndarray
+        Array from start-end of ra the size of the fits image.
+    decpix: numpy.ndarray
+        Array from start-end of dec the size of the fits image.
+    """
     size = (header['NAXIS1'], header['NAXIS2'])
     ra_pix = header['CRPIX1']
     dec_pix = header['CRPIX2']
@@ -153,24 +230,5 @@ def header_radec(header: dict):
     rapix = np.arange(0, size[0], 1) * ra_del + ra_begin
     decpix = np.arange(0, size[1], 1) * dec_del + dec_begin
     return rapix, decpix
-
-
-
-def main():
-    """Main caller function."""
-    pass
-
-
-def test():
-    """Testing function for module."""
-    pass
-
-
-if __name__ == "__main__":
-    """Directly Called."""
-
-    print('Testing module')
-    test()
-    print('Test Passed')
 
 # end of code

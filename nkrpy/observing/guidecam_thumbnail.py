@@ -7,19 +7,19 @@ import multiprocessing as mp
 from argparse import ArgumentParser
 
 # external modules
-from astropy.io import fits
 import matplotlib.pyplot as plt
 import numpy as np
 
 # relative modules
+from .. import fits
 from ..files import list_files
 
 # global attributes
-__all__ = ('test', 'main', 'thumbnails')
-__doc__ = """Just call this module as a file while inside the directory of guidecam images."""
+__all__ = ('main', 'thumbnails')
+__doc__ = """Just call this module as a file while
+    inside the directory of guidecam images."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
-__version__ = 0.1
 _cwd_ = os.getcwd()
 cpu = mp.cpu_count()
 
@@ -27,16 +27,13 @@ cpu = mp.cpu_count()
 def thumbnails(ifile, ax, fig, dpi=200):
     """Create thumbnails."""
     outname = ifile.replace('.fits', '.png')
-    print(ifile)
-    header, data = None, None
-    with fits.open(ifile) as f:
-        header = f[0].header
-        data = f[0].data
+    header, data = fits.read(ifile)
+    header = header[0]
+    data = data[0]
     data = np.log10(data)
     med = np.median(data)
     ax.imshow(data / med, cmap='gray', vmin=0.9995, vmax=1.001, origin='left')
     fig.savefig(outname, dpi=dpi)
-
 
 
 def main(dest, ifile):
@@ -65,7 +62,7 @@ def main(dest, ifile):
                 i += 1
         else:
             fig[p_count] = plt.figure(figsize=(4, 4))
-            ax[p_count] = fig[p_count].add_subplot(111) 
+            ax[p_count] = fig[p_count].add_subplot(111)
             ax[p_count].set_title(f'{x}')
             a = (x, ax[p_count], fig[p_count])
             processes[p_count] = Process(target=thumbnails, args=a)
@@ -75,11 +72,6 @@ def main(dest, ifile):
     for process in processes:
         if process:
             process.join()
-
-
-def test():
-    """Testing function for module."""
-    pass
 
 
 if __name__ == "__main__":

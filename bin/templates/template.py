@@ -16,8 +16,7 @@ __version__ = 0.1
 
 
 def main():
-    """
-    Summary line.
+    """Summary line.
 
     Extended description of function.
 

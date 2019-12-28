@@ -12,11 +12,19 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 
 # import standard modules
 from copy import deepcopy
+
+# external modules
 import numpy as np
+
+# relative modules
 from .miscmath import binning
+from ._unit import units
+from . import constants
+
 
 def call(*args,**kwargs):
-    """
+    """Wrapper.
+
     Better wrapper for quickly calling 
     the lines class
     Can specify the arguments within a single line without
@@ -36,6 +44,7 @@ def call(*args,**kwargs):
         final()
     return final
 
+
 class lines(object):
     """
     supported units all to anstroms and hz
@@ -43,32 +52,10 @@ class lines(object):
     """
 
     def __init__(self):
-        """
-        Setup the class with loading copy
+        """Magic Method.
 
-        units{} defines all units that can be used
-        Dictionary is as follows:
-        key  = master name
-        vals = possible aliases to resolve
-        type = specifies either wavelength or frequency
-        fac  = the conversion factor to get to Angstrom(Hertz) for wavelength(frequency)
-        """
-        self.c     = 2.99792458e18       # speed of light AGS
-
-        self.units = {
-                         'bananas'    : {'vals':['b','banana'],'type':'wave','fac':2.032*10**9},
-                         'angstroms'  : {'vals':['ang','a','angs','angstrom'],'type':'wave','fac':1.},
-                         'micrometers': {'vals':['microns','micron','mu','micrometres','micrometre','micrometer'],'type':'wave','fac':10**4},
-                         'millimeters': {'vals':['mm','milli','millimetres','millimetre','millimeter'],'type':'wave','fac':10**7},
-                         'centimeters': {'vals':['cm','centi','centimetres','centimetre','centimeter'],'type':'wave','fac':10**8},
-                         'meters'     : {'vals':['m','metres','meter','metre'],'type':'wave','fac':10**10},
-                         'kilometers' : {'vals':['km','kilo','kilometres','kilometre','kilometer'],'type':'wave','fac':10**13},
-                         'hz'         : {'vals':['hertz','h'],'type':'freq','fac':1.},
-                         'khz'        : {'vals':['kilohertz','kilo-hertz','kh'],'type':'freq','fac':10**3},
-                         'mhz'        : {'vals':['megahertz','mega-hertz','mh'],'type':'freq','fac':10**6},
-                         'ghz'        : {'vals':['gigahertz','giga-hertz','gh'],'type':'freq','fac':10**9},
-                         'thz'        : {'vals':['terahertz','tera-hertz','th'],'type':'freq','fac':10**12},
-                         }
+        Setup the class with loading copy"""
+        self.units = units
 
         self.types = atomiclines.keys()
 
@@ -104,10 +91,10 @@ class lines(object):
             if ((x1 == self.x1) and (x2 == self.x2) and (self.region)) and not regen:
                 # checking if regions have already been set but flag misfired
                 regen = False
-                pass    
+                pass
             else:
                 regen = True
-                pass       
+                pass
         except:
             regen = True
 
@@ -240,15 +227,30 @@ class lines(object):
         """
         returns conversion factor needed
         """
-        if ctype == ftype: # converting between common types (wavelength->wavelength)
+        if ctype == ftype:  # converting between common types
             return self.units[init]['fac']/self.units[fin]['fac']
-        elif ctype == 'freq': # converting from freq to wavelength
-            return self.units['angstroms']['fac']/self.units[fin]['fac'] * self.c * self.units[init]['fac']/self.units['hz']['fac']
-        elif ctype == 'wave': # converting from wavelength to freq
-            return self.units['hz']['fac']/self.units[fin]['fac'] * self.c * self.units[init]['fac']/self.units['angstroms']['fac']
+        if ctype == 'freq':  # converting from freq to wavelength or energy
+            if ftype == 'wave':
+                return self.units['angstroms']['fac']/self.units[fin]['fac'] * constants.c * self.units[init]['fac']/self.units['hz']['fac']
+            if ftype == 'energy':
+                return self.units['angstroms']['fac']/self.units[fin]['fac'] * constants.c * self.units[init]['fac']/self.units['hz']['fac']
+        if ctype == 'wave':
+            if ftype == 'freq':  # converting from wavelength to freq
+                return self.units['hz']['fac']/self.units[fin]['fac'] * constants.c * self.units[init]['fac']/self.units['angstroms']['fac']
+            return self.conversion(init, ctype, 'hz', 'freq') * constants.h  # converting from wavelength to energy
+            
+        if ctype == 'energy':
+            if ftype == 'freq':
+                return self.units['hz']['fac']/self.units[fin]['fac'] * constants.c * self.units[init]['fac']/self.units['angstroms']['fac']
+            return self.conversion(init, ctype, 'hz', 'freq')
+
+        elif ctype == 'energy' and ftype == 'freq': # converting from wavelength to freq
+            return self.units['hz']['fac']/self.units[fin]['fac'] * constants.c * self.units[init]['fac']/self.units['angstroms']['fac']
+        elif ctype == 'energy' and ftype == 'wave': # converting from wavelength to freq
+            return self.units['hz']['fac']/self.units[fin]['fac'] * constants.c * self.units[init]['fac']/self.units['angstroms']['fac']
 
 
-    def find_lines(self):    
+    def find_lines(self):
         """
         Returns the dictionary of all converted types
         """

@@ -1,4 +1,4 @@
-all: clean, build, doc
+all: build, doc
 
 --help: help
 
@@ -20,6 +20,9 @@ clean: clear_pycache
 
 clear_pycache:
 	@find . -name "__pycache__" -type d -print0 | xargs -0 rm -rf
+
+test:
+	tox
 
 build: clean
 	@python3 setup.py build && python3 setup.py sdist
