@@ -21,9 +21,9 @@ class TestBaseGila(unittest.TestCase):
     __settings = {}
     __file = None
 
-    def compline(self):
+    def compline(self, lnum: int = 0):
         line = self.__file.readlines()
-        line = line[0]
+        line = line[lnum]
         line = ']'.join((line).split(']')[1:]).strip('\n').strip(' ')
         return line
 
@@ -38,6 +38,22 @@ class TestBaseGila(unittest.TestCase):
         line = self.compline()
         testline = 'The logger'
         self.__file .close()
+        self.assertEqual(line[:len(testline)], testline)
+
+    def test_decorator(self):
+    
+        @logger.decorator(style='debug')
+        def test(*args, **kwargs):
+            return args, kwargs
+
+        _t = test(1, one = 1)
+        name = logger.get_logfile()
+        logger.teardown()
+        self.__file = open(name, 'r')
+        line = self.compline(1)
+        logger.teardown()
+        self.__file .close()
+        testline = '''Called <test> with params: (1,), {'one': 1}'''
         self.assertEqual(line[:len(testline)], testline)
 
     def test_failure(self):

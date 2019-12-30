@@ -72,7 +72,7 @@ __doc__ = """
 
     logger.warn('This is a test message')
 
-    logger.decorator(style = 'debug', verbosity=5)
+    @logger.decorator(style = 'debug', verbosity=5)
     def custom_function(*args, **kwargs):
         return args, kwargs
 
@@ -107,7 +107,6 @@ class SingletonMetaClass(type):
 class Logger(object):
 
     __instance = None
-    __setup_status = False
 
     def __new__(cls):
         cls.__doc__ = __doc__ + cls.setup.__doc__
@@ -119,6 +118,7 @@ class Logger(object):
     def __init__(self):
         """Doesn't actually build the instance.
         Need to separately call the __setup."""
+        self.__setup_status = False
         pass
 
     def __guarantee_setup(function):
@@ -128,7 +128,7 @@ class Logger(object):
             if not args[0].__setup_status:
                 args[0].setup()
                 args[0].warn("The logger command wasn't properly setup," +
-                             "fallback values were used.")
+                             f"fallback values were used. {function}")
             result = function(*args, **kwargs)
             return result
         return wrapper
@@ -260,15 +260,18 @@ class Logger(object):
     """
 
     def decorator(self, style: str = 'warn', verbosity: int = 2):
+        print(1)
         def real_decorator(function):
+            print(10)
             def wrapper(*args, **kwargs):
-                msg = f'Calling <{function.__name}> with ' +\
+                print(10)
+                msg = f'Calling <{function.__name__}> with ' +\
                     f'params: {args}, {kwargs}'
                 (self.__resolve_style(style))(msg, verbosity)
                 result = function(*args, **kwargs)
-                (self.__resolve_style(style))(msg, verbosity)
-                msg = f'Called <{function.__name}> with ' +\
+                msg = f'Called <{function.__name__}> with ' +\
                     f'params: {args}, {kwargs}. Result: {result}'
+                (self.__resolve_style(style))(msg, verbosity)
                 return result
             return wrapper
         return real_decorator
@@ -375,11 +378,9 @@ class Logger(object):
             self.warn('Will continue in {}s. CTRL+C to escape'.format(seconds))
             time__sleep(seconds)
 
-    @__guarantee_setup
     def teardown(self):
         self.__teardown()
 
-    @__guarantee_setup
     def sigHandler(self):
         self.__sigHandler()
 
