@@ -89,21 +89,6 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 
-'''# function that creates a logger
-class SingletonMetaClass(type):
-    def __init__(cls, name, bases, dict):
-        super(SingletonMetaClass, cls).__init__(name, bases, dict)
-        original_new = cls.__new__
-
-        def my_new(cls, *args, **kwargs):
-            if cls.instance is None:
-                cls.instance = original_new(cls, *args, **kwargs)
-            return cls.instance
-
-        cls.instance = None
-        cls.__new__ = staticmethod(my_new)'''
-
-
 class Logger(object):
 
     __instance = None
