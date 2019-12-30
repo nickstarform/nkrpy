@@ -17,7 +17,7 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 
-class TestBaseGila(unittest.TestCase):
+class TestBaseLogger(unittest.TestCase):
     __settings = {}
     __file = None
 
