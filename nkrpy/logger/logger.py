@@ -245,11 +245,8 @@ class Logger(object):
     """
 
     def decorator(self, style: str = 'warn', verbosity: int = 2):
-        print(1)
         def real_decorator(function):
-            print(10)
             def wrapper(*args, **kwargs):
-                print(10)
                 msg = f'Calling <{function.__name__}> with ' +\
                     f'params: {args}, {kwargs}'
                 (self.__resolve_style(style))(msg, verbosity)
