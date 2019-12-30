@@ -15,7 +15,7 @@ from .. import colours
 
 # global parameters
 datetime__today = datetime__datetime.today
-__all__ = (
+__all__ = (  # noqa
     "Logger",
     "decorator",
     "waiting",
@@ -30,8 +30,61 @@ __all__ = (
     "enable_colour",
     "disable_colour",
     "setup",
+    "set_verbosity",
+    "get_verbosity",
+    "set_logfile_base",
+    "switch_logfile",
+    "new_logfile",
+    "get_logfile",
+    "teardown",
 )
-__doc__ = """."""
+__doc__ = """
+    Description
+    -----------
+    A very (read overly) generalized logger. Instantiated as a singleton,
+    this module can handle nearly any case of logging output desired. It
+    is codified to try and be threadsafe and cleanly deconstruct/close the
+    necessary files as terminated.
+
+    Definitions
+    -----------
+    verbosity
+        An integer from 1 - 5 that detail the amount of output to have. With
+        5 being a higher verbosity.
+    structure
+        A string that will handle deliniation between various logger outputs.
+        A string of `.>` with standard verbosity set, will output
+            ```
+            SUCCESS
+            FAILURE
+            .> HEADER1
+            .>.> HEADER2
+            .>.>.> MESSAGE
+            .>.> DEBUG
+            ```
+
+    Usage
+    -----
+    ```
+    from nkrpy import logger
+
+    logger.setup()  # inputs described below
+
+    logger.warn('This is a test message')
+
+    logger.decorator(style = 'debug', verbosity=5)
+    def custom_function(*args, **kwargs):
+        return args, kwargs
+
+    print(custom_function(1, ten = 10))
+    # .>.> Calling <{function.__name}> with  params: {args}, {kwargs}'
+    # 1, {'ten': 10}
+    # .>.> Called <{function.__name}> with  params: {args}, {kwargs}. Result: {result}'
+    ```
+
+    Setting up the Logger
+    ---------------------
+"""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
@@ -52,17 +105,12 @@ class SingletonMetaClass(type):
 
 
 class Logger(object):
-    """Generalized Logger.
-
-    Handles pretty logging both to terminal and to a log
-    file which was intended for running codes on clusters in batch jobs where
-    terminals were not slaved.
-    """
 
     __instance = None
     __setup_status = False
 
     def __new__(cls):
+        cls.__doc__ = __doc__ + cls.setup.__doc__
         if cls.__instance is None:
             instance = object.__new__(cls)
             cls.__instance = instance
@@ -86,9 +134,9 @@ class Logger(object):
         return wrapper
 
     def setup(self, append: bool = False,
-                verbosity: int = 2, use_colour: bool = True,
-                structure_string: str = ".    ", add_timestamp: bool = True,
-                logfile: str = None):
+              verbosity: int = 2, use_colour: bool = True,
+              structure_string: str = ".>", add_timestamp: bool = True,
+              logfile: str = None, suppress_terminal: bool = False):
         """Set the parameters for the Messenger class.
 
         Parameters
@@ -110,6 +158,8 @@ class Logger(object):
             This will serve as the base name for
                 the logfile. If unset will just
                 output to the terminal.
+        suppress_terminal: bool
+            If toggled will suppress terminal output
         """
         saved_args = locals()
         self.__setup_status = True
@@ -123,25 +173,26 @@ class Logger(object):
             self.disable_colour()
 
         ctime = str(time__time()).split('.')[0]
-        self.write_status = 'a' if self.append else 'w'
+        self.__write_status = 'a' if self.append else 'w'
         if not self.append and self.logfile is not None:
             self.logs = {'basename': self.logfile + f'-{ctime}'}
         else:
             self.logs = {'basename': self.logfile}
         self.logfile = ''
+        msg = f'The logger has been setup with parameters ' +\
+            f': {saved_args}'
+        self.success(msg)
 
     def _get_structure_string(self, level):
         """Returns the string of the message with the specified level
         Which is dependent on the verbosity
         """
-
         string = self.structure_string * level
         return string
 
     def _get_time_string(self):
         """Returns the detailed datetime for extreme debugging
         """
-
         string = ''
         if self.add_timestamp:
             string = '[{}] '.format(datetime__today())
@@ -155,10 +206,6 @@ class Logger(object):
         struct_string = self._get_structure_string(verb_level)
         time_string = self._get_time_string()
         return time_string + struct_string + msg
-
-    def __set_logfile_base(self, *, basename: str):
-        """Set the basename for the logfile."""
-        self.logs['basename'] = basename
 
     def __teardown(self):
         """Close all opened files."""
@@ -175,21 +222,21 @@ class Logger(object):
         self.__teardown()
         sys__exit(0)
 
-    def _write(self, cmod: str, msg: str, out: bool = True, fname: str = None):
+    def _write(self, cmod: str, msg: str, fname: str = None):
         """Wrapper to write to terminal and file.
 
         Write the message to the file and print
         it to the terminal if it is wanted.
         """
-        if out:
+        if not self.suppress_terminal:
             print("{}{}{}".format(cmod, msg, self._RST_))
 
         if self.logs['basename'] is None:
             return
         if fname is not None:
-            self.logfile = '-'.join(self.logs['basename'], fname) + '.log'
+            self.logfile = '-'.join((self.logs['basename'], fname)) + '.log'
         elif self.logfile == '':
-            self.logfile = '-'.join(self.logs['basename'], '-1') + '.log'
+            self.logfile = '-'.join((self.logs['basename'], '1')) + '.log'
 
         if self.logfile in self.logs:
             if self.logs[self.logfile].closed:
@@ -227,6 +274,32 @@ class Logger(object):
         return real_decorator
 
     @__guarantee_setup
+    def set_logfile_base(self, *, basename: str):
+        """Set the basename for the logfile."""
+        self.logs['basename'] = basename
+
+    @__guarantee_setup
+    def new_logfile(self, *, end_str: str = None):
+        """Set the basename for the logfile."""
+        if end_str is None:
+            end_str = str(datetime__today())
+        self.logfile = '-'.join((self.logs['basename'], end_str)) + '.log'
+        self.logs[self.logfile] = open(self.logfile, self.__write_status)
+
+    @__guarantee_setup
+    def switch_logfile(self, *, fname: str):
+        """Set the basename for the logfile."""
+        fname = fname.strip('.log') + '.log'
+        if fname in self.logs:
+            self.logfile = fname
+
+    @__guarantee_setup
+    def get_logfile(self):
+        """Return the verbosity level of the class.
+        """
+        return self.logfile
+
+    @__guarantee_setup
     def set_verbosity(self, verbosity):
         """Set the verbosity level for the class.
         """
@@ -251,54 +324,38 @@ class Logger(object):
         """
         self.__dict__ = {**colours.__dict__, **self.__dict__}
 
-    @__guarantee_setup
-    def warn(self, msg, verb_level=2):
-
+    def __general_messager(self, colour: str, msg: str, verb_level: int):
         if verb_level <= self.verbosity:
             full_msg = self._make_full_msg(msg, verb_level)
-            self._write(self.WARNING, full_msg)
+            self._write(colour, full_msg)
+
+    @__guarantee_setup
+    def warn(self, msg, verb_level=2):
+        self.__general_messager(self.WARNING, msg, verb_level)
 
     @__guarantee_setup
     def header1(self, msg, verb_level=0):
-
-        if verb_level <= self.verbosity:
-            full_msg = self._make_full_msg(msg, verb_level)
-            self._write(self.HEADER, full_msg)
+        self.__general_messager(self.HEADER, msg, verb_level)
 
     @__guarantee_setup
     def header2(self, msg, verb_level=1):
-
-        if verb_level <= self.verbosity:
-            full_msg = self._make_full_msg(msg, verb_level)
-            self._write(self.Cyan, full_msg)
+        self.__general_messager(self.Cyan, msg, verb_level)
 
     @__guarantee_setup
     def success(self, msg, verb_level=1):
-
-        if verb_level <= self.verbosity:
-            full_msg = self._make_full_msg(msg, verb_level)
-            self._write(self.OKGREEN, full_msg)
+        self.__general_messager(self.OKGREEN, msg, verb_level)
 
     @__guarantee_setup
     def failure(self, msg, verb_level=0):
-
-        if verb_level <= self.verbosity:
-            full_msg = self._make_full_msg(msg, verb_level)
-            self._write(self.FAIL, full_msg)
+        self.__general_messager(self.FAIL, msg, verb_level)
 
     @__guarantee_setup
     def message(self, msg, verb_level=2):
-
-        if verb_level <= self.verbosity:
-            full_msg = self._make_full_msg(msg, verb_level)
-            self._write(self.OKBLUE, full_msg)
+        self.__general_messager(self.OKBLUE, msg, verb_level)
 
     @__guarantee_setup
     def debug(self, msg, verb_level: int = 4):
-
-        if verb_level <= self.verbosity:
-            full_msg = self._make_full_msg(msg, verb_level)
-            self._write(self.Yellow, full_msg)
+        self.__general_messager(self.Yellow, msg, verb_level)
 
     @__guarantee_setup
     def pyinput(self, message: str = '', verb_level: int = 0):
@@ -329,6 +386,10 @@ class Logger(object):
 
 # Yielding singleton to module
 _logger = Logger()
+
+__doc__ += _logger.setup.__doc__
+_logger.__doc__ = __doc__
+Logger.__doc__ = __doc__
 
 for func in __all__:
     if func == 'Logger':
