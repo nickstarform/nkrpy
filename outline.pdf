@@ -70,7 +70,7 @@ endobj
 endobj
 11 0 obj
 <<
-/Author (Nickalas Reynolds email@nickreynolds.xyz) /CreationDate (D:20191227195948+06'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20191227195948+06'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
+/Author (Nickalas Reynolds email@nickreynolds.xyz) /CreationDate (D:20191230112605+06'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20191230112605+06'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
   /Subject (\(unspecified\)) /Title (Outline) /Trapped /False
 >>
 endobj
@@ -81,7 +81,7 @@ endobj
 endobj
 13 0 obj
 <<
-/Length 11153
+/Length 13660
 >>
 stream
 1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
@@ -168,7 +168,7 @@ q
 1 0 0 1 91.03937 3 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (2019-12-27 19:59:47.984084) Tj T* ET
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (2019-12-30 11:26:04.293330) Tj T* ET
 Q
 Q
 q
@@ -223,30 +223,30 @@ q
 1 0 0 1 42 661.7165 cm
 Q
 q
-1 0 0 1 42 139.7165 cm
+1 0 0 1 42 92.17323 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 507 cm
+1 0 0 1 6 554.5433 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
 Q
 Q
 q
-1 0 0 1 23 507 cm
+1 0 0 1 23 554.5433 cm
 q
 BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (nkrpy/) Tj T* ET
 Q
 Q
 q
-1 0 0 1 23 501 cm
+1 0 0 1 23 548.5433 cm
 Q
 q
-1 0 0 1 23 501 cm
+1 0 0 1 23 548.5433 cm
 Q
 q
-1 0 0 1 23 489 cm
+1 0 0 1 23 536.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -266,10 +266,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 483 cm
+1 0 0 1 23 530.5433 cm
 Q
 q
-1 0 0 1 23 471 cm
+1 0 0 1 23 518.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -289,10 +289,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 465 cm
+1 0 0 1 23 512.5433 cm
 Q
 q
-1 0 0 1 23 453 cm
+1 0 0 1 23 500.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -312,10 +312,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 447 cm
+1 0 0 1 23 494.5433 cm
 Q
 q
-1 0 0 1 23 435 cm
+1 0 0 1 23 482.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -335,10 +335,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 429 cm
+1 0 0 1 23 476.5433 cm
 Q
 q
-1 0 0 1 23 417 cm
+1 0 0 1 23 464.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -358,10 +358,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 411 cm
+1 0 0 1 23 458.5433 cm
 Q
 q
-1 0 0 1 23 399 cm
+1 0 0 1 23 446.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -381,10 +381,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 393 cm
+1 0 0 1 23 440.5433 cm
 Q
 q
-1 0 0 1 23 381 cm
+1 0 0 1 23 428.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -404,10 +404,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 375 cm
+1 0 0 1 23 422.5433 cm
 Q
 q
-1 0 0 1 23 363 cm
+1 0 0 1 23 410.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -427,10 +427,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 357 cm
+1 0 0 1 23 404.5433 cm
 Q
 q
-1 0 0 1 23 345 cm
+1 0 0 1 23 392.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -450,10 +450,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 339 cm
+1 0 0 1 23 386.5433 cm
 Q
 q
-1 0 0 1 23 327 cm
+1 0 0 1 23 374.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -473,10 +473,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 321 cm
+1 0 0 1 23 368.5433 cm
 Q
 q
-1 0 0 1 23 309 cm
+1 0 0 1 23 356.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -496,10 +496,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 303 cm
+1 0 0 1 23 350.5433 cm
 Q
 q
-1 0 0 1 23 291 cm
+1 0 0 1 23 338.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -519,10 +519,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 285 cm
+1 0 0 1 23 332.5433 cm
 Q
 q
-1 0 0 1 23 273 cm
+1 0 0 1 23 320.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -542,10 +542,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 267 cm
+1 0 0 1 23 314.5433 cm
 Q
 q
-1 0 0 1 23 255 cm
+1 0 0 1 23 302.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -565,10 +565,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 249 cm
+1 0 0 1 23 296.5433 cm
 Q
 q
-1 0 0 1 23 237 cm
+1 0 0 1 23 284.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -588,10 +588,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 231 cm
+1 0 0 1 23 278.5433 cm
 Q
 q
-1 0 0 1 23 219 cm
+1 0 0 1 23 266.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -611,10 +611,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 213 cm
+1 0 0 1 23 260.5433 cm
 Q
 q
-1 0 0 1 23 201 cm
+1 0 0 1 23 248.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -634,10 +634,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 195 cm
+1 0 0 1 23 242.5433 cm
 Q
 q
-1 0 0 1 23 183 cm
+1 0 0 1 23 230.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -657,33 +657,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 177 cm
+1 0 0 1 23 224.5433 cm
 Q
 q
-1 0 0 1 23 165 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (utilities.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 159 cm
-Q
-q
-1 0 0 1 23 129 cm
+1 0 0 1 23 194.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -733,10 +710,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 123 cm
+1 0 0 1 23 188.5433 cm
 Q
 q
-1 0 0 1 23 75 cm
+1 0 0 1 23 140.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -809,10 +786,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 69 cm
+1 0 0 1 23 134.5433 cm
 Q
 q
-1 0 0 1 23 3 cm
+1 0 0 1 23 68.54331 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -908,42 +885,104 @@ q
 Q
 Q
 q
-1 0 0 1 23 -3 cm
+1 0 0 1 23 62.54331 cm
 Q
 q
-Q
-Q
-q
-1 0 0 1 42 92.17323 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-BT 1 0 0 1 6 34.54331 Tm  T* ET
-q
-1 0 0 1 23 8.543307 cm
+1 0 0 1 23 -21.45669 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 21 cm
+1 0 0 1 6 69 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
 Q
 Q
 q
-1 0 0 1 23 21 cm
+1 0 0 1 23 69 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (dustmodels/) Tj T* ET
 Q
 Q
 q
-1 0 0 1 23 15 cm
+1 0 0 1 23 63 cm
+Q
+q
+1 0 0 1 23 63 cm
+Q
+q
+1 0 0 1 23 51 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (kappa.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 45 cm
+Q
+q
+1 0 0 1 23 33 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (README.md <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 27 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 15 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
 Q
 q
 1 0 0 1 23 15 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (models/) Tj T* ET
+Q
 Q
 q
-1 0 0 1 23 3 cm
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 -3 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -969,81 +1008,16 @@ q
 Q
 Q
 q
-Q
-Q
- 
-endstream
-endobj
-14 0 obj
-<<
-/Length 10101
->>
-stream
-1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
-q
-1 0 0 1 42 197.7165 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-BT 1 0 0 1 6 593 Tm  T* ET
-q
-1 0 0 1 23 573 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-BT 1 0 0 1 6 17 Tm  T* ET
-q
-1 0 0 1 23 15 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (kappa.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 9 cm
-Q
-q
-1 0 0 1 23 -3 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (README.md <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
 1 0 0 1 23 -3 cm
 Q
 q
 Q
 Q
 q
-1 0 0 1 23 567 cm
+1 0 0 1 23 -27.45669 cm
 Q
 q
-1 0 0 1 23 501 cm
+1 0 0 1 23 -93.45669 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -1139,34 +1113,34 @@ q
 Q
 Q
 q
-1 0 0 1 23 495 cm
+1 0 0 1 23 -99.45669 cm
 Q
 q
-1 0 0 1 23 447 cm
+1 0 0 1 23 -135.4567 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 33 cm
+1 0 0 1 6 21 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
 Q
 Q
 q
-1 0 0 1 23 33 cm
+1 0 0 1 23 21 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (publication/) Tj T* ET
 Q
 Q
 q
-1 0 0 1 23 27 cm
-Q
-q
-1 0 0 1 23 27 cm
+1 0 0 1 23 15 cm
 Q
 q
 1 0 0 1 23 15 cm
+Q
+q
+1 0 0 1 23 3 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -1186,8 +1160,33 @@ q
 Q
 Q
 q
-1 0 0 1 23 9 cm
+1 0 0 1 23 -3 cm
 Q
+q
+Q
+Q
+q
+Q
+Q
+ 
+endstream
+endobj
+14 0 obj
+<<
+/Length 8373
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 42 305.7165 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 485 Tm  T* ET
+q
+1 0 0 1 23 483 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 -1 Tm  T* ET
 q
 1 0 0 1 23 -3 cm
 0 0 0 rg
@@ -1215,10 +1214,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 441 cm
+1 0 0 1 23 477 cm
 Q
 q
-1 0 0 1 23 285 cm
+1 0 0 1 23 321 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -1436,10 +1435,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 279 cm
+1 0 0 1 23 315 cm
 Q
 q
-1 0 0 1 23 195 cm
+1 0 0 1 23 231 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -1558,10 +1557,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 189 cm
+1 0 0 1 23 225 cm
 Q
 q
-1 0 0 1 23 141 cm
+1 0 0 1 23 177 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -1634,10 +1633,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 135 cm
+1 0 0 1 23 171 cm
 Q
 q
-1 0 0 1 23 33 cm
+1 0 0 1 23 69 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -1779,6 +1778,59 @@ q
 Q
 Q
 q
+1 0 0 1 23 63 cm
+Q
+q
+1 0 0 1 23 33 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 15 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 15 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (logger/) Tj T* ET
+Q
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (logger.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
 1 0 0 1 23 27 cm
 Q
 q
@@ -1838,7 +1890,7 @@ q
 Q
 Q
 q
-1 0 0 1 42 197.7165 cm
+1 0 0 1 42 305.7165 cm
 Q
  
 endstream
@@ -1874,14 +1926,14 @@ xref
 0000001598 00000 n 
 0000001903 00000 n 
 0000001969 00000 n 
-0000013175 00000 n 
-0000023329 00000 n 
-0000023379 00000 n 
-0000023413 00000 n 
+0000015682 00000 n 
+0000024107 00000 n 
+0000024157 00000 n 
+0000024191 00000 n 
 trailer
 <<
 /ID 
-[<8a45a4ab37f4557d2370593d73d82169><8a45a4ab37f4557d2370593d73d82169>]
+[<be5538b1ddddce8970ec11e12fba69a6><be5538b1ddddce8970ec11e12fba69a6>]
 % ReportLab generated PDF document -- digest (http://www.reportlab.com)
 
 /Info 11 0 R
@@ -1889,5 +1941,5 @@ trailer
 /Size 18
 >>
 startxref
-23447
+24225
 %%EOF

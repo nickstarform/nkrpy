@@ -1,14 +1,15 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 
+[tool.tox]
+legacy_tox_ini = """
 [tox]
 envlist = py37, flake8
-
 [testenv]
 commands = python -m unittest discover -s tests
-
 [testenv:flake8]
 basepython = python3
 skip_install = true
 deps = -rrequirements.txt
 commands = flake8 nkrpy/ tests/
+"""

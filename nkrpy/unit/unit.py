@@ -9,6 +9,8 @@ from numpy import ndarray
 from ..functions import typecheck
 from ..constants import h, c, kb  # imported as cgs
 from ._unit import units
+from . import astro as nkrpy__astro
+from . import coordinate as nkrpy__coordinate
 
 # global attributes
 __all__ = ('Unit',)
@@ -287,6 +289,11 @@ class Unit(object):
         """Return the units possible in the current setup."""
         return self.__units.keys()
 
+    @property
+    def get_items(self):
+        """Return the units possible in the current setup."""
+        return self.__units.items()
+
     def __resolve_units(self, bu):
         """Will resolve the name of the unit from known types."""
         bu = str(bu).lower()
@@ -315,12 +322,25 @@ class Unit(object):
         if self.__current_unit is None or self.__final_unit is None:
             return None
         ctype, ftype = self.__current_unit['type'], self.__final_unit['type']
+        # handle coordinate and astronomial transformations
+        if ctype in ('coords', 'astro'):
+            if not (ctype == ftype):
+                return None
+            if ctype == 'coords':
+                func = getattr(nkrpy__coordinate,
+                               f"{self.__current_unit['name']}2" +
+                               f"{self.__final_unit['name']}")
+            if ctype == 'astro':
+                func = getattr(nkrpy__astro,
+                               f"{self.__current_unit['name']}2" +
+                               f"{self.__final_unit['name']}")
+            return func(vals)
+        # converting between freq, wavelength, energy
         if ctype == ftype:
             scaled = vals * self.__current_unit['fac']
         # converting from freq to wavelength
         elif ((ctype == 'freq') and (ftype == 'wave') or
               (ctype == 'wave') and (ftype == 'freq')):
-            # print(c,self.__units[init]['fac'], self.__units[fin]['fac'])
             scaled = c / (vals * self.__current_unit['fac'])
         elif (ctype == 'energy') and (ftype == 'freq'):
             scaled = vals * self.__current_unit['fac'] / h

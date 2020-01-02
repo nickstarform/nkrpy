@@ -4,6 +4,7 @@ import os
 
 def populate_info(kwargs):
     with open('nkrpy/__info__.py', 'w') as f:
+        f.write('# This file is auto-generated from the setup.py file.\n')
         for key, val in kwargs.items():
             if isinstance(val, str):
                 f.write(f'{key} = "{val}"\n')
@@ -46,7 +47,7 @@ settings = {
     'license': 'MPL2.0',
     'packages': find_packages(exclude=['tests', 'docs', 'examples']),
     'scripts': [],
-    'zip_safe': False,
+    'zip_safe': True,
     'include_package_data': True,
     'package_data': package_data,
     'install_requires': requirements,

@@ -1,10 +1,8 @@
 """Various math functions."""
 
 # standard modules
-from math import ceil, cos, sin, acos
-from copy import deepcopy
+from math import cos, sin, acos
 from itertools import chain
-import types
 
 # external modules
 import numpy as np

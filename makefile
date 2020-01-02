@@ -16,7 +16,8 @@ doc:
 	@sh ./bin/docgen.sh
 
 clean: clear_pycache
-	@rm -rf ./docs ./build ./nkrpy.egg-info
+	@rm -rf ./docs ./build ./nkrpy.egg-info ./dist
+	@find . -name "test-*.log" -type f -print0 | xargs -0 rm -f
 
 clear_pycache:
 	@find . -name "__pycache__" -type d -print0 | xargs -0 rm -rf

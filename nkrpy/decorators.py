@@ -16,7 +16,6 @@ __all__ = ('deprecated', 'call_counter', 'timing', 'checker',
 __doc__ = """Generalized decorators for common usage."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
-__version__ = 0.1
 
 
 class alias(object):
@@ -128,7 +127,6 @@ def debug(f):
 #
 # -------------------/Smart deprecation warnings\-------------------#
 #
-
 def discontinued(func):
     """This is a decorator which can be used to mark functions
     as fully discontinued/jetisoned. It will result in a warning being emitted
@@ -145,9 +143,24 @@ def discontinued(func):
 
 
 def deprecated(func):
-    """This is a decorator which can be used to mark functions
+    """Deprecated wrapper.
+    
+    This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
-    when the function is used."""
+    when the function is used.
+
+    Usage
+    -----
+    @deprecated
+    def my_func(): pass
+
+    @other_decorators_must_be_upper
+    @deprecated
+    def my_func(): pass
+
+    @deprecated
+    def my_func2(): pass
+    """
     @functools.wraps(func)
     def new_func(*args, **kwargs):
         warnings.simplefilter('always', DeprecationWarning)  # turn off filter
@@ -158,30 +171,29 @@ def deprecated(func):
         return func(*args, **kwargs)
     return new_func
 
-"""Usage examples
-@deprecated
-def my_func():
-    pass
-
-@other_decorators_must_be_upper
-@deprecated
-def my_func():
-    pass
-
-@deprecated
-def my_func2():
-    pass
-"""
 
 #
 # -------------------/Ignoredeprecation warnings\-------------------#
 #
-
-
 def ignore_deprecation_warnings(func):
-    """Ignore depreciation."""
-    """This is a decorator which can be used to ignore deprecation warnings
-    occurring in a function."""
+    """Ignore depreciation.
+
+    This is a decorator which can be used to ignore deprecation warnings
+    occurring in a function.
+
+    Usage
+    -----
+    @ignore_deprecation_warnings
+    def some_function_raising_deprecation_warning():
+        warnings.warn("This is a deprecationg warning.",
+                    category=DeprecationWarning)
+
+    class SomeClass:
+        @ignore_deprecation_warnings
+        def some_method_raising_deprecation_warning():
+            warnings.warn("This is a deprecationg warning.",
+                        category=DeprecationWarning)
+    """
     def new_func(*args, **kwargs):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -191,25 +203,93 @@ def ignore_deprecation_warnings(func):
     new_func.__dict__.update(func.__dict__)
     return new_func
 
-"""Usage examples
-@ignore_deprecation_warnings
-def some_function_raising_deprecation_warning():
-    warnings.warn("This is a deprecationg warning.",
-                  category=DeprecationWarning)
-
-class SomeClass:
-    @ignore_deprecation_warnings
-    def some_method_raising_deprecation_warning():
-        warnings.warn("This is a deprecationg warning.",
-                      category=DeprecationWarning)
-
-"""
 
 #
 # -------------------/Type Enforcement\-------------------#
 #
-"""
-Example usage:
+def accepts(*types, **kw):
+    """Check decorated arguments are of the expected types.
+
+    Parameters
+    ----------
+    types -- The expected types of the inputs to the decorated function.
+             Must specify type for each parameter.
+    kw    -- Optional specification of 'debug' level (this is the only valid
+             keyword argument, no other should be given).
+             debug = ( 0 | 1 | 2 )
+
+    """
+    if not kw:
+        # default level: MEDIUM
+        debug = 1
+    else:
+        debug = kw['debug']
+    try:
+        def decorator(f):
+            def newf(*args):
+                if debug == 0:
+                    return f(*args)
+                assert len(args) == len(types)
+                argtypes = tuple(map(type, args))
+                if argtypes != types:
+                    msg = info(f.__name__, types, argtypes, 0)
+                    if debug == 1:
+                        print(sys.stderr, 'TypeWarning: ', msg)
+                    elif debug == 2:
+                        raise TypeError(msg)
+                return f(*args)
+            newf.__name__ = f.__name__
+            return newf
+        return decorator
+    except KeyError as key:
+        raise KeyError(key + "is not a valid keyword argument")
+    except TypeError as msg:
+        raise TypeError(msg)
+
+
+def returns(ret_type, **kw):
+    """Check decorated function's return is of the expected type.
+
+    Parameters
+    ----------
+    ret_type -- The expected type of the decorated function's return value.
+                Must specify type for each parameter.
+    kw       -- Optional specification of 'debug' level (this is the only valid
+                keyword argument, no other should be given).
+                debug=(0 | 1 | 2)
+    """
+    try:
+        if not kw:
+            # default level: MEDIUM
+            debug = 1
+        else:
+            debug = kw['debug']
+
+        def decorator(f):
+            def newf(*args):
+                result = f(*args)
+                if debug == 0:
+                    return result
+                res_type = type(result)
+                if res_type != ret_type:
+                    msg = info(f.__name__, (ret_type,), (res_type,), 1)
+                    if debug == 1:
+                        print(sys.stderr, 'TypeWarning: ', msg)
+                    elif debug == 2:
+                        raise TypeError(msg)
+                return result
+            newf.__name__ = f.__name__
+            return newf
+        return decorator
+    except KeyError as key:
+        raise KeyError(key + "is not a valid keyword argument")
+    except TypeError as msg:
+        raise TypeError(msg)
+
+
+_t = """
+Usage
+-----
     >>> NONE, MEDIUM, STRONG = 0, 1, 2
     >>>
     >>> @accepts(int, int, int)
@@ -238,84 +318,10 @@ Needed to cast params as floats in function def (or simply divide by 2.0).
     Traceback (most recent call last):
       ...
     TypeError: 'fib' method accepts (int), but was given (float)
-
 """
 
-
-def accepts(*types, **kw):
-    """Check decorated arguments are of the expected types."""
-    """Parameters:
-    types -- The expected types of the inputs to the decorated function.
-             Must specify type for each parameter.
-    kw    -- Optional specification of 'debug' level (this is the only valid
-             keyword argument, no other should be given).
-             debug = ( 0 | 1 | 2 )
-
-    """
-    if not kw:
-        # default level: MEDIUM
-        debug = 1
-    else:
-        debug = kw['debug']
-    try:
-        def decorator(f):
-            def newf(*args):
-                if debug is 0:
-                    return f(*args)
-                assert len(args) == len(types)
-                argtypes = tuple(map(type, args))
-                if argtypes != types:
-                    msg = info(f.__name__, types, argtypes, 0)
-                    if debug is 1:
-                        print >> sys.stderr, 'TypeWarning: ', msg
-                    elif debug is 2:
-                        raise TypeError(msg)
-                return f(*args)
-            newf.__name__ = f.__name__
-            return newf
-        return decorator
-    except KeyError as key:
-        raise KeyError(key + "is not a valid keyword argument")
-    except TypeError as msg:
-        raise TypeError(msg)
-
-
-def returns(ret_type, **kw):
-    """Check decorated function's return is of the expected type."""
-    """Parameters:
-    ret_type -- The expected type of the decorated function's return value.
-                Must specify type for each parameter.
-    kw       -- Optional specification of 'debug' level (this is the only valid
-                keyword argument, no other should be given).
-                debug=(0 | 1 | 2)
-    """
-    try:
-        if not kw:
-            # default level: MEDIUM
-            debug = 1
-        else:
-            debug = kw['debug']
-
-        def decorator(f):
-            def newf(*args):
-                result = f(*args)
-                if debug is 0:
-                    return result
-                res_type = type(result)
-                if res_type != ret_type:
-                    msg = info(f.__name__, (ret_type,), (res_type,), 1)
-                    if debug is 1:
-                        print >> sys.stderr, 'TypeWarning: ', msg
-                    elif debug is 2:
-                        raise TypeError(msg)
-                return result
-            newf.__name__ = f.__name__
-            return newf
-        return decorator
-    except KeyError as key:
-        raise KeyError(key + "is not a valid keyword argument")
-    except TypeError as msg:
-        raise TypeError(msg)
+returns.__doc__ += _t
+accepts.__doc__ += _t
 
 
 def info(fname, expected, actual, flag):
@@ -328,6 +334,7 @@ def info(fname, expected, actual, flag):
           + ("accepts", "returns")[flag] + " ({}), but ".format(expected)\
           + ("was given", "result is")[flag] + " ({})".format(actual)
     return msg
+
 
 def validate(func):
     """Validate the inputs that only a single flag is used."""

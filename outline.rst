@@ -5,7 +5,7 @@ Outline
 :Web: `nkrpy`_
 :Author: `Nickalas Reynolds`_ email@nickreynolds.xyz
 :Author Web: `http://nickreynolds.xyz`_
-:Date: 2019-12-27 19:59:47.984084
+:Date: 2019-12-30 11:26:04.293330
 :Description: This is my own personaly python files that can be useful. They are not guaranteed to work. Just things I tend to use a lot.
 :Desc. Cont...: This file is auto-generated from bin/outlinegen.py
 
@@ -51,8 +51,6 @@ Outline
 
   * coordinates.py     <--
 
-  * utilities.py       <--
-
   * observing/
 
     * guidecam_thumbnail.py <--
@@ -73,11 +71,13 @@ Outline
 
   * dustmodels/
 
-    * oh1994.tsb  <--
-
     * kappa.py    <--
 
     * README.md   <--
+
+    * models/
+
+      * oh1994.tsb <--
 
   * check_file_templates/
 
@@ -138,6 +138,10 @@ Outline
     * orbit.py           <--
 
     * config_plotting.py <--
+
+  * logger/
+
+    * logger.py   <--
 
   * fits/
 

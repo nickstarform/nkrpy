@@ -13,7 +13,6 @@ from IPython import embed
 
 # relative modules
 from .miscmath import binning
-from .. import unit
 from .. import constants
 
 # global attributes
@@ -201,8 +200,8 @@ def emissivegaussian(x, mu: float, fwhm: float, flux: float, skew: float = 1):
     skew: float
         amount to skew gaussian
     """
-    sigma = unit('km', 'm', fwhm) / (2. * np.sqrt(2. * np.log(2)))
-    c = unit('cm', 'm', constants.c)
+    sigma = fwhm / 1000. / (2. * np.sqrt(2. * np.log(2)))
+    c = constants.c / 100.
     s = mu * sigma / c
     a = flux / np.sqrt(2. * np.pi) / s
     dx = (x - mu) / s

@@ -7,10 +7,8 @@ import numpy as np
 
 # relative modules
 from .constants import h, c, kb, msun, jy
-from .dustmodels.kappa import kappa
-from .decorators import deprecated
-from .miscmath import gauss
-from .unit import Unit
+from . import kappa
+from . import unit
 from .functions import between
 
 # global attributes
@@ -35,32 +33,27 @@ def Keplerian_Rotation(mass, velocity, Distance, inclination):
 """
 def planck_wav(temp=None, val=None, unit=None):
     """Plank Function in wavelength."""
-    _c = Unit(baseunit='angstroms', vals=c)('meters')
+    _c = unit(baseunit='angstroms', vals=c)('meters')
     _h = h
-    wav = Unit(baseunit=unit, vals=val)('meters')
+    wav = unit(baseunit=unit, vals=val)('meters')
     a = 2.0 * _h * _c ** 2
     b = _h * _c / (wav * kb * temp)
     intensity = a / ((wav ** 5) * (np.exp(b) - 1.0))
     # returns in units of watts/ m^2 / steradian / Hz
-    return intensity * Unit(baseunit='meters', vals=1)('hz')
+    return intensity * unit(baseunit='meters', vals=1)('hz')
 
 
 def planck_nu(temp=None, val=None, unit=None):
     """Plank Function in frequency."""
-    _c = Unit(baseunit='angstroms', vals=c)('meters')
+    _c = unit(baseunit='angstroms', vals=c)('meters')
     _h = h
 
-    nu = Unit(baseunit=unit, vals=val)('hz')
+    nu = unit(baseunit=unit, vals=val)('hz')
     a = 2.0 * _h / _c ** 2
     b = _h * nu / (kb * temp)
     intensity = a * (nu ** 3) / (np.exp(b) - 1.0)
     # returns in units of watts/ m^2 / steradian / inputunit
-    return intensity * Unit(baseunit='hz', vals=1)(unit)
-
-
-@deprecated
-def planck():
-    pass
+    return intensity * unit(baseunit='hz', vals=1)(unit)
 
 
 def dustmass(dist=100, dist_unit='pc', val=0.1,
@@ -70,9 +63,9 @@ def dustmass(dist=100, dist_unit='pc', val=0.1,
 
     @param dist, dist_unit, wavelength, wavelength_unit, flux, temp,model,beta, opacity
     Assuming temp in Kelvin, flux in Janskys"""
-    dist = float(Unit(baseunit=dist_unit, vals=dist)('cm'))  # to match the opacity units
-    wav = float(Unit(baseunit=val_unit, vals=val)('microns'))  # to search opcaity models
-    intensity = planck_nu(temp, float(Unit(baseunit=val_unit, vals=val)('hz')), 'hz') * 1.E26  # in jansky
+    dist = float(unit(baseunit=dist_unit, vals=dist)('cm'))  # to match the opacity units
+    wav = float(unit(baseunit=val_unit, vals=val)('microns'))  # to search opcaity models
+    intensity = planck_nu(temp, float(unit(baseunit=val_unit, vals=val)('hz')), 'hz') * 1.E26  # in jansky
     from IPython import embed
     #embed()
     if not opacity:

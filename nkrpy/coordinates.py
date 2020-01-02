@@ -1,123 +1,12 @@
 """Coordinate transformations."""
 
-# import standard modules
+# standard modules
 import math
 import re
 
 # relative modules
 from .functions import typecheck
-
-
-def checkconv(coord, conv='deg'):
-    """Convert coord to a list."""
-    """Handles RA, dec conversions.
-    Possible conv: deg, icrs.
-    Workflow: icrs->deg
-    > convert input to two lists of the deg, mm, ss
-    > convert and return a float
-    Workflow: deg->icrs
-    > convert input to two floats
-    > return two strings with : delimiters"""
-    conversion = ('deg', 'icrs')
-    oregex = r""
-    if conv == 'deg':
-        # convert from icrs to deg
-        # first check if string and convert to list
-        assert not (isinstance(coord, float) or isinstance(coord, int))
-        case = 1
-        while isinstance(coord, str) and (case != -1):
-            coord = coord.lower()
-            if case == 1:
-                # try just splitting
-                delimiters = (':', ' ', ',')
-                for delim in delimiters:
-                    coord = coord.split(delim)
-                    if len(coord) == 1:
-                        coord = coord[0]
-                    if typecheck(coord):
-                        toret = coord
-                        case = -1
-                        break
-            elif case == 2:
-                # now try via regex with hms dms hm dm h d
-                for delim in (('h', 'm', 's'), ('d', 'm', 's'),
-                              ('h', 'm'), ('d', 'm'),
-                              ('h', ), ('d', )):
-                    if case != -1:
-                        regex = oregex
-                        _tmp = []
-                        for i, j in enumerate(delim):
-                            regex += r'(-?[0-9]+\.?[0-9]+?)' + f'{j}'
-                        regex += r'(.*(.*))$'
-                        # print(regex)
-                        matches = re.finditer(regex, coord, re.MULTILINE)
-                        matched = False
-                        for match in matches:
-                            for groupNum in range(0, len(match.groups())):
-                                    groupNum = groupNum + 1
-                                    _tmp.append(match.group(groupNum))
-                                    matched = True
-                        if matched:
-                            toret = _tmp
-                            case = -1
-                            break
-            elif case == 3:
-                # try via regex for #.#.#.decimal
-                regex = r'(\+?\-?\d*)\.?(\d*)?\.?(\d*\.?\d*)?'
-                # print(regex)
-                matches = re.finditer(regex, coord, re.MULTILINE)
-                matched = False
-                for match in matches:
-                    if len(match.group()) > 0:
-                        toret = list(match.groups())
-                        case = -1
-                        break
-            elif case == 4:
-                print('Failed')
-                exit()
-            if case == -1:
-                break
-            case += 1
-        # print(toret, regex, delim)
-        # toret should be the returned list of len 3
-        if len(toret) == 1:
-            toret = [*toret, 0, 0]
-        if len(toret) == 2:
-            toret = [*toret, 0]
-        if len(toret) > 3:
-            toret = toret[0:3]
-        for x in toret:
-            if x == '':
-                toret[toret.index(x)] = 0
-        temp0, temp1, temp2 = tuple(map(float, toret))
-        total = abs(temp0) + temp1 / 60. + temp2 / 3600
-        if temp0 < 0:
-            total = -1. * total
-        return total
-
-    elif conv == 'icrs':
-        # convert from deg to icrs
-        toret = abs(float(coord))
-        _t1 = int(toret)
-        _t2 = (toret - _t1) * 60.
-        _t3 = (_t2 - int(_t2)) * 60.
-        _toret = ':'.join(map(str, [int(_t1), int(_t2), _t3]))
-        if float(coord) < 0:
-            _toret = '-' + _toret
-        return _toret
-    else:
-        return False
-
-
-def rad_2_deg(rad):
-    """Convert radian to degrees."""
-    return 180. * rad / math.pi
-
-
-def deg_2_rad(deg):
-    """Convert degrees to radians."""
-    return deg / 180. * math.pi
-
+from .math import rad, deg
 
 class coord(object):
     """Class holding coordinate objects."""
@@ -198,13 +87,13 @@ class coord(object):
         _r = (self.c1 ** 2 + self.c2 ** 2 + self.c3 ** 2) ** 0.5
 
         if self.c3 != 0:
-            _phi = rad_2_deg(math.acos(self.c3 / _r))
+            _phi = deg(math.acos(self.c3 / _r))
         else:
             _phi = 90.
 
         if self.c1 != 0:
-            _theta = rad_2_deg(math.asin(self.c2 /
-                                         (_r * math.sin(deg_2_rad(_phi)))))
+            _theta = deg(math.asin(self.c2 /
+                                         (_r * math.sin(radians(_phi)))))
             if self.c1 < 0:
                 _theta += 90
         else:
@@ -227,8 +116,8 @@ class coord(object):
         self._hold[_i] = (self.c1, self.c2, self.c3)
 
     def _sph_2_cyl(self):
-        _p = self.c1 * math.sin(deg_2_rad(self.c3))
-        _z = self.c1 * math.cos(deg_2_rad(self.c3))
+        _p = self.c1 * math.sin(radians(self.c3))
+        _z = self.c1 * math.cos(radians(self.c3))
         self.c1 = _p
         self.c3 = _z
         self.sys = 'cyl'
@@ -236,8 +125,8 @@ class coord(object):
         self._hold[_i] = (self.c1, self.c2, self.c3)
 
     def _cyl_2_cart(self):
-        _x = self.c1 * math.cos(deg_2_rad(self.c2))
-        _y = self.c1 * math.sin(deg_2_rad(self.c2))
+        _x = self.c1 * math.cos(radians(self.c2))
+        _y = self.c1 * math.sin(radians(self.c2))
         self.c1 = _x
         self.c2 = _y
         self.sys = 'cart'

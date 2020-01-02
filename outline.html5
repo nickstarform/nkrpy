@@ -5,7 +5,7 @@
 <meta name="generator" content="Docutils 0.15.2: http://docutils.sourceforge.net/" />
 <title>Outline</title>
 <meta name="author" content="Nickalas Reynolds email&#64;nickreynolds.xyz" />
-<meta name="dcterms.date" content="2019-12-27 19:59:47.984084" />
+<meta name="dcterms.date" content="2019-12-30 11:26:04.293330" />
 <link rel="schema.dcterms" href="http://purl.org/dc/terms/">
 <style type="text/css">
 
@@ -572,7 +572,7 @@ a { text-decoration: none; }
 <dd class="author-web"><p><a class="reference external" href="http://nickreynolds.xyz">http://nickreynolds.xyz</a></p>
 </dd>
 <dt class="date">Date</dt>
-<dd class="date">2019-12-27 19:59:47.984084</dd>
+<dd class="date">2019-12-30 11:26:04.293330</dd>
 <dt class="description">Description</dt>
 <dd class="description"><p>This is my own personaly python files that can be useful. They are not guaranteed to work. Just things I tend to use a lot.</p>
 </dd>
@@ -601,7 +601,6 @@ a { text-decoration: none; }
 <li><p>mp.py              &lt;--</p></li>
 <li><p>functions.py       &lt;--</p></li>
 <li><p>coordinates.py     &lt;--</p></li>
-<li><p>utilities.py       &lt;--</p></li>
 <li><p>observing/</p>
 <ul>
 <li><p>guidecam_thumbnail.py &lt;--</p></li>
@@ -622,9 +621,13 @@ a { text-decoration: none; }
 </li>
 <li><p>dustmodels/</p>
 <ul>
-<li><p>oh1994.tsb  &lt;--</p></li>
 <li><p>kappa.py    &lt;--</p></li>
 <li><p>README.md   &lt;--</p></li>
+<li><p>models/</p>
+<ul>
+<li><p>oh1994.tsb &lt;--</p></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><p>check_file_templates/</p>
@@ -676,6 +679,11 @@ a { text-decoration: none; }
 <li><p>config_orbit.py    &lt;--</p></li>
 <li><p>orbit.py           &lt;--</p></li>
 <li><p>config_plotting.py &lt;--</p></li>
+</ul>
+</li>
+<li><p>logger/</p>
+<ul>
+<li><p>logger.py   &lt;--</p></li>
 </ul>
 </li>
 <li><p>fits/</p>

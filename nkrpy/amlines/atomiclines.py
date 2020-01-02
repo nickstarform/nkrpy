@@ -8,7 +8,6 @@ Misc  : Houses all useful atomic lines and short program for parsing
         After initial call, then use the functions defined within the class
 
 """
-__filename__ = __file__.split('/')[-1].strip('.py')
 
 # import standard modules
 from copy import deepcopy
@@ -17,15 +16,18 @@ from copy import deepcopy
 import numpy as np
 
 # relative modules
-from .miscmath import binning
-from ._unit import units
-from . import constants
+from ..math import binning
+from .. import unit
+from .. import constants
+
+
+__filename__ = __file__.split('/')[-1].strip('.py')
 
 
 def call(*args,**kwargs):
     """Wrapper.
 
-    Better wrapper for quickly calling 
+    Better wrapper for quickly calling
     the lines class
     Can specify the arguments within a single line without
     having to self initialize and recall
@@ -55,7 +57,7 @@ class lines(object):
         """Magic Method.
 
         Setup the class with loading copy"""
-        self.units = units
+        self.units = dict(unit().get_items)
 
         self.types = atomiclines.keys()
 
