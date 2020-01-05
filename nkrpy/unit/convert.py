@@ -1,13 +1,12 @@
 """Astronomical Conversions."""
 
 # standard modules
-import re
 
 # external modules
 import numpy as np
 
 # relative modules
-from ..functions import typecheck
+from ..misc.functions import typecheck
 from ..math import radians as nkrpy__radians
 from ..math import deg as nkrpy__deg
 
@@ -44,7 +43,7 @@ def __split_icrs(string: str):
 
 
 def icrs2deg(icrs) -> np.ndarray:
-    """Convert ICRS to Degrees
+    """Convert ICRS to Degrees.
 
     [[DD, DD, DD], ...]
     ['DD DD DD', ...]
@@ -57,6 +56,7 @@ def icrs2deg(icrs) -> np.ndarray:
     >>> icrs2deg(['11','11','11.5'])
     >>> icrs2deg([['11','11','11.5']])
     >>> icrs2deg([['11','11','11.5'], ['11','11','11.5']])
+
     """
     if not typecheck(icrs):
         icrs = [icrs]
@@ -77,7 +77,7 @@ def icrs2deg(icrs) -> np.ndarray:
 
 
 def deg2icrs(deg) -> np.ndarray:
-    """Convert degrees to ICRS
+    """Convert degrees to ICRS.
 
     [DD.DDD, ...]
     'DD.DDD'
@@ -87,6 +87,7 @@ def deg2icrs(deg) -> np.ndarray:
     >>> deg2icrs('11.18652778')
     >>> deg2icrs(['11.18652778'])
     >>> deg2icrs(['11.18652778','11.18652778','11.18652778'])
+
     """
     if not typecheck(deg):
         deg = [deg]
@@ -101,14 +102,23 @@ def deg2icrs(deg) -> np.ndarray:
 
 
 # http://star-www.st-and.ac.uk/~fv/webnotes/chapter8.htm
-def j20002b1950(): pass
+def j20002b1950():
+    """."""
+    pass
 
 
-def b19502j2000(): pass
+def b19502j2000():
+    """."""
+    pass
 
 
-def gal2j2000():
-    """Convert Galactic to Equatorial coordinates (J2000.0)
+def cart2cyl():
+    """."""
+    pass
+
+
+def gal2j2000(ga):
+    """Convert Galactic to Equatorial coordinates (J2000.0).
 
     Input: [l,b] in decimal degrees
     Returns: [ra,dec] in decimal degrees
@@ -139,7 +149,7 @@ def gal2j2000():
 
 
 def gal2b1950(ga):
-    """Convert Galactic to Equatorial coordinates (B1950.0)
+    """Convert Galactic to Equatorial coordinates (B1950.0).
 
     Input: [l,b] in decimal degrees
     Returns: [ra,dec] in decimal degrees
@@ -168,17 +178,24 @@ def gal2b1950(ga):
     return (nkrpy__deg(ra), nkrpy__deg(dec))
 
 
-def j20002gal(): pass
+def j20002gal():
+    """."""
+    pass
 
 
-def b19502gal(): pass
+def b19502gal():
+    """."""
+    pass
 
 
-def gal2helio(): pass
+def gal2helio():
+    """."""
+    pass
 
 
 def helio2gal():
-    """
+    r"""Helio2gal.
+
     Distances to astronomical objects beyond the Solar System are usually
       heliocentric, i.e. with respect to the Sun. However, Galactocentric
       distances are sometimes required. Heliocentric distances can be
@@ -191,31 +208,50 @@ def helio2gal():
 
     where
 
-    \vec{R}_{\rm hel} = \begin{pmatrix} d \cos(b) \cos(l) \\ d \cos(b) \sin(l) \\ d \sin(b) \end{pmatrix} , \qquad{} \vec{R}_{0} = \begin{pmatrix} R_{0} \\ 0 \\ 0 \end{pmatrix} \end{equation*}
+    \vec{R}_{\rm hel} = \begin{pmatrix} d \cos(b) \cos(l) \\ d \cos(b)
+    \sin(l) \\ d \sin(b) \end{pmatrix} , \qquad{} \vec{R}_{0} =
+    \begin{pmatrix} R_{0} \\ 0 \\ 0 \end{pmatrix} \end{equation*}
 
-    with $R_{0}$ being the distance of the Sun from the Galactic centre and $l$, $b$ and $d$ the Galactic longitude, Galactic latitude and heliocentric distance, respectively, of the object under study. Hence, the distance of the object from the Galactic centre is given as
+    with $R_{0}$ being the distance of the Sun from the Galactic centre
+    and $l$, $b$ and $d$ the Galactic longitude, Galactic latitude and
+    heliocentric distance, respectively, of the object under study.
+    Hence, the distance of the object from the Galactic centre is given
+    as;
 
-    \begin{equation*} |\vec{R}_{\rm gal}| = \sqrt{[d \cos(b) \cos(l) - R_{0}]^{2} + d^{2} \cos^{2}(b) \sin^{2}(l) + d^{2} \sin^{2}(b)} \, . \end{equation*}
+    \begin{equation*} |\vec{R}_{\rm gal}| = \sqrt{[d \cos(b) \cos(l) -
+    R_{0}]^{2} + d^{2} \cos^{2}(b) \sin^{2}(l) + d^{2} \sin^{2}(b)}
+    \, . \end{equation*}
 
-    This result is generally valid for all possible object positions irrespective of whether they are inside or outside the Solar circle. 
+    This result is generally valid for all possible object positions
+    irrespective of whether they are inside or outside the Solar
+    circle.
+
     """
     pass
 
 
-def helio2j2000(): pass
+def helio2j2000():
+    """."""
+    pass
 
 
-def helio2b1950(): pass
+def helio2b1950():
+    """."""
+    pass
 
 
-def j20002helio(): pass
+def j20002helio():
+    """."""
+    pass
 
 
-def b19502helio(): pass
+def b19502helio():
+    """."""
+    pass
 
 
 def __recasting(inp):
-    """Recast input to 2d numpy
+    """Recast input to 2d numpy.
 
     Check
     [.., .., ..]
@@ -225,6 +261,7 @@ def __recasting(inp):
     ------
     np.ndarray
         [[.., .., ..], ...]
+
     """
     if not isinstance(inp, np.ndarray):
         inp = np.array(inp, dtype=np.float)
@@ -236,9 +273,7 @@ def __recasting(inp):
 
 
 def cart2sph(xyz) -> np.ndarray:
-    """
-    All angles are returned in radians.
-    """
+    """Angle in radians."""
     xyz = __recasting(xyz)
     xy2 = xyz[:, 0] ** 2 + xyz[:, 1] ** 2
     r = np.sqrt(xy2 + xyz[:, 2] ** 2)
@@ -248,9 +283,7 @@ def cart2sph(xyz) -> np.ndarray:
 
 
 def sph2cart(rtp) -> np.ndarray:
-    """
-    All angles must be in radians.
-    """
+    """Angle in radians."""
     rtp = __recasting(rtp)
     r, theta, phi = rtp[:, 0], rtp[:, 1], rtp[:, 2]
     x = r * np.sin(phi) * np.cos(theta)
@@ -260,9 +293,7 @@ def sph2cart(rtp) -> np.ndarray:
 
 
 def sph2cyl(rtp) -> np.ndarray:
-    """
-    All angles must be in radians.
-    """
+    """Angle in radians."""
     rtp = __recasting(rtp)
     p = rtp[:, 0] * np.sin(rtp[:, 2])
     z = rtp[:, 0] * np.cos(rtp[:, 2])
@@ -270,9 +301,7 @@ def sph2cyl(rtp) -> np.ndarray:
 
 
 def cyl2sph(ptz) -> np.ndarray:
-    """
-    All angles must be in radians.
-    """
+    """Angle in radians."""
     ptz = __recasting(ptz)
     r = np.sqrt(ptz[:, 0] ** 2 + ptz[:, 2] ** 2)
     phi = np.arccos(ptz[:, 2] / r)
@@ -280,9 +309,7 @@ def cyl2sph(ptz) -> np.ndarray:
 
 
 def cyl2cart(ptz):
-    """
-    All angles must be in radians.
-    """
+    """Angle in radians."""
     ptz = __recasting(ptz)
     x = ptz[:, 0] * np.cos(ptz[:, 1])
     y = ptz[:, 0] * np.sin(ptz[:, 1])

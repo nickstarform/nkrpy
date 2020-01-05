@@ -5,7 +5,7 @@ Outline
 :Web: `nkrpy`_
 :Author: `Nickalas Reynolds`_ email@nickreynolds.xyz
 :Author Web: `http://nickreynolds.xyz`_
-:Date: 2019-12-30 11:26:04.293330
+:Date: 2020-01-04 20:49:14.109410
 :Description: This is my own personaly python files that can be useful. They are not guaranteed to work. Just things I tend to use a lot.
 :Desc. Cont...: This file is auto-generated from bin/outlinegen.py
 
@@ -15,137 +15,145 @@ Outline
 
 * nkrpy/
 
-  * files.py           <--
+  * logger/
 
-  * keplerian.py       <--
+    * logger.py   <--
 
-  * colours.py         <--
+  * astro/
 
-  * check_file.py      <--
+    * radio_functions.py <--
 
-  * sizeof.py          <--
+    * keplerian.py       <--
 
-  * decorators.py      <--
+    * convert_jy_to_k.py <--
 
-  * load.py            <--
+    * astro.py           <--
 
-  * convert_jy_to_k.py <--
+    * dustmodels/
 
-  * stdio.py           <--
+      * kappa.py    <--
 
-  * error.py           <--
+      * README.md   <--
 
-  * constants.py       <--
+      * models/
 
-  * config.py          <--
+        * oh1994.tsb <--
 
-  * radio_functions.py <--
+    * observing/
 
-  * sorting.py         <--
+      * guidecam_thumbnail.py <--
 
-  * astro.py           <--
+    * reduction/
 
-  * mp.py              <--
+      * apoexpcal.pro    <--
 
-  * functions.py       <--
+      * reduction.py     <--
 
-  * coordinates.py     <--
+      * plottingtspec.py <--
 
-  * observing/
+      * arcsat/
 
-    * guidecam_thumbnail.py <--
+        * reduction.py       <--
 
-  * image/
+        * arcsat_mosaic.py   <--
 
-    * image_reproj.py <--
+        * arcsat_file.py     <--
 
-    * image_interp.py <--
+        * template_config.py <--
 
-  * amlines/
+    * mercury/
 
-    * atomicline.py.new <--
+      * plotting.py        <--
 
-    * atomiclines.py    <--
+      * config_plotting.py <--
 
-    * linelist.py       <--
+      * config_orbit.py    <--
 
-  * dustmodels/
+      * file_loader.py     <--
 
-    * kappa.py    <--
+      * orbit.py           <--
 
-    * README.md   <--
+  * unit/
 
-    * models/
+    * convert.py  <--
 
-      * oh1994.tsb <--
+    * unit.py     <--
 
-  * check_file_templates/
-
-    * sh.py      <--
-
-    * default.py <--
-
-    * python.py  <--
+    * _unit.py    <--
 
   * publication/
 
-    * format.py   <--
-
     * plots.py    <--
 
-  * reduction/
+    * format.py   <--
 
-    * plottingtspec.py <--
+  * image/
 
-    * apoexpcal.pro    <--
+    * image_interp.py <--
 
-    * reduction.py     <--
+    * image_reproj.py <--
 
-    * arcsat/
+  * misc/
 
-      * arcsat_file.py     <--
+    * mp.py         <--
 
-      * arcsat_mosaic.py   <--
+    * decorators.py <--
 
-      * reduction.py       <--
+    * functions.py  <--
 
-      * template_config.py <--
+    * constants.py  <--
+
+    * errors.py     <--
+
+    * colours.py    <--
 
   * math/
+
+    * sampler.py  <--
+
+    * miscmath.py <--
 
     * fit.py      <--
 
     * image.py    <--
 
-    * miscmath.py <--
+    * gp/
 
-    * sampler.py  <--
+  * io/
 
-  * unit/
+    * sizeof.py     <--
 
-    * _unit.py    <--
+    * load.py       <--
 
-    * unit.py     <--
+    * config.py     <--
 
-  * mercury/
+    * files.py      <--
 
-    * file_loader.py     <--
+    * sorting.py    <--
 
-    * plotting.py        <--
+    * stdio.py      <--
 
-    * config_orbit.py    <--
+    * check_file.py <--
 
-    * orbit.py           <--
+    * check_file_templates/
 
-    * config_plotting.py <--
+      * default.py <--
 
-  * logger/
+      * sh.py      <--
 
-    * logger.py   <--
+      * python.py  <--
 
-  * fits/
+    * fits/
 
-    * functions.py <--
+      * functions.py <--
+
+  * amlines/
+
+    * lines.py          <--
+
+    * atomicline.py.new <--
+
+    * __linelist.py     <--
 
 
 

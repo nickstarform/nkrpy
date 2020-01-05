@@ -1,5 +1,5 @@
 """Hold units for Unit class."""
-from ..constants import ev, pi
+from ..misc.constants import ev, pi
 
 __all__ = ('units',)
 

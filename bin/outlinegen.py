@@ -31,10 +31,10 @@ else:
 sys.path.append(os.path.dirname(f'{__path__}'))
 import setup # noqa
 settings = setup.settings
-nkrpy = importlib.util.find_spec("nkrpy", package="files")
+nkrpy = importlib.util.find_spec("nkrpy.io", package="files")
 found = nkrpy is not None
 if found:
-    from nkrpy.files import list_files_fmt as nkrpy
+    from nkrpy.io.files import list_files_fmt as nkrpy
 
 
 # incase nkrpy doesn't exist, declare basic functions
@@ -44,7 +44,7 @@ def typecheck(obj):
 
 
 def list_comp(base, comp):
-    """Compare 2 lists, make sure purely unique. True if unique"""
+    """Compare 2 lists, make sure purely unique (True)."""
     l1 = set(comp)
     l2 = set(base)
     if (l1 - l2) != l1:
@@ -172,7 +172,7 @@ def list_files_fmt(startpath, ignore='',
 
 # main caller
 def main():
-    """Main caller function."""
+    """Main."""
     fname = './outline.rst'
     title = 'Outline'
     spacing = ''.join(["=" for x in range(len(title) + 2)])
@@ -199,7 +199,8 @@ def main():
             list_files_fmt('nkrpy',
                            'build,egg,__info__.py,__init__.py,' +
                            '.pyc,__pycache__,' +
-                           '.git,dist,ipynb_,orbital',
+                           '.git,dist,ipynb_,orbital,' +
+                           '__init_generator__.py',
                            formatter=['', '  ', 1, '* ', '\n'],
                            header_wrap=['both', '**'],
                            pad=True, append='<--', docs=True):

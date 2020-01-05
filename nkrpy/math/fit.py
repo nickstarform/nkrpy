@@ -8,12 +8,13 @@ import numpy as np
 from scipy.special import wofz
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-from scipy.stats import rv_continuous, norm
+# from scipy.stats import rv_continuous
+from scipy.stats import norm
 from IPython import embed
 
 # relative modules
 from .miscmath import binning
-from .. import constants
+from ..misc import constants
 
 # global attributes
 __all__ = ('fit_conf', 'sigma_clip_fit', 'quad', 'voigt',
@@ -37,6 +38,7 @@ def fit_conf(x, y, func: types.FunctionType, opt, ci: float = 0.95):
     opt: iterable
         starting parameters for function to fit
     ci: float
+
     """
     # Define confidence interval.
     ci = 0.95
@@ -45,9 +47,8 @@ def fit_conf(x, y, func: types.FunctionType, opt, ci: float = 0.95):
     pp = (1. + ci) / 2.
     # Convert to number of standard deviations.
     nstd = norm.ppf(pp)
-    #func = np.poly1d(opt)
-    from IPython import embed
-    #embed()
+    # func = np.poly1d(opt)
+    # embed()
 
     # Find best fit.
     popt, pcov = curve_fit(func, x, y, p0=opt)
@@ -58,6 +59,7 @@ def fit_conf(x, y, func: types.FunctionType, opt, ci: float = 0.95):
     popt_up = popt + nstd * perr
     popt_dw = popt - nstd * perr
     return (popt_up, popt_dw)
+
 
 """
 from nkrpy.miscmath import sigma_clip_fit, binning
@@ -81,7 +83,8 @@ def func(x, a,b,c,d,e,f,g,h, i):
         b * x + a
 
 
-p0 = (np.full(len(inspect.signature(func).parameters.values()) - 1, 1, dtype=np.float)).tolist()
+p0 = (np.full(len(inspect.signature(func).parameters.values()) - 1,
+              1, dtype=np.float)).tolist()
 
 xd, yd = map(lambda x: binning(x, 1), [xdo,ydo])
 s = sigma_clip_fit(xd, yd, func, p0, 3, 2)
@@ -93,6 +96,7 @@ plt.plot(xdo, func(xdo, *s[1]), color='blue', lw=1)
 plt.scatter(xdo[s[0]], ydo[s[0]], color='red', marker='.', lw=1)
 plt.show()
 """
+
 
 def sigma_clip_fit(xdata, ydata, func, p0,
                    sigma_clip: int = 5,
@@ -135,6 +139,7 @@ def sigma_clip_fit(xdata, ydata, func, p0,
     '''
 
     sigma_clip_fit(x, y, func, [1], sigma_clip: int=5, max_iterations: int=5)
+
     """
     def plot(x, y, f, p):
         plt.figure()
@@ -166,7 +171,7 @@ def sigma_clip_fit(xdata, ydata, func, p0,
         y = y / np.median(y)
         tmp_mask = np.copy(mask)
         rolling_sigma.append(y[~(mask + tmp_mask)].std())
-        mask = ((np.abs(y - 1.) > sigma_clip * rolling_sigma[-1]) + mask + tmp_mask)
+        mask = ((np.abs(y - 1.) > sigma_clip * rolling_sigma[-1]) + mask + tmp_mask)  # noqa
 
     embed()
     finfn = func(xdata, *p0)
@@ -177,8 +182,14 @@ def sigma_clip_fit(xdata, ydata, func, p0,
 
 
 def voigt(x, mu, alpha, gamma):
-    """
-    Voigt Profile x, alpha, gamma
+    """Voigt Profile.
+
+    Parameters
+    ----------
+    mu: float
+    alpha: float
+    gamma: float
+
     """
     sigma = alpha / np.sqrt(2. * np.log(2))
     return np.real(wofz((x - mu + 1.j * gamma) / sigma / np.sqrt(2.))) /\
@@ -199,6 +210,7 @@ def emissivegaussian(x, mu: float, fwhm: float, flux: float, skew: float = 1):
         integrated flux of the line
     skew: float
         amount to skew gaussian
+
     """
     sigma = fwhm / 1000. / (2. * np.sqrt(2. * np.log(2)))
     c = constants.c / 100.
@@ -272,7 +284,7 @@ def plummer_mass(x, mass, a):
 
 
 def plummer_radius(mass_frac, a):
-    """Sampling function to evenly sample mass distribution."""
+    """Sample Plummer radius."""
     return a * ((1. / mass_frac) ** (2. / 3.) - 1.) ** (-0.5)
 
 

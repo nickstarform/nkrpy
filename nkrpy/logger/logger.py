@@ -1,3 +1,4 @@
+"""."""
 # internal modules
 from datetime import datetime as datetime__datetime
 from time import sleep as time__sleep
@@ -10,8 +11,7 @@ from sys import exit as sys__exit
 # external modules
 
 # relative modules
-from .. import colours
-
+from ..misc import colours
 
 # global parameters
 datetime__today = datetime__datetime.today
@@ -79,7 +79,7 @@ __doc__ = """
     print(custom_function(1, ten = 10))
     # .>.> Calling <{function.__name}> with  params: {args}, {kwargs}'
     # 1, {'ten': 10}
-    # .>.> Called <{function.__name}> with  params: {args}, {kwargs}. Result: {result}'
+    # .>.> Called <{function.__name}> with  params: {args}, {kwargs}. Result: {result}'  # noqa
     ```
 
     Setting up the Logger
@@ -90,10 +90,12 @@ __path__ = __file__.strip('.py').strip(__filename__)
 
 
 class Logger(object):
+    """."""
 
     __instance = None
 
     def __new__(cls):
+        """Dunder."""
         cls.__doc__ = __doc__ + cls.setup.__doc__
         if cls.__instance is None:
             instance = object.__new__(cls)
@@ -101,14 +103,16 @@ class Logger(object):
         return cls.__instance
 
     def __init__(self):
-        """Doesn't actually build the instance.
-        Need to separately call the __setup."""
+        """Dunder.
+
+        Doesn't actually build the instance.
+        Need to separately call the __setup.
+        """
         self.__setup_status = False
         pass
 
     def __guarantee_setup(function):
-        """A specific wrapper to handle if
-        the overall class was setup properly."""
+        """Guarantee proper setup."""
         def wrapper(*args, **kwargs):
             if not args[0].__setup_status:
                 args[0].setup()
@@ -145,6 +149,7 @@ class Logger(object):
                 output to the terminal.
         suppress_terminal: bool
             If toggled will suppress terminal output
+
         """
         saved_args = locals()
         self.__setup_status = True
@@ -169,15 +174,12 @@ class Logger(object):
         self.success(msg)
 
     def _get_structure_string(self, level):
-        """Returns the string of the message with the specified level
-        Which is dependent on the verbosity
-        """
+        """Return vebosity dependent string."""
         string = self.structure_string * level
         return string
 
     def _get_time_string(self):
-        """Returns the detailed datetime for extreme debugging
-        """
+        """Return detailed timedate."""
         string = ''
         if self.add_timestamp:
             string = '[{}] '.format(datetime__today())
@@ -208,7 +210,7 @@ class Logger(object):
         sys__exit(0)
 
     def _write(self, cmod: str, msg: str, fname: str = None):
-        """Wrapper to write to terminal and file.
+        """Handle terminal/file writing.
 
         Write the message to the file and print
         it to the terminal if it is wanted.
@@ -243,8 +245,19 @@ class Logger(object):
     will handle writing to the log
     file and to the terminal
     """
-
     def decorator(self, style: str = 'warn', verbosity: int = 2):
+        """Ganeral decorator method.
+
+        This method is the decorator to use for logging other methods.
+
+        Parameters
+        ----------
+        style: str
+            The logging style which will be resolved.
+        verbosity: int
+            The verbosity level to set, [1-5]
+
+        """
         def real_decorator(function):
             def wrapper(*args, **kwargs):
                 msg = f'Calling <{function.__name__}> with ' +\
@@ -280,33 +293,28 @@ class Logger(object):
 
     @__guarantee_setup
     def get_logfile(self):
-        """Return the verbosity level of the class.
-        """
+        """Get current logfile."""
         return self.logfile
 
     @__guarantee_setup
     def set_verbosity(self, verbosity):
-        """Set the verbosity level for the class.
-        """
+        """Set verbosity level."""
         self.verbosity = verbosity
 
     @__guarantee_setup
     def get_verbosity(self):
-        """Return the verbosity level of the class.
-        """
+        """Get verbosity level."""
         return self.verbosity
 
     @__guarantee_setup
     def disable_colour(self):
-        """Turn off all colour formatting.
-        """
+        """Disable colour output in terminal."""
         for c in colours.__dict__:
             setattr(self, c, '')
 
     @__guarantee_setup
     def enable_colour(self):
-        """Enable all colour formatting.
-        """
+        """Enable colour output in terminal."""
         self.__dict__ = {**colours.__dict__, **self.__dict__}
 
     def __general_messager(self, colour: str, msg: str, verb_level: int):
@@ -316,35 +324,42 @@ class Logger(object):
 
     @__guarantee_setup
     def warn(self, msg, verb_level=2):
+        """Warn level."""
         self.__general_messager(self.WARNING, msg, verb_level)
 
     @__guarantee_setup
     def header1(self, msg, verb_level=0):
+        """Highest Header level."""
         self.__general_messager(self.HEADER, msg, verb_level)
 
     @__guarantee_setup
     def header2(self, msg, verb_level=1):
+        """Lower Header level."""
         self.__general_messager(self.Cyan, msg, verb_level)
 
     @__guarantee_setup
     def success(self, msg, verb_level=1):
+        """Success level (highest)."""
         self.__general_messager(self.OKGREEN, msg, verb_level)
 
     @__guarantee_setup
     def failure(self, msg, verb_level=0):
+        """Failure level (highest)."""
         self.__general_messager(self.FAIL, msg, verb_level)
 
     @__guarantee_setup
     def message(self, msg, verb_level=2):
+        """Message level (lowest)."""
         self.__general_messager(self.OKBLUE, msg, verb_level)
 
     @__guarantee_setup
     def debug(self, msg, verb_level: int = 4):
+        """Debug level."""
         self.__general_messager(self.Yellow, msg, verb_level)
 
     @__guarantee_setup
     def pyinput(self, message: str = '', verb_level: int = 0):
-
+        """Gather input from the terminal."""
         total_Message = "Please input {}: ".format(message)
         out = input(total_Message)
         if verb_level <= self.verbosity:
@@ -354,6 +369,7 @@ class Logger(object):
 
     @__guarantee_setup
     def waiting(self, auto: bool, seconds: int = 10, verb_level: int = 0):
+        """Wait for a Ret or sigint."""
         if not auto:
             self.pyinput('[RET] to continue or CTRL+C to escape')
         elif verb_level <= self.verbosity:
@@ -361,9 +377,11 @@ class Logger(object):
             time__sleep(seconds)
 
     def teardown(self):
+        """Clean teardown call."""
         self.__teardown()
 
     def sigHandler(self):
+        """Gather sigint thrown."""
         self.__sigHandler()
 
 

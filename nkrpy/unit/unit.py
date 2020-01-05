@@ -6,14 +6,13 @@
 from numpy import ndarray
 
 # relative modules
-from ..functions import typecheck
-from ..constants import h, c, kb  # imported as cgs
+from ..misc.functions import typecheck
+from ..misc.constants import h, c, kb  # imported as cgs
 from ._unit import units
-from . import astro as nkrpy__astro
-from . import coordinate as nkrpy__coordinate
+from . import convert as nkrpy__convert
 
 # global attributes
-__all__ = ('Unit',)
+__all__ = ('Unit', 'BaseUnit')
 __doc__ = """Convert supported units all to angstroms and hz
     to add new units have to correct self.__units and resolve_units
     To setup, just initialize and call with units /  values to convert
@@ -37,31 +36,42 @@ def checknum(num):
 
 
 class BaseUnit(object):
+    """Override typical dict classing."""
+
     def __init__(self, **entries):
+        """Dunder."""
         self.__dict__.update(entries)
 
     def values(self):
+        """Dunder."""
         return self.__dict__.values()
 
     def items(self):
+        """Dunder."""
         return self.__dict__.items()
 
     def keys(self):
+        """Dunder."""
         return self.__dict__.keys()
 
     def __iter__(self):
+        """Dunder."""
         return self.__dict__.items().__iter__()
 
     def __getitem__(self, key):
+        """Dunder."""
         return getattr(self, key)
 
     def __next__(self):
+        """Dunder."""
         pass
 
     def __setattr__(self):
+        """Dunder."""
         pass
 
     def __delattr__(self):
+        """Dunder."""
         pass
 
 
@@ -72,7 +82,7 @@ class Unit(object):
 
     def __init__(self, baseunit: str = None,
                  convunit: str = None, vals=None):
-        """Main unit building.
+        """Dunder.
 
         Parameters
         ----------
@@ -82,20 +92,20 @@ class Unit(object):
             The unit to convert to. Not Required.
         vals: number | numpy.ndarray
             The numbers to convert. Not Required.
-        """
 
+        """
         self.reset()
         if baseunit is not None:
-            self.__current_unit = self.__resolve_units(baseunit)
+            self.__current_unit = self.resolve_unit(baseunit)
         if convunit is not None:
-            self.__final_unit = self.__resolve_units(convunit)
+            self.__final_unit = self.resolve_unit(convunit)
         if baseunit is None and convunit is None:
             return
         self.__current_vals = vals
-        self.__final_vals = self.__return_vals(vals=vals)
+        self.__generate_vals(vals=vals)
 
     def __call__(self, convunit: str = None, vals=None):
-        """Standard call for resolving various conditions.
+        """Resolve various conditions.
 
         Allows repeat calls and inline calling of function.
         Main process to gather all files
@@ -105,6 +115,7 @@ class Unit(object):
         ----------
         unit: str
         vals: float | ndarray
+
         """
         if not isinstance(vals, ndarray) and\
            not checknum(vals) and (vals is not None):
@@ -117,21 +128,21 @@ class Unit(object):
         if vals is None and convunit is None:
             unit = self.__current_unit
         elif convunit is not None and vals is not None:
-            unit = self.__resolve_units(convunit)
+            unit = self.resolve_unit(convunit)
             self.__current_unit = unit
             self.__final_unit = unit
             self.__current_vals = vals
         elif convunit is not None:
-            unit = self.__resolve_units(convunit)
+            unit = self.resolve_unit(convunit)
             vals = self.__current_vals
         elif convunit is None:
             unit = self.__final_unit
-        vals = self.__return_vals(unit=unit, vals=vals)
-        return vals
+        self.__generate_vals(unit=unit, vals=vals)
+        return self.__final_vals
 
     def __repr__(self):
-        """Representative Magic Method for calling."""
-        self.__return_vals()
+        """Dunder."""
+        self.__generate_vals()
         _t = self.__final_vals
         if typecheck(_t):
             return ', '.join(map(str, _t))
@@ -139,6 +150,7 @@ class Unit(object):
             return str(f'{_t}')
 
     def __format__(self, formatstr: str = 's'):
+        """Dunder."""
         if formatstr == 's':
             return self.__repr__()
         if '.' in formatstr:
@@ -150,116 +162,142 @@ class Unit(object):
             return int(self.__repr__())
 
     def __abs__(self):
+        """Dunder."""
         return abs(self.__final_vals)
 
     def __add__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals + value
 
     def __radd__(self, *args, **kwargs):
+        """Dunder."""
         return self.__add__(*args, **kwargs)
 
     def __sub__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals - value
 
     def __rsub__(self, *args, **kwargs):
+        """Dunder."""
         return self.__sub__(*args, **kwargs)
 
     def __divmod__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals / value
 
     def __rdivmod__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return value / self.__final_vals
 
     def __truediv__(self, *args, **kwargs):
+        """Dunder."""
         return self.__divmod__(*args, **kwargs)
 
     def __rtruediv__(self, *args, **kwargs):
+        """Dunder."""
         return self.__rdivmod__(*args, **kwargs)
 
     def __mul__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals * value
 
     def __rmul__(self, *args, **kwargs):
+        """Dunder."""
         return self.__mul__(*args, **kwargs)
 
     def __pow__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals ** value
 
     def __rpow__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return value ** self.__final_vals
 
     def __mod__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals % value
 
     def __rmod__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return value % self.__final_vals
 
     def __floordiv__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals // value
 
     def __rfloordiv__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return value // self.__final_vals
 
     def __int__(self):
+        """Dunder."""
         return int(self.__final_vals)
 
     def __float__(self):
+        """Dunder."""
         return float(self.__final_vals)
 
     def __gt__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals > value
 
     def __lt__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals < value
 
     def __le__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals <= value
 
     def __eq__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals == value
 
     def __ge__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals >= value
 
     def __ne__(self, value):
+        """Dunder."""
         if isinstance(value, Unit):
             value = value.__final_vals
         return self.__final_vals != value
 
     @property
     def debug(self):
+        """General debug help."""
         print(f"""
             Current Unit: {self.__current_unit}\n
             Current Values: {self.__current_vals}\n
@@ -267,6 +305,7 @@ class Unit(object):
             Final Values: {self.__final_vals}""")
 
     def reset(self):
+        """Reset vals."""
         self.__current_unit = None
         self.__current_vals = None
         self.__final_vals = None
@@ -275,9 +314,14 @@ class Unit(object):
 
     def set_base_unit(self, unit):
         """Set the base unit, don't reset vals."""
-        _tmp = self.__resolve_units(unit)
+        _tmp = self.resolve_unit(unit)
         self.__current_unit = _tmp
-        self.__return_vals()
+        self.__generate_vals()
+
+    @property
+    def get_vals(self):
+        """Get the final val."""
+        return self.__final_vals
 
     @property
     def get_base_val(self):
@@ -294,16 +338,17 @@ class Unit(object):
         """Return the units possible in the current setup."""
         return self.__units.items()
 
-    def __resolve_units(self, bu):
-        """Will resolve the name of the unit from known types."""
-        bu = str(bu).lower()
-        if bu not in self.get_units:
-            for i in self.get_units:
-                if bu in self.__units[i]['vals']:
-                    return self.__units[i]
+    @classmethod
+    def resolve_unit(__cls__, unresolved_unit: str):
+        """Resolve the name of the unit from known types."""
+        unresolved_unit = str(unresolved_unit).lower()
+        if unresolved_unit not in __cls__.get_units:
+            for i in __cls__.get_units:
+                if unresolved_unit in __cls__.__units[i]['vals']:
+                    return __cls__.__units[i]
             return None
         else:
-            return self.__units[bu]
+            return __cls__.__units[unresolved_unit]
 
     def __conversion(self, vals=None):
         """Return conversion factor needed.
@@ -315,6 +360,7 @@ class Unit(object):
         init is the initial unit
         fin is the final unit
         This assumes everything has already been resolved with units
+
         """
         if vals is None:
             vals = self.__current_vals
@@ -327,11 +373,11 @@ class Unit(object):
             if not (ctype == ftype):
                 return None
             if ctype == 'coords':
-                func = getattr(nkrpy__coordinate,
+                func = getattr(nkrpy__convert,
                                f"{self.__current_unit['name']}2" +
                                f"{self.__final_unit['name']}")
             if ctype == 'astro':
-                func = getattr(nkrpy__astro,
+                func = getattr(nkrpy__convert,
                                f"{self.__current_unit['name']}2" +
                                f"{self.__final_unit['name']}")
             return func(vals)
@@ -352,11 +398,12 @@ class Unit(object):
 
         return scaled / self.__final_unit['fac']
 
-    def __return_vals(self, unit=None, vals=None):
+    def __generate_vals(self, unit=None, vals=None):
         """Convert the values appropriately.
 
         unit is the type _resolve_name output
-        vals can be either single values or iterable."""
+        vals can be either single values or iterable.
+        """
         # print(vals, unit)
         if unit is None and vals is None:
             if self.__final_unit is self.__current_unit:

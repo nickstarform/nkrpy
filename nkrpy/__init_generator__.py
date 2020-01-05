@@ -1,4 +1,5 @@
 """DESC"""
+# flake8: noqa
 from .astro import dustmodels
 from . import math
 from .unit import Unit, convert

@@ -1,4 +1,5 @@
 """Image Interpolation functions."""
+# flake8: noqa
 
 # standard modules
 import types
@@ -7,7 +8,7 @@ import types
 import numpy as np
 
 # relative modules
-from ..functions import typecheck
+from ..misc.functions import typecheck
 
 # global attributes
 __all__ = ('interpolate', )

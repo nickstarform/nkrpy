@@ -1,4 +1,6 @@
 nkrpy
 -----
 
-This is my own personaly python files that can be useful. They are not guaranteed to work. Just things I tend to use a lot.
+Originally was just a collection of python programs that I 
+    found myself using repeatidly. Migrating a lot of more
+    efficient modules and made more general.

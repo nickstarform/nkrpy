@@ -13,7 +13,6 @@ __all__ = ('raster_matrix', 'gen_angles', 'rotate_points', 'rotate_matrix')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
-__version__ = 0.1
 
 
 def raster_matrix(*args, auto=False, **kwargs):

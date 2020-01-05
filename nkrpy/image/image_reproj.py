@@ -1,50 +1,25 @@
+"""Reproject image."""
+# flake8: noqa
+# internal modules
 
-from math import *
+# external modules
 import numpy as np
 
-def ga2equ(ga):
-    """
-    Convert Galactic to Equatorial coordinates (J2000.0)
-    (use at own risk)
-    
-    Input: [l,b] in decimal degrees
-    Returns: [ra,dec] in decimal degrees
-    
-    Source: 
-    - Book: "Practical astronomy with your calculator" (Peter Duffett-Smith)
-    - Wikipedia "Galactic coordinates"
-    
-    Tests (examples given on the Wikipedia page):
-    >>> ga2equ([0.0, 0.0]).round(3)
-    array([ 266.405,  -28.936])
-    >>> ga2equ([359.9443056, -0.0461944444]).round(3)
-    array([ 266.417,  -29.008])
-    """
-    l,b = map(radians,ga)
-    # North galactic pole (J2000) -- according to Wikipedia
-    pole_ra = radians(192.859508)
-    pole_dec = radians(27.128336)
-    posangle = radians(122.932-90.0)
-    # North galactic pole (B1950)
-    #pole_ra = radians(192.25)
-    #pole_dec = radians(27.4)
-    #posangle = radians(123.0-90.0)
-    ra = atan2( (cos(b)*cos(l-posangle)), (sin(b)*cos(pole_dec) - cos(b)*sin(pole_dec)*sin(l-posangle)) ) + pole_ra
-    print(ra)
-    dec = asin( cos(b)*cos(pole_dec)*sin(l-posangle) + sin(b)*sin(pole_dec) )
-    return (degrees(ra), degrees(dec))
+# relative modules
+from ..misc.functions import typecheck
+from ..io.fits import reference
+
+# global attributes
+__all__ = ('decimal_format', 'general_format',
+           'fortran_format', 'wrapper')
+__doc__ = """."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+
 
 # 158.1277,142.000001201,-0.00277777777942,339
 # -21.4501305556, 41.9999987994,0.00277777777942,96
 # given image header info, creates array of projects
-def ref(crval,crpix,cdelt,num):
-    a = np.arange(1,num+1,1,dtype=float)
-    a[int(crpix)] = crval
-    for i,x in enumerate(a):
-        delpix = i - int(crpix)
-        delpix_delta = delpix * cdelt
-        a[i] = crval + delpix_delta
-    return a
 
 # generating gcoord vals from known header
 glon = ref(158.1277,142.000001201,-0.00277777777942,339)
@@ -72,15 +47,15 @@ imheader = hdulist[0].header
 imdata   = hdulist[0].data
 coords   = wcs.WCS(imheader)
 
-headervals = ('CTYPE1'                                                           ,
-'CRVAL1'                                             ,
-'CDELT1'                                                 ,
-'CRPIX1'                                                ,
-'CUNIT1'                                                            ,
-'CTYPE2'                                                           ,
-'CRVAL2'                                                ,
-'CDELT2'                                                ,
-'CRPIX2'   ,                                              
+headervals = ('CTYPE1',
+'CRVAL1',
+'CDELT1',
+'CRPIX1',
+'CUNIT1',
+'CTYPE2',
+'CRVAL2',
+'CDELT2',
+'CRPIX2',
 'CUNIT2')
 # These are the header values, have to override them by hand because I am lazy
 # example

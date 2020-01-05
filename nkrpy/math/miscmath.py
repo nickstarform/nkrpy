@@ -1,27 +1,27 @@
 """Various math functions."""
 
 # standard modules
-from math import cos, sin, acos
 from itertools import chain
 
 # external modules
 import numpy as np
 
 # relative modules
-from ..constants import pi
-from ..functions import typecheck
+from ..misc.constants import pi
+from ..misc.functions import typecheck
 
 # global attributes
 __all__ = ('flatten', 'listinvert', 'binning', 'cross',
-           'dot', 'radians', 'deg', 'mag', 'length',
+           'dot', 'radians', 'deg', 'mag',
            'ang_vec', 'determinant', 'inner_angle',
-           'angle_clockwise', 'apply_window')
+           'angle_clockwise', 'apply_window', 'list_array')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 
 def flatten(inputs) -> list:
+    """."""
     ret = list(chain.from_iterable(inputs))
     return ret
 
@@ -81,28 +81,23 @@ def mag(a):
     return (ret) ** 0.5
 
 
-def length(*args):
-    """Same as mag."""
-    return mag(*args)
-
-
 def ang_vec(deg):
-    """Unit vec of deg."""
+    """Generate a unit vec of deg."""
     rad = deg * pi / 180.
-    return cos(rad), sin(rad)
+    return np.cos(rad), np.sin(rad)
 
 
 def determinant(v, w):
-    """Determinant of two vecs."""
+    """Determine the determinant of two vecs."""
     return v[0] * w[1] - v[1] * w[0]
 
 
 def inner_angle(v, w):
     """Calculate inner angle between two vecs."""
-    cosx = dot(v, w) / (length(v) * length(w))
+    cosx = dot(v, w) / (mag(v) * mag(w))
     while np.abs(cosx) >= 1:
         cosx = cosx / (np.abs(cosx) * 1.001)
-    rad = acos(cosx)  # in radians
+    rad = np.acos(cosx)  # in radians
     return rad * 180. / pi  # returns degrees
 
 
@@ -180,7 +175,7 @@ def _2d(ite, dtype):
     return _return
 
 
-def _list_array(ite, dtype=np.float64, verbose=False):
+def list_array(ite, dtype=np.float64, verbose=False):
     """Transform list to numpy array of dtype."""
     assert typecheck(ite)
     inner = typecheck(ite[0])

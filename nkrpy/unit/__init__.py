@@ -1,5 +1,6 @@
-from .unit import Unit as unit
+"""General unit converter and handler."""
+from .unit import Unit
 from ._unit import units as __unit
-from . import astro as astroconversion
+from . import convert as convert
 
-__all__ = ('unit', '__unit', 'astroconversion')  # 'astroconversions')
+__all__ = ('Unit', '__unit', 'convert')
