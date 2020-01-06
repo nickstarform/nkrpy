@@ -9,7 +9,7 @@ from astropy.io import fits
 import numpy as np
 
 # relative modules
-from ..functions import typecheck
+from ...misc.functions import typecheck
 
 # global attributes
 __all__ = ('read', 'write', 'make_nan', 'make_zero',
