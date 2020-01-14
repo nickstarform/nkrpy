@@ -20,7 +20,7 @@ import numpy as np
 # relative modules
 from ..misc.constants import h, c, kb, msun, jy, mh
 from .dustmodels import kappa
-from ..unit import Unit as unit
+from .. import unit
 # from ..misc.functions import between
 
 # global attributes

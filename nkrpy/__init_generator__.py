@@ -2,7 +2,8 @@
 # flake8: noqa
 from .astro import dustmodels
 from . import math
-from .unit import Unit, convert
+from . import unit
+from .unit import unit, BaseUnit, convert
 from . import publication
 from .misc import (colours, constants, decorators, errors, mp,
                    typecheck, addspace, between,
@@ -11,7 +12,7 @@ from .misc import (colours, constants, decorators, errors, mp,
 
 __all__ = ('dustmodels',
            'math',
-           'Unit', 'convert',
+           'BaseUnit', 'unit', 'convert',
            'publication',
            'colours', 'constants', 'decorators', 'errors', 'mp',
            'typecheck', 'addspace', 'between',

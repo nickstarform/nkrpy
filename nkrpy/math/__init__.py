@@ -10,6 +10,8 @@ from .miscmath import (flatten, listinvert, binning, cross,
                        dot, radians, deg, mag,
                        ang_vec, determinant, inner_angle,
                        angle_clockwise, apply_window, list_array)
+from .vector import BaseVectorArray
+from .vector import Vector as vector
 
 __all__ = ('fit_conf', 'sigma_clip_fit', 'quad', 'voigt',
            'gauss', 'ndgauss', 'polynomial', 'baseline',
@@ -20,4 +22,5 @@ __all__ = ('fit_conf', 'sigma_clip_fit', 'quad', 'voigt',
            'binning', 'cross',
            'dot', 'radians', 'deg', 'mag',
            'ang_vec', 'determinant', 'inner_angle',
-           'angle_clockwise', 'apply_window', 'list_array')
+           'angle_clockwise', 'apply_window', 'list_array',
+           'vector', 'BaseVectorArray',)

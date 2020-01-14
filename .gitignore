@@ -9,6 +9,7 @@
 *.egg-info
 *egg*
 *build*
+*.so
 
 # Any personal files just in case
 *keys*

@@ -12,9 +12,9 @@ from ._unit import units
 from . import convert as nkrpy__convert
 
 # global attributes
-__all__ = ('Unit', 'BaseUnit')
+__all__ = ('BaseUnit', 'Unit',)
 __doc__ = """Convert supported units all to angstroms and hz
-    to add new units have to correct self.__units and resolve_units
+    to add new units have to correct self.__units and resolve_unit
     To setup, just initialize and call with units /  values to convert
     Holds values to quick accessing later
 
@@ -295,7 +295,6 @@ class Unit(object):
             value = value.__final_vals
         return self.__final_vals != value
 
-    @property
     def debug(self):
         """General debug help."""
         print(f"""
@@ -318,37 +317,32 @@ class Unit(object):
         self.__current_unit = _tmp
         self.__generate_vals()
 
-    @property
     def get_vals(self):
         """Get the final val."""
         return self.__final_vals
 
-    @property
     def get_base_val(self):
         """Get the base val."""
         return self.__current_vals
 
-    @property
     def get_units(self):
         """Return the units possible in the current setup."""
         return self.__units.keys()
 
-    @property
     def get_items(self):
         """Return the units possible in the current setup."""
         return self.__units.items()
 
-    @classmethod
-    def resolve_unit(__cls__, unresolved_unit: str):
+    def resolve_unit(self, unresolved_unit: str):
         """Resolve the name of the unit from known types."""
         unresolved_unit = str(unresolved_unit).lower()
-        if unresolved_unit not in __cls__.get_units:
-            for i in __cls__.get_units:
-                if unresolved_unit in __cls__.__units[i]['vals']:
-                    return __cls__.__units[i]
+        if unresolved_unit not in self.get_units():
+            for i in self.get_units():
+                if unresolved_unit in self.__units[i]['vals']:
+                    return self.__units[i]
             return None
         else:
-            return __cls__.__units[unresolved_unit]
+            return self.__units[unresolved_unit]
 
     def __conversion(self, vals=None):
         """Return conversion factor needed.
@@ -404,7 +398,6 @@ class Unit(object):
         unit is the type _resolve_name output
         vals can be either single values or iterable.
         """
-        # print(vals, unit)
         if unit is None and vals is None:
             if self.__final_unit is self.__current_unit:
                 self.__final_vals = self.__current_vals
@@ -415,7 +408,7 @@ class Unit(object):
                 self.__final_unit = self.__current_unit
         if vals is not None:
             # convert from cu to fu with vals
-            return self.__conversion(vals)
+            self.__final_vals = self.__conversion(vals)
         else:
             # convert from cu to fu with self.vals
             self.__final_vals = self.__conversion()

@@ -356,15 +356,15 @@ def info(fname, expected, actual, flag):
 
 def validate(func):
     """Validate the inputs that only a single flag is used."""
-    def wrapper(f: str, *args, **kwargs):
+    def wrapper(*args, **kwargs):
         total = dict(args.__dict__)
         total.update(kwargs)
-        res = total.values()
-        if all(res) or not any(res):
-            raise Exception('Incorrect input.' +
-                            'Please select either Jy->K or K->Jy')
+        res = [x for x in total.values() if isinstance(x, bool)]
+        if (res.count(True) != 1):
+            raise Exception('Incorrect flag configuration.' +
+                            ' Please only toggle a single flag.')
         else:
-            return func(f, *args, **kwargs)
+            return func(*args, **kwargs)
     return wrapper
 
 

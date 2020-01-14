@@ -1,6 +1,6 @@
 """General unit converter and handler."""
-from .unit import Unit
-from ._unit import units as __unit
-from . import convert as convert
+from .unit import Unit as unit  # noqa
+from .unit import BaseUnit
+from . import convert as convert  # noqa
 
-__all__ = ('Unit', '__unit', 'convert')
+__all__ = ('BaseUnit', 'unit', 'convert')

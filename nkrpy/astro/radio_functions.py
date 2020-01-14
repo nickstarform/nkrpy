@@ -29,7 +29,6 @@ def k_2_jy(freq, theta_major, theta_minor, brightness):
     @return jan mJy/beam.
     """
     conv = (1.222E3 * (freq ** -2) / theta_minor / theta_major) ** -1
-    print(f'Conversion: {conv}')
     return brightness * conv
 
 
@@ -42,7 +41,6 @@ def jy_2_k(freq, theta_major, theta_minor, intensity):
     @return temp Kelvin/beam.
     """
     conv = 1.222E3 * (freq ** -2) / theta_minor / theta_major
-    print(f'Conversion: {conv}')
     return intensity * conv
 
 
@@ -68,7 +66,10 @@ def convert_file(filename: str, jy_k: bool, k_jy: bool):
         nd = k_2_jy(*inp, data) / cv
         nh = 'Jy/beam'
     if nh:
+        fname = f'{nh.replace("/", "_")}_{filename}'
         header['BUNIT'] = nh
-        write(f'Temp_{filename}', header=header, data=nd)
+        write(fname, header=header, data=nd)
+        return fname, header, nd
+    return None, None, None
 
 # end of code

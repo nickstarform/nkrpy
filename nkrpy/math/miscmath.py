@@ -97,7 +97,7 @@ def inner_angle(v, w):
     cosx = dot(v, w) / (mag(v) * mag(w))
     while np.abs(cosx) >= 1:
         cosx = cosx / (np.abs(cosx) * 1.001)
-    rad = np.acos(cosx)  # in radians
+    rad = np.arccos(cosx)  # in radians
     return rad * 180. / pi  # returns degrees
 
 
@@ -138,13 +138,13 @@ def apply_window(ilist: list, window: float):
         if (ilist[i] - current) < window:
             tmp.append(ilist[i])
         elif (i <= len(ilist) - 1):
-            ret.append(sum(tmp)/len(tmp))
+            ret.append(sum(tmp) / len(tmp))
             tmp = [ilist[i]]
             current = ilist[i]
         i += 1
         if i == len(ilist):
-            tmp.append(ilist[i-1])
-            ret.append(sum(tmp)/len(tmp))
+            tmp.append(ilist[i - 1])
+            ret.append(sum(tmp) / len(tmp))
 
     return ret
 
