@@ -4,6 +4,7 @@
 
 # external modules
 from numpy import ndarray
+from numpy import array as np_array
 
 # relative modules
 from ..misc.functions import typecheck
@@ -25,6 +26,19 @@ __path__ = __file__.strip('.py').strip(__filename__)
 
 c = c * 1E8  # A/s
 kb = kb * 1E-7  # SI
+
+
+class BaseVals(object):
+    def __new__(cls, vals):
+        if isinstance(vals, ndarray):
+            cls.vals = vals
+        if typecheck(vals):
+            cls.vals = np_array(vals)
+        if checknum(vals):
+            cls.vals = np_array([vals])
+        if 'vals' not in cls.__dict__:
+            cls.vals = None
+        return cls.vals
 
 
 def checknum(num):
@@ -60,7 +74,7 @@ class BaseUnit(object):
 
     def __getitem__(self, key):
         """Dunder."""
-        return getattr(self, key)
+        return self.__dict__[key]
 
     def __next__(self):
         """Dunder."""
@@ -81,7 +95,7 @@ class Unit(object):
     __units = BaseUnit(**units)
 
     def __init__(self, baseunit: str = None,
-                 convunit: str = None, vals=None):
+                 convunit: str = None, vals: BaseVals = None):
         """Dunder.
 
         Parameters
@@ -95,16 +109,22 @@ class Unit(object):
 
         """
         self.reset()
+        vals = BaseVals(vals)
         if baseunit is not None:
             self.__current_unit = self.resolve_unit(baseunit)
+        if self.__current_unit is None:
+            raise UnitNotFound('Unable to resolve the base unit. ' +
+                               f'Make sure it is found in {self.__units}')
         if convunit is not None:
             self.__final_unit = self.resolve_unit(convunit)
-        if baseunit is None and convunit is None:
-            return
-        self.__current_vals = vals
-        self.__generate_vals(vals=vals)
+        if self.__final_unit is None:
+            raise UnitNotFound('Unable to resolve the conversion unit. ' +
+                               f'Make sure it is found in {self.__units}')
+        if not (baseunit is None and convunit is None):
+            self.__current_vals = vals
+            self.__generate_vals(vals=vals)
 
-    def __call__(self, convunit: str = None, vals=None):
+    def __call__(self, convunit: str = None, vals: BaseVals = None):
         """Resolve various conditions.
 
         Allows repeat calls and inline calling of function.
@@ -117,26 +137,20 @@ class Unit(object):
         vals: float | ndarray
 
         """
-        if not isinstance(vals, ndarray) and\
-           not checknum(vals) and (vals is not None):
-            return
-
-        if isinstance(convunit, ndarray) or checknum(convunit):
-            vals = convunit
-            convunit = None
+        vals = BaseVals(vals)
 
         if vals is None and convunit is None:
-            unit = self.__current_unit
+            print(1)
+            return self.__final_vals
         elif convunit is not None and vals is not None:
+            print(1)
             unit = self.resolve_unit(convunit)
-            self.__current_unit = unit
             self.__final_unit = unit
             self.__current_vals = vals
         elif convunit is not None:
+            print(1)
             unit = self.resolve_unit(convunit)
             vals = self.__current_vals
-        elif convunit is None:
-            unit = self.__final_unit
         self.__generate_vals(unit=unit, vals=vals)
         return self.__final_vals
 
@@ -398,9 +412,6 @@ class Unit(object):
         unit is the type _resolve_name output
         vals can be either single values or iterable.
         """
-        if unit is None and vals is None:
-            if self.__final_unit is self.__current_unit:
-                self.__final_vals = self.__current_vals
         if unit is not None:
             self.__final_unit = unit
         else:
@@ -413,4 +424,16 @@ class Unit(object):
             # convert from cu to fu with self.vals
             self.__final_vals = self.__conversion()
 
+
+class UnitNotFound(Exception):
+    def __init__(self, message, errors = None):
+
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+        # Now for your custom code...
+        self.errors = errors
+
 # end of code
+
+# end of file
