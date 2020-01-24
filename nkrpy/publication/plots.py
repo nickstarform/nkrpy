@@ -16,11 +16,8 @@ __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
-import matplotlib.pyplot as plt
-
-# relative modules
-
 fontConv = 3. / 0.04167  # pts/inche
+
 
 def set_style():
     """Setting the style."""

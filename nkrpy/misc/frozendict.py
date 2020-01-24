@@ -2,6 +2,8 @@
 
 # internal modules
 import collections
+from collections.abc import Iterable
+from copy import deepcopy
 
 # external modules
 
@@ -20,39 +22,44 @@ class FrozenDict(collections.Mapping):
 
     def __init__(self, *args, **kwargs):
         """Dunder."""
-        _d_args = self._cls()
+        self.__built = 0
+        _d = self._cls()
         for x in args:
-            _d_args.update(x)
+            _d.update(x)
         _d_kwargs = self._cls(**kwargs)
-        _d_args.update(_d_kwargs)
-        self._dict = _d_args
+        _d.update(_d_kwargs)
+        self.__dict = _d
         self._hash = None
+        self.__built = 1
 
     def __getitem__(self, key):
         """Dunder."""
-        return self._dict[key]
+        iterable = self.__dict[key]
+        if isinstance(iterable, Iterable) and not isinstance(iterable, str):
+            return deepcopy(iterable)
+        return self.__dict[key]
 
     def __contains__(self, key):
         """Dunder."""
-        return key in self._dict
+        return key in self._keys
 
     def __iter__(self):
         """Dunder."""
-        return iter(self._dict)
+        return iter(self.__dict)
 
     def __len__(self):
         """Dunder."""
-        return len(self._dict)
+        return len(self._keys)
 
     def __repr__(self):
         """Dunder."""
-        return f'<{self.__class__.__name__!s} {self._dict!r}>'
+        return f'<{self.__class__.__name__!s} {self.__dict!r}>'
 
     def __hash__(self):
         """Dunder."""
         if self._hash is None:
             h = 0
-            for key, value in iteritems(self._dict):
+            for key, value in iteritems(self.__dict):
                 h ^= hash((key, value))
             self._hash = h
         return self._hash

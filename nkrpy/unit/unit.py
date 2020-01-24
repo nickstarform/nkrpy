@@ -31,14 +31,14 @@ kb = kb * 1E-7  # SI
 class BaseVals(object):
     def __new__(cls, vals):
         if isinstance(vals, ndarray):
-            cls.vals = vals
-        if typecheck(vals):
-            cls.vals = np_array(vals)
-        if checknum(vals):
-            cls.vals = np_array([vals])
-        if 'vals' not in cls.__dict__:
-            cls.vals = None
-        return cls.vals
+            vals = vals
+        elif typecheck(vals):
+            vals = np_array(vals)
+        elif checknum(vals):
+            vals = np_array([vals])
+        else:
+            vals = None
+        return vals
 
 
 def checknum(num):
@@ -108,6 +108,8 @@ class Unit(object):
             The numbers to convert. Not Required.
 
         """
+        if isinstance(vals, Unit):
+            vals = vals.get_vals()
         self.reset()
         vals = BaseVals(vals)
         if baseunit is not None:
@@ -124,6 +126,7 @@ class Unit(object):
             self.__current_vals = vals
             self.__generate_vals(vals=vals)
 
+
     def __call__(self, convunit: str = None, vals: BaseVals = None):
         """Resolve various conditions.
 
@@ -138,26 +141,23 @@ class Unit(object):
 
         """
         vals = BaseVals(vals)
-
         if vals is None and convunit is None:
-            print(1)
             return self.__final_vals
         elif convunit is not None and vals is not None:
-            print(1)
             unit = self.resolve_unit(convunit)
             self.__final_unit = unit
             self.__current_vals = vals
         elif convunit is not None:
-            print(1)
             unit = self.resolve_unit(convunit)
             vals = self.__current_vals
-        self.__generate_vals(unit=unit, vals=vals)
-        return self.__final_vals
+        return self.__conversion(finalunit=unit, vals=vals)
+
+    def __getitem__(self, x):
+        return self.get_vals()[x]
 
     def __repr__(self):
         """Dunder."""
-        self.__generate_vals()
-        _t = self.__final_vals
+        _t = self.__conversion()
         if typecheck(_t):
             return ', '.join(map(str, _t))
         else:
@@ -325,40 +325,57 @@ class Unit(object):
         self.__final_unit = None
         self.__units = BaseUnit(**units)
 
-    def set_base_unit(self, unit):
+    def set_base_unit(self, unit: str):
         """Set the base unit, don't reset vals."""
         _tmp = self.resolve_unit(unit)
         self.__current_unit = _tmp
+        self.__generate_vals()
+
+    def set_final_unit(self, unit: str):
+        """Set the base unit, don't reset vals."""
+        _tmp = self.resolve_unit(unit)
+        self.__final_unit = _tmp
         self.__generate_vals()
 
     def get_vals(self):
         """Get the final val."""
         return self.__final_vals
 
+    def get_base_unit(self):
+        """Get the base units."""
+        return self.__current_unit
+
+    def get_final_unit(self):
+        """Get the final units."""
+        return self.__final_unit
+
     def get_base_val(self):
         """Get the base val."""
         return self.__current_vals
 
-    def get_units(self):
+    @classmethod
+    def get_units(cls):
         """Return the units possible in the current setup."""
-        return self.__units.keys()
+        return cls.__units.keys()
 
-    def get_items(self):
+    @classmethod
+    def get_units_verbose(cls):
         """Return the units possible in the current setup."""
-        return self.__units.items()
+        return cls.__units.items()
 
-    def resolve_unit(self, unresolved_unit: str):
+    @classmethod
+    def resolve_unit(cls, unresolved_unit: str):
         """Resolve the name of the unit from known types."""
         unresolved_unit = str(unresolved_unit).lower()
-        if unresolved_unit not in self.get_units():
-            for i in self.get_units():
-                if unresolved_unit in self.__units[i]['vals']:
-                    return self.__units[i]
+        if unresolved_unit not in cls.get_units():
+            for i in cls.get_units():
+                if unresolved_unit in cls.__units[i]['vals']:
+                    return cls.__units[i]
             return None
         else:
-            return self.__units[unresolved_unit]
+            return cls.__units[unresolved_unit]
 
-    def __conversion(self, vals=None):
+    def __conversion(self, baseunit=None, finalunit=None, vals=None):
         """Return conversion factor needed.
 
         Parameters
@@ -373,38 +390,42 @@ class Unit(object):
         if vals is None:
             vals = self.__current_vals
         # converting between common types (wavelength->wavelength)
-        if self.__current_unit is None or self.__final_unit is None:
+        if baseunit is None:
+            baseunit = self.__current_unit
+        if finalunit is None:
+            finalunit = self.__final_unit
+        if baseunit is None or finalunit is None:
             return None
-        ctype, ftype = self.__current_unit['type'], self.__final_unit['type']
+        ctype, ftype = baseunit['type'], finalunit['type']
         # handle coordinate and astronomial transformations
         if ctype in ('coords', 'astro'):
             if not (ctype == ftype):
                 return None
             if ctype == 'coords':
                 func = getattr(nkrpy__convert,
-                               f"{self.__current_unit['name']}2" +
-                               f"{self.__final_unit['name']}")
+                               f"{baseunit['name']}2" +
+                               f"{finalunit['name']}")
             if ctype == 'astro':
                 func = getattr(nkrpy__convert,
-                               f"{self.__current_unit['name']}2" +
-                               f"{self.__final_unit['name']}")
+                               f"{baseunit['name']}2" +
+                               f"{finalunit['name']}")
             return func(vals)
         # converting between freq, wavelength, energy
         if ctype == ftype:
-            scaled = vals * self.__current_unit['fac']
+            scaled = vals * baseunit['fac']
         # converting from freq to wavelength
         elif ((ctype == 'freq') and (ftype == 'wave') or
               (ctype == 'wave') and (ftype == 'freq')):
-            scaled = c / (vals * self.__current_unit['fac'])
+            scaled = c / (vals * baseunit['fac'])
         elif (ctype == 'energy') and (ftype == 'freq'):
-            scaled = vals * self.__current_unit['fac'] / h
+            scaled = vals * baseunit['fac'] / h
         elif (ctype == 'freq') and (ftype == 'energy'):
-            scaled = h * vals * self.__current_unit['fac']
+            scaled = h * vals * baseunit['fac']
         elif ((ctype == 'energy') and (ftype == 'wave') or
               (ctype == 'wave') and (ftype == 'energy')):
-            scaled = h * c / (vals * self.__current_unit['fac'])
+            scaled = h * c / (vals * baseunit['fac'])
 
-        return scaled / self.__final_unit['fac']
+        return scaled / finalunit['fac']
 
     def __generate_vals(self, unit=None, vals=None):
         """Convert the values appropriately.
@@ -419,7 +440,7 @@ class Unit(object):
                 self.__final_unit = self.__current_unit
         if vals is not None:
             # convert from cu to fu with vals
-            self.__final_vals = self.__conversion(vals)
+            self.__final_vals = self.__conversion(vals=vals)
         else:
             # convert from cu to fu with self.vals
             self.__final_vals = self.__conversion()

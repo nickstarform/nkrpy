@@ -5,7 +5,7 @@ import os
 import re
 
 # external modules
-from astropy.io import fits
+from astropy.io import fits as astropy__fits
 import numpy as np
 
 # relative modules
@@ -43,7 +43,7 @@ def create_header(h):
 
     """
     CARD_MX_LEN = 22
-    if isinstance(h, fits.header.Header):
+    if isinstance(h, astropy__fits.header.Header):
         return h
     if isinstance(h, tuple) or isinstance(h, list) or isinstance(h, set):
         if typecheck(h[0]):
@@ -73,7 +73,7 @@ def create_header(h):
                                 .rjust(CARD_MX_LEN) for v in value.split('/')])
             tmp.append((key, value))
         ret = dict(tmp)
-        return fits.header.Header(ret)
+        return astropy__fits.header.Header(ret)
     else:
         return None
 
@@ -88,7 +88,7 @@ def read(fname: str):
 
     """
     header, data = [], []
-    with fits.open(fname) as hdul:
+    with astropy__fits.open(fname) as hdul:
         for h in hdul:
             if 'XTENSION' in list(map(lambda x: x.upper(), h.header.keys())):
                 if h.header['XTENSION'].upper() == 'BINTABLE':
@@ -118,7 +118,7 @@ def write(f, fname=None, header=None, data=None):
         Data to write
 
     """
-    if not isinstance(header, fits.header.Header):
+    if not isinstance(header, astropy__fits.header.Header):
         header = create_header(header)
         if typecheck(header):
             while len(header) < (36 * 4 - 1):
@@ -131,7 +131,7 @@ def write(f, fname=None, header=None, data=None):
         if os.path.isfile(f):
             # open and update
             print('Updating File')
-            with fits.open(f, mode='update') as hdul:
+            with astropy__fits.open(f, mode='update') as hdul:
                 if header is not None:
                     header = hdul[0].header
                 if data is not None:
@@ -142,12 +142,12 @@ def write(f, fname=None, header=None, data=None):
             # write new
             print('Making new file')
             if header is not None:
-                hdu = fits.PrimaryHDU(data, header)
+                hdu = astropy__fits.PrimaryHDU(data, header)
             else:
-                hdu = fits.PrimaryHDU(data)
+                hdu = astropy__fits.PrimaryHDU(data)
             hdu.writeto(f)
 
-    elif isinstance(f, fits.hdu.hdulist.HDUList):
+    elif isinstance(f, astropy__fits.hdu.hdulist.HDUList):
         print('Found HDUList')
         if header is not None:
             f[0].header = header
@@ -157,7 +157,7 @@ def write(f, fname=None, header=None, data=None):
             f.writeto(fname)
         else:
             f.flush()
-    elif isinstance(f, fits.hdu.image.PrimaryHDU):
+    elif isinstance(f, astropy__fits.hdu.image.PrimaryHDU):
         print('Found PrimaryHDU')
         if header is not None:
             f.header = header

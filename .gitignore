@@ -1,6 +1,7 @@
 # Compiled python modules.
 *.pyc
 *__pycache__
+*.c
 
 # Setuptools distribution folder.
 /dist/
@@ -10,13 +11,15 @@
 *egg*
 *build*
 *.so
+pip-wheel-metadata
 
 # Any personal files just in case
 *keys*
 *tmp
 *docs*
 *.vscode
-
+*.zip
+nkrpy__orbital
 # test files
 *.log
 *.tox

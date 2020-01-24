@@ -4,7 +4,7 @@ These files range from general astronomy converters/functions
 to bandpass specific (radio IR etc) functions.
 """
 from . import dustmodels, observing, reduction
-from .astro import ecc
+from .misc import ecc, dustmass, planck_nu, planck_wav
 from .keplerian import (orbital_params, orbital_2_xyz, mean_anomoly,
                         eccentricity_vector, ecc_anomoly,
                         keplerian_velocity, xyz_2_orbital,

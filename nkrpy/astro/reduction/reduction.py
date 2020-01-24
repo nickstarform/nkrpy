@@ -13,7 +13,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 # relative modules
-from ...math.miscmath import linear
+from ...math.fit import linear
 
 # global attributes
 __all__ = ('tspec_orders', 'determine_order_tspec', 'tspec_noisy_region',

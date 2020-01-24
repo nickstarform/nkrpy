@@ -1,8 +1,7 @@
 """Atomic Line List."""
 
 __all__ = ('atomiclines', )
-__doc__ = """
-Atomic Line List
+__doc__ += """
 ----------------
 Main linelist for various wavelength bands. The main
 setup is <rank>: 0-9 (0 highest) which holds the rank

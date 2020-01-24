@@ -22,6 +22,18 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 
+def _counter():
+    i = 0
+    while True:
+        yield i
+        i += 1
+
+
+def counter():
+    return next(_counter())
+
+
+
 class aliasClass(object):
     """Aliasing methods.
 
@@ -357,8 +369,11 @@ def info(fname, expected, actual, flag):
 def validate(func):
     """Validate the inputs that only a single flag is used."""
     def wrapper(*args, **kwargs):
-        total = dict(args.__dict__)
-        total.update(kwargs)
+        total = {}
+        for x in args:
+            total.update({counter(): x})
+        if kwargs:
+            total.update(**kwargs)
         res = [x for x in total.values() if isinstance(x, bool)]
         if (res.count(True) != 1):
             raise Exception('Incorrect flag configuration.' +

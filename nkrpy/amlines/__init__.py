@@ -7,6 +7,6 @@ The file linelist holds the lines themselves and can be
 accessed from `atomiclines` while the converter is `Lines`
 """
 from .__linelist import atomiclines
-from .lines import Lines
+from .lines import Lines as lines
 
-__all__ = ('atomiclines', 'Lines')
+__all__ = ('atomiclines', 'lines')

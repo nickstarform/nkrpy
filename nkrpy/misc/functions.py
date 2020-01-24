@@ -12,11 +12,21 @@ import numpy as np
 # global attributes
 __all__ = ('typecheck', 'addspace', 'between',
            'find_nearest', 'strip', 'get', 'list_comp',
-           'add', 'find_max')
+           'add', 'find_max', 'deep_resolve')
 __doc__ = """Just generic functions that I use a good bit."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
+
+def deep_resolve(iterable):
+    if not isinstance(iterable, Iterable) or isinstance(iterable, str):
+        yield (iterable, )
+    try:
+        for sub in iterable:
+            for element in deep_resolve(sub):
+                yield element
+    except TypeError:
+        yield (iterable, )
 
 def get(iterable, **attrs):
     """Find first instance of element in iterable.

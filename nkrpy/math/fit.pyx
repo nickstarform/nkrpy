@@ -19,10 +19,38 @@ from ..misc import constants
 __all__ = ('fit_conf', 'sigma_clip_fit', 'quad', 'voigt',
            'gauss', 'ndgauss', 'polynomial', 'baseline',
            'plummer_density', 'plummer_mass', 'plummer_radius',
-           'linear')
+           'linear', 'numeric_error_propagator')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
+
+
+# TODO: need to add a numerical error approximator
+'''
+x = numpy.linspace(0,10,1000)
+dx = x[1]-x[0]
+y = x**2 + 1
+dydx = numpy.gradient(y, dx)
+'''
+
+
+def numeric_error_propagator(func, vals, sigmas):
+    """.
+
+    Parameters
+    ----------
+    func: `Function`
+
+    """
+    if not callable(func):
+        return
+    for i, _ in enumerate(vals):
+        val, sigma = vals[i], sigmas[i]
+        x = np.linspace(val - 3 * sigma, val + 3 * sigma, 1000)
+        dx = x[1] - x[0]
+        y = func(x)
+        dydx = np.gradient(y, dx)
+    return dydx
 
 
 def fit_conf(x, y, func: types.FunctionType, opt, ci: float = 0.95):

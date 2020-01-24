@@ -5,7 +5,8 @@
 # external modules
 
 # relative modules
-from ..io.fits import read, write
+from ..io.fits import read as nkrpy_read
+from ..io.fits import write as nkrpy_write
 from ..misc.decorators import validate
 
 # global attributes
@@ -20,34 +21,53 @@ def rad_2_as(rad):
     return float(rad) * 3600.
 
 
-def k_2_jy(freq, theta_major, theta_minor, brightness):
+def k_2_jy(freq: float, theta_major: float,
+           theta_minor: float, brightness: float) -> float:
     """Convert Kelvin to Jy.
 
-    @param freq ghz
-    @param theta arcseconds
-    @param brightness Kelvin/beam
-    @return jan mJy/beam.
+    Parameters
+    ----------
+    Parameters
+    ----------
+    freq: float
+        ghz
+    theta_major: float
+        arcseconds
+    theta_minor: float
+        arcseconds
+    brightness: float
+        Kelvin/beam.
     """
     conv = (1.222E3 * (freq ** -2) / theta_minor / theta_major) ** -1
     return brightness * conv
 
 
-def jy_2_k(freq, theta_major, theta_minor, intensity):
+def jy_2_k(freq: float, theta_major: float,
+           theta_minor: float, intensity: float) -> float:
     """Convert Kelvin to Jy.
 
-    @param freq ghz
-    @param theta arcseconds
-    @param intensity mJy/beam
-    @return temp Kelvin/beam.
+    Parameters
+    ----------
+    freq: float
+        ghz
+    theta_major: float
+        arcseconds
+    theta_minor: float
+        arcseconds
+    intensity: float
+        mJy/beam
+
     """
     conv = 1.222E3 * (freq ** -2) / theta_minor / theta_major
     return intensity * conv
 
 
 @validate
-def convert_file(filename: str, jy_k: bool, k_jy: bool):
+def convert_file(filename: str, jy_k: bool = False, k_jy: bool = False) -> tuple:
     """."""
-    header, data = read(filename)
+    header, data = nkrpy_read(filename)
+    header = header[0]
+    data = data[0]
     inp = [float(header['RESTFRQ']) / 1E9,
            rad_2_as(header['BMAJ']),
            rad_2_as(header['BMIN'])]
@@ -68,7 +88,7 @@ def convert_file(filename: str, jy_k: bool, k_jy: bool):
     if nh:
         fname = f'{nh.replace("/", "_")}_{filename}'
         header['BUNIT'] = nh
-        write(fname, header=header, data=nd)
+        nkrpy_write(fname, header=header, data=nd)
         return fname, header, nd
     return None, None, None
 
