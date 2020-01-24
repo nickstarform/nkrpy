@@ -1,11 +1,12 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools", "wheel", "Cython"]
 
 [tool.tox]
 legacy_tox_ini = """
 [tox]
 envlist = py37, flake8
 [testenv]
+deps = -rrequirements.txt
 commands = python -m unittest discover -s tests
 [testenv:flake8]
 basepython = python3
