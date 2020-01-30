@@ -1,4 +1,5 @@
 """Unit conversion."""
+# cython modules
 
 # internal modules
 
@@ -8,7 +9,9 @@ from numpy import array as np_array
 
 # relative modules
 from ..misc.functions import typecheck
-from ..misc.constants import h, c, kb  # imported as cgs
+from ..misc.constants import c as n_c  # imported as cgs
+from ..misc.constants import kb as n_kb  # imported as cgs
+from ..misc.constants import h  # imported as cgs
 from ._unit import units
 from . import convert as nkrpy__convert
 
@@ -24,8 +27,9 @@ __doc__ = """Convert supported units all to angstroms and hz
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
-c = c * 1E8  # A/s
-kb = kb * 1E-7  # SI
+cdef long c, kb
+c = n_c * 1E8  # A/s
+kb = n_kb * 1E-7  # SI
 
 
 class BaseVals(object):

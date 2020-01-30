@@ -12,7 +12,7 @@ from ..math import vector
 from ..math.vector import BaseVectorArray
 
 # global attributes
-__all__ = ('Triangle',)
+__all__ = ('Triangle', 'recenter')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
@@ -25,14 +25,18 @@ find all gaussians in images
 make triangles from all points
 """
 
-class Triangle(object):
-    AreaError = 0.1  # amount of error allowed for area.
-    AngleError = 0.005  # amount of error allowed in angle
-    SideError = 0.005  # amount of error allowed in side length
+cdef class Triangle(object):
+    cdef public float AreaError  # amount of error allowed for area.
+    cdef public float AngleError  # amount of error allowed in angle
+    cdef public float SideError  # amount of error allowed in side length
 
     def __init__(self, vertex1: BaseVectorArray, vertex2: BaseVectorArray,
                  vertex3: BaseVectorArray, radius=0):
         """Dunder."""
+        self.AreaError = 0.1  # amount of error allowed for area.
+        self.AngleError = 0.005  # amount of error allowed in angle
+        self.SideError = 0.005  # amount of error allowed in side length
+
         vectors = itertools.combinations((vertex1, vertex2, vertex3), 2)
         vectors = [vector(*x, (radius, radius, radius)) for x in vectors]
         vectors.sort(key=lambda x: x.get_vec()['distance'])
@@ -174,12 +178,14 @@ class Triangle(object):
         similar_area = np.logical_and((1. - cls.AreaError) <= diff_area,
                                       diff_area <= (1. + cls.AreaError))
         # Check for AAA _ Area
-        # TODO: Why is all(np.ndarray) much faster than np.ndarray.all()
         if all(similar) and similar_area:
             print('True by aaaa')
             return True
         return False
 
+
+def recenter(image: np.ndarray):
+    pass
 
 # end of code
 

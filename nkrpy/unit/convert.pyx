@@ -4,6 +4,7 @@
 
 # external modules
 import numpy as np
+cimport numpy as np
 
 # relative modules
 from ..misc.functions import typecheck
@@ -20,24 +21,29 @@ __all__ = ('icrs2deg', 'deg2icrs',
            'b19502gal', 'gal2b1950',
            'cyl2cart', 'cart2cyl',
            'cyl2sph', 'sph2cyl',
-           'cart2sph', 'sph2cart',)
+           'cart2sph', 'sph2cart', 'split_icrs')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 
-def __split_icrs(string: str):
-    ret = []
-    _t = ''
-    lstring = len(string)
+cpdef double[:] split_icrs(str string: str):
+    cdef double[:] ret = np.zeros(3, float)
+    cdef str _t = ''
+    cdef int lstring = len(string)
+    cdef int i
+    cdef int count = 0
+    cdef str x
     for i, x in enumerate(string):
+        print(_t)
         if str.isdigit(x) or x == '.':
             _t += x
             if i != (lstring - 1):
                 continue
-        if len(ret) == 3:
+        ret[count] = float(_t)
+        if count >= 2:
             return ret
-        ret.append(float(_t))
+        count += 1
         _t = ''
     return ret
 
@@ -58,18 +64,20 @@ def icrs2deg(icrs) -> np.ndarray:
     >>> icrs2deg([['11','11','11.5'], ['11','11','11.5']])
 
     """
+    print('start:',icrs)
     if not typecheck(icrs):
         icrs = [icrs]
-
     try:
         ret = np.array(icrs, dtype=np.float)
         if len(ret.shape) == 1:
             ret = ret[np.newaxis, :]
+        print('ret:', ret)
 
-        assert ret.shape[-1] <= 3
+        assert ret.shape[-1] < 3
     except Exception:
-        toconv = list(map(lambda x: __split_icrs(str(x)), icrs))
-        ret = np.array(toconv, np.float)
+        toconv = list(map(lambda x: split_icrs(str(x)), icrs))
+        ret = np.array(toconv, dtype=np.float)
+        print('toconv:', toconv)
 
     for col in range(ret.shape[-1]):
         ret[:, col] /= 60. ** col
@@ -117,7 +125,7 @@ def cart2cyl():
     pass
 
 
-def gal2j2000(ga):
+def gal2j2000(ga: list):
     """Convert Galactic to Equatorial coordinates (J2000.0).
 
     Input: [l,b] in decimal degrees

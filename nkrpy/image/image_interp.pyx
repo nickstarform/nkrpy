@@ -17,25 +17,6 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 
-def moduleLoad(modulename='datetime'):
-    mods = imports()
-    if modulename in mods:
-        return mods[modulename]
-    else:
-        return False
-
-
-def imports():
-    '''
-    all imported functions
-    '''
-    mods = {}
-    for name, val in globals().items():
-        if isinstance(val, types.ModuleType):
-            mods[val.__name__] = (name, )
-    return mods
-
-
 def interpolate(obj, val, dtype='linear'):
     '''
     obj can be any iterable form of 1d or 2d. Easily transferable to higher D

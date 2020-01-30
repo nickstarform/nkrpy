@@ -25,26 +25,30 @@ The orbital_2_xyz converts orbital elements to xyz components.
 Keep everything in AU, days, solar masses, radians"""
 
 # Acceptable Numerical Error
-eps = 1E-15
+cdef public double eps = 1E-15
 
 
-def eccentricity_vector(position, velocity, mu):
+cpdef double[:] eccentricity_vector(double [:] position: np.ndarray,
+                                double [:] velocity: np.ndarray,
+                                double mu: float):
     """Return eccentricity vector.
 
     :param position: Position (r) [AU]
     :param velocity: Velocity (v) [AU/day]
     :return: Eccentricity vector (ev) [-]
     """
+    cdef double[:] ev
     ev = 1. / mu * ((norm(velocity) ** 2 - mu / norm(position)) *
                     position - dot(position, velocity) * velocity)
     return ev
 
 
-def mean_anomoly(ecc, tan):
+cpdef double mean_anomoly(double ecc: float, double tan: float):
     """Compute the mean anomoly out to 5 taylor terms.
 
     Each line is a new taylor term.
     """
+    cdef double mean
     mean = tan \
         - (2. * ecc * np.sin(tan))  \
         + ((((3. / 4.) * (ecc ** 2)) +
@@ -54,31 +58,33 @@ def mean_anomoly(ecc, tan):
     return mean
 
 
-def ecc_anomoly(ecc, tan):
+cpdef double ecc_anomoly(double ecc: float, double tan: float):
     """Find the eccentric anomoly."""
+    cdef double _tmp, ecc_a
     _tmp = np.tan(tan / 2.) * ((1. - ecc) / (1. + ecc)) ** 0.5
     ecc_a = np.arctan(_tmp) * 2.
     return ecc_a
 
 
-def period(a, mu):
+cpdef double period(double a: float, double mu: float):
     """Given the semimajor and Standard grav. parameter, return period."""
     return 2. * pi * ((a ** 3) / mu) ** 0.5
 
 
-def grav_param(mass):
+cpdef double grav_param(double mass: float):
     """Return the standard grav. param. given mass in solar masses."""
+    cdef double new_g
     new_g = 4. * (pi ** 2)  # in AU/solarmass/yr
     new_g = new_g / (365.25 ** 2)  # now in days
     return new_g * mass
 
 
-def _a2ecc(sma, ecc=0):
+cpdef double _a2ecc(double sma: float, double ecc: float = 0):
     """Given semi major axis and eccentricity, yield semi, minor axis."""
     return ((sma ** 2) / (1. - (ecc ** 2))) ** 0.5
 
 
-def rad(a, ecc, nu):
+cpdef double rad(double a: float, double ecc: float, double nu: float):
     """Compute the distance given the semi-major, ecc, and true anomoly.
 
     nu should be in degrees.
@@ -87,15 +93,27 @@ def rad(a, ecc, nu):
     return a * (1. - (ecc ** 2)) / (1. + (ecc * np.cos(nu)))
 
 
-def keplerian_velocity(r, a, mu):
+cpdef double keplerian_velocity(double r: float,
+                                double a: float,
+                                double mu: float):
     """Given distance, semimajor and standard grav param, give the velocity."""
     return (mu * ((2. / r) - (1. / a))) ** 0.5
 
 
-def orbital_params(lower_smajora, upper_smajora, lower_ecc, upper_ecc,
-                   lower_inc, upper_inc, central_mass=1, size=100):
+cpdef orbital_params(double lower_smajora: float,
+                   double upper_smajora: float,
+                   double lower_ecc: float,
+                   double upper_ecc: float,
+                   double lower_inc: float,
+                   double upper_inc: float,
+                   double central_mass: float = 1.0,  # noqa
+                   short size = 100):
     """Generate samples of orbital params."""
     # compute the standard gravitational parameter
+    cdef double mu
+    cdef double[:] sample_smajora, sample_inc, sample_lan
+    cdef double[:] sample_ecc, sample_aop, sample_tan
+    cdef double[:] keplerian, cartesian
     mu = grav_param(central_mass)
 
     # sample given params within bounds
@@ -170,7 +188,9 @@ def orbital_2_xyz(params):
     return ret
 
 
-def specific_orbital_energy(position, velocity, mu):
+cpdef double specific_orbital_energy(double[:] position: np.ndarray,
+                                    double[:] velocity: np.ndarray,
+                                    double mu: float):
     """Return specific orbital energy.
 
     :param position: Position (r) [AU]
