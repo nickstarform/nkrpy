@@ -5,6 +5,7 @@ import os
 
 # external modules
 from Cython.Build import cythonize
+import numpy
 
 # global attributes
 __doc__ += """."""
@@ -14,6 +15,7 @@ sep = os.sep
 
 supported = {'pyx': 0, 'f90': 1, 'c': 3, 'i': 2}  # supported extensions
 supported_inverse = dict((v, k) for k, v in supported.items())
+
 
 # populate the __info__ and __init__ files
 def populate_info(kwargs: dict) -> None:
@@ -39,7 +41,7 @@ def populate_info(kwargs: dict) -> None:
             if isinstance(val, list):
                 f.write(f'{key} = {val}\n')
 
-    # read generator 
+    # read generator
     with open(f'nkrpy{sep}__init_generator__.py', 'r') as f:
         alllines = f.readlines()
     string = [kwargs['description']]
@@ -76,7 +78,8 @@ def load_ext(extname: str, files: list, fext: str) -> tuple:
     """
     pym = None
     if fext == 'pyx':
-        ext = cythonize(Extension(extname, files, include_dirs=[],
+        ext = cythonize(Extension(extname, files,
+                                  include_dirs=[numpy.get_include()],
                                   libraries=[], library_dirs=[]),
                         language_level='3')[0]
     elif fext == 'f90':
@@ -99,10 +102,10 @@ def resolve(files: list) -> list:
         """Get the extension for a filename."""
         try:
             ext = f.split('.')[-1]
-            if not ext in supported:
+            if ext not in supported:
                 return -1
             return supported[ext]
-        except:
+        except Exception:
             return -1
     _t = [[f, get_ext(f)] for i, f in enumerate(files)]
     _t.sort(key=lambda x: x[1])
@@ -110,101 +113,101 @@ def resolve(files: list) -> list:
     return _t
 
 
+extensions = []  # hold all exts
+extensions_name = set()
+py_modules = []  # hold any aggregates from SWIGs
+# walk through all files
+aggregate = []
+for path, dirnames, filenames in os.walk(f'.{sep}nkrpy{sep}'):
+    for filename in filenames:
+        aggregate.append(os.sep.join([path, filename]))
+dict_agg = {}
+for file in aggregate:
+    file_ext = file.split('.')[-1]
+    if file_ext not in supported:
+        continue
+    file = file.replace(f'.{file_ext}', '')
+    if file not in dict_agg:
+        dict_agg[file] = []
+    dict_agg[file].append(supported[file_ext])
+for file in dict_agg:
+    ext = dict_agg[file]
+    ext.sort()
+    ext = ext[0]
+    fname = file.replace(sep, '.').strip('.')
+    file += f'.{supported_inverse[ext]}'
+    ext, pym = load_ext(fname, [file], supported_inverse[ext])
+    if ext is not None:
+        if pym is None:
+            extensions_name.add(fname)
+        extensions.append(ext)
+    if pym is not None:
+        py_modules.append(pym)
+        extensions_name.add(pym)
+
+# The below is used to populate the settings dictionary to pass for
+# building of the dunders and into `setuptools.setup`
+# gather all scripts
+scripts = []
+for path, dirnames, filenames in os.walk(f'.{sep}bin{sep}'):
+    for file in filenames:
+        fext = file.split('.')[-1]
+        file = os.path.join(path, file)
+        scripts.append(file)
+
+# read .version
+with open(os.path.join(os.path.dirname(__file__), '.version')) as v:
+    version = v.read()
+
+# read README
+with open(os.path.join(os.path.dirname(__file__), 'README.md')) as r:
+    skiprows = 4
+    readme = r.readlines()
+    readme = '\n'.join(readme[skiprows:])
+
+# read requirements
+with open(os.path.join(os.path.dirname(__file__),
+          'requirements.txt')) as req:
+    requirements = req.read().splitlines()
+
+# define package data
+package_data = {
+    '': ['LICENSE', 'README.md', 'requirements.txt', '.version']
+}
+
+# the general settings handler
+settings = {
+    'name': 'nkrpy',
+    'description': readme,
+    'long_description': readme,
+    'long_description_content_type': "text/md",
+    'version': version,
+    'url': 'http://github.com/nickalaskreynolds/nkrpy',
+    'author': 'Nickalas Reynolds',
+    'author_email': 'email@nickreynolds.xyz',
+    'license': 'MPL2.0',
+    'packages': find_packages(exclude=['tests', 'docs', 'examples']),
+    'scripts': scripts,
+    'zip_safe': True,
+    'include_package_data': True,
+    'package_data': package_data,
+    'ext_modules': extensions,
+    'install_requires': requirements,
+    'py_modules': py_modules,
+    'classifiers': [
+        'Development Status :: 4 - Beta',
+        'License :: OSI Approved :: aikolsuaklsdjklasjdklasjdkljaskldj' +
+            'Mozilla Public License 2.0 (MPL 2.0)',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3 :: Only',
+        'Intended Audience :: Developers',
+        'Natural Language :: English'
+    ]
+}
+
 if __name__ == '__main__':
-    extensions = []  # hold all exts
-    extensions_name = set()
-    py_modules = []  # hold any aggregates from SWIGs
-    # walk through all files
-    aggregate = []
-    for path, dirnames, filenames in os.walk(f'.{sep}nkrpy{sep}'):
-        for filename in filenames:
-            aggregate.append(os.sep.join([path, filename]))
-    dict_agg = {}
-    for file in aggregate:
-        file_ext = file.split('.')[-1]
-        if file_ext not in supported:
-            continue
-        file = file.replace(f'.{file_ext}', '')
-        if file not in dict_agg:
-            dict_agg[file] = []
-        dict_agg[file].append(supported[file_ext])
-    for file in dict_agg:
-        ext = dict_agg[file]
-        ext.sort()
-        ext = ext[0]
-        fname = file.replace(sep, '.').strip('.')
-        file += f'.{supported_inverse[ext]}'
-        ext, pym = load_ext(fname, [file], supported_inverse[ext])
-        if ext is not None:
-            if pym is None:
-                extensions_name.add(fname)
-            extensions.append(ext)
-        if pym is not None:
-            py_modules.append(pym)
-            extensions_name.add(pym)
-
-    # The below is used to populate the settings dictionary to pass for 
-    # building of the dunders and into `setuptools.setup`
-    # gather all scripts
-    scripts = []
-    for path, dirnames, filenames in os.walk(f'.{sep}bin{sep}'):
-        for file in filenames:
-            fext = file.split('.')[-1]
-            file = os.path.join(path, file)
-            scripts.append(file)
-
-    # read .version
-    with open(os.path.join(os.path.dirname(__file__), '.version')) as v:
-        version = v.read()
-
-    # read README
-    with open(os.path.join(os.path.dirname(__file__), 'README.md')) as r:
-        skiprows = 2
-        readme = r.readlines()
-        readme = '\n'.join(readme[skiprows:])
-
-    # read requirements
-    with open(os.path.join(os.path.dirname(__file__),
-                           'requirements.txt')) as req:
-        requirements = req.read().splitlines()
-
-    # define package data
-    package_data = {
-        '': ['LICENSE', 'README.md', 'requirements.txt', '.version']
-    }
-
-    # the general settings handler
-    settings = {
-        'name': 'nkrpy',
-        'description': readme,
-        'long_description': readme,
-        'long_description_content_type': "text/md",
-        'version': version,
-        'url': 'http://github.com/nickalaskreynolds/nkrpy',
-        'author': 'Nickalas Reynolds',
-        'author_email': 'email@nickreynolds.xyz',
-        'license': 'MPL2.0',
-        'packages': find_packages(exclude=['tests', 'docs', 'examples']),
-        'scripts': scripts,
-        'zip_safe': True,
-        'include_package_data': True,
-        'package_data': package_data,
-        'ext_modules': extensions,
-        'install_requires': requirements,
-        'py_modules': py_modules,
-        'classifiers': [
-            'Development Status :: 4 - Beta',
-            'License :: OSI Approved :: aikolsuaklsdjklasjdklasjdkljaskldj' +\
-                'Mozilla Public License 2.0 (MPL 2.0)',
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: 3.7',
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3 :: Only',
-            'Intended Audience :: Developers',
-            'Natural Language :: English'
-        ]
-    }
-
     # now pass into the main functions
     populate_info(settings)
 
