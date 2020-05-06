@@ -205,14 +205,16 @@ class Lines(object):
         """
         self.__config['remove_lines'] = self.__config['remove_lines']\
             .union(set(linenames))
-        self.__remove_lines()
+        for line in self.__config['remove_lines']:
+            if line in self.__lines:
+                del self.__lines[line]
         return self
 
     def remove_regions(self, limits):
         """Remove several regions.
 
         A nice wrapper function to quickly remove several defined
-        regions.
+        regions. limits is 2d list.
 
         Parameters
         ----------
@@ -220,8 +222,26 @@ class Lines(object):
             A list with 2 parameters of floats.
 
         """
+        keys = list(self.__lines.keys())
+        _tmp = np.array([[i, line] for i, ln in enumerate(keys)
+                        for line in self.__lines[ln]['vals']]).reshape(-1, 2)  # noqa
+        ind = np.zeros(_tmp.shape[0], dtype=bool)
         for x in limits:
-            self.remove_region(*x)
+            xlower, xupper = x
+            if (xlower == -1) and (xupper == -1):
+                return self
+            if xupper == -1:
+                xupper = np.inf
+            _ind = ~(_tmp[:, 1] >= xlower)
+            _ind += ~(_tmp[:, 1] <= xupper)
+            ind += _ind
+        for key in range(len(keys)):
+            key_idx = _tmp[ind, 0] == key
+            ln = keys[key]
+            if (key_idx.shape[0] == 0) or (_tmp[ind, 1][key_idx].shape[0] == 0):  # noqa
+                del self.__lines[ln]
+                continue
+            self.__lines[ln]['vals'] = _tmp[ind, 1][key_idx]
         return self
 
     def remove_region(self, xlower: float, xupper: float):
@@ -235,8 +255,7 @@ class Lines(object):
             The upper bound to revoke linelists
 
         """
-        self.__config['xlower'], self.__config['xupper'] = xlower, xupper
-        self.__generate_regions()
+        self.remove_regions([[xlower, xupper], ])
         return self
 
 
