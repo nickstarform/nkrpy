@@ -152,6 +152,32 @@ class Lines(object):
         """Return lines within the region."""
         return frozendict(**self.__config)
 
+    def return_labels(self, mindistance: float = 0.005):
+        """Return all labels.
+
+        mindistance: float
+            The minimum distance between labels in units of the labels
+        """
+        labels = {}
+        ap = mindistance
+        if ap is None or ap < 0.:
+            return
+        keys = list(self.__lines.keys())
+        _tmp = np.array([[i, line] for i, ln in enumerate(keys)
+                         for line in self.__lines[ln]['vals']]).reshape(-1, 2)  # noqa
+        for key in range(len(keys)):
+            key_idx = _tmp[:, 0] == key
+            if key_idx.shape[0] < 0:
+                continue
+            ln = keys[key]
+            df = np.abs(np.diff(np.hstack([_tmp[key_idx, 1], [np.inf]])))
+            indices = np.arange(df.shape[0])
+            idx = indices[(df > ap)] + 1
+            split = np.split(indices, idx)
+            labels[ln] = np.array([np.median(_tmp[key_idx, :][s, 1]) for s in split if _tmp[key_idx, :][s, 1].shape[0] > 0]).tolist()  # noqa
+        return labels
+
+
     def reset(self):
         """."""
         self.__reset()
@@ -225,7 +251,7 @@ class Lines(object):
         keys = list(self.__lines.keys())
         _tmp = np.array([[i, line] for i, ln in enumerate(keys)
                         for line in self.__lines[ln]['vals']]).reshape(-1, 2)  # noqa
-        ind = np.zeros(_tmp.shape[0], dtype=bool)
+        ind = np.zeros(_tmp.shape[0], dtype=bool)  # noqa
         for x in limits:
             xlower, xupper = x
             if (xlower == -1) and (xupper == -1):
