@@ -1,3 +1,3 @@
 from .logger import *  # noqa
 
-__doc__ = logger.__doc__  # noqa
+__doc__ = Logger.__doc__  # noqa

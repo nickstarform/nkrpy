@@ -1,5 +1,5 @@
 """Hold units for Unit class."""
-from ..constants import ev, pi
+from ..misc.constants import ev, pi
 
 __all__ = ('units',)
 
@@ -66,6 +66,10 @@ units = {
             'name': 'gal',
             'type': 'astro',
             'fac': None},
+    'j2015.5': {'vals': ('j2015',),
+                'name': 'j2015.5',
+                'type': 'astro',
+                'fac': None},
     'j2000': {'vals': ('j2000',),
               'name': 'j2000',
               'type': 'astro',
@@ -111,6 +115,10 @@ units = {
                    'name': 'kilometers',
                    'type': 'wave',
                    'fac': 10 ** 13},
+    'au': {'vals': ('astronomical unit',),
+           'name': 'au',
+           'type': 'wave',
+           'fac': 1.496E21},
     'lightyear': {'vals': ('lyr', 'lightyears'),
                   'name': 'lightyear',
                   'type': 'wave',

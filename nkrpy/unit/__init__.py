@@ -1,5 +1,6 @@
-from .unit import Unit as unit
-from ._unit import units as __unit
-from . import astro as astroconversion
+"""General unit converter and handler."""
+from .unit import Unit as unit  # noqa
+from .unit import BaseUnit
+from . import convert as convert  # noqa
 
-__all__ = ('unit', '__unit', 'astroconversion')  # 'astroconversions')
+__all__ = ('BaseUnit', 'unit', 'convert')
