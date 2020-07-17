@@ -1,7 +1,9 @@
 """Various math functions."""
+# cython modules
 
 # standard modules
-from itertools import chain
+from itertools import chain, islice, groupby
+from operator import itemgetter
 
 # external modules
 import numpy as np
@@ -14,10 +16,69 @@ from ..misc.functions import typecheck
 __all__ = ('flatten', 'listinvert', 'binning', 'cross',
            'dot', 'radians', 'deg', 'mag',
            'ang_vec', 'determinant', 'inner_angle',
-           'angle_clockwise', 'apply_window', 'list_array')
+           'angle_clockwise', 'apply_window', 'list_array',
+           'pairwise', 'window', 'group_ranges',)
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
+
+
+def group_ranges(data):
+    """Yield range of consecutive numbers."""
+    for k, g in groupby(enumerate(data), lambda x: x[0] - x[1]):
+        group = (map(itemgetter(1), g))
+        group = list(map(int, group))
+        if len(group) == 0:
+            yield (group[0], )
+        yield (group[0], group[-1])
+
+def pairwise(points, window_points: int = 2):
+    """Create point pairs given a window.
+    
+    So [1,2,3,4, 5] with window 2 (e.g. 2 points) yields
+        [[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [4.0, 5.0]]
+    whereas with window 4 yields
+        [[1.0, 4.0], [2.0, 5.0]]
+    """
+    window_points -= 1
+    if isinstance(points, list):
+        for x in window(points, window_points):
+            yield x[0], x[-1]
+
+    if isinstance(points, np.ndarray):
+        for x in __window_array(points, window_points):
+            yield x[0], x[-1]
+
+
+def window(points, window_points: int = 2):
+    if isinstance(points, list):
+        return __window_list(points, window_points)
+
+    if isinstance(points, np.ndarray):
+        return __window_array(points, window_points)
+
+
+def __window_array(points: np.ndarray, window_points: int = 2):
+        ind = np.arange(0, points.shape[0]).tolist()
+        ind = np.ravel(list(zip(ind, ind[window_points:])))
+        spl = np.split(points, ind)
+        if spl[0].shape[0] == 0:
+            spl = spl[1::2]
+        else:
+            spl = spl[::2]
+        for elem in spl:
+            yield elem
+
+
+def __window_list(points: list, window_points: int = 2):
+    """Similar to pairwise, but efficiently returns window."""
+    it = iter(points)
+    result = tuple(islice(it, window_points))
+    if len(result) == window_points:
+        yield result
+    for elem in it:
+        result = result[1:] + (elem, )
+        yield result
 
 
 def flatten(inputs) -> list:

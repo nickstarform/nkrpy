@@ -152,6 +152,20 @@ class Vector(object):
         """Return the vector info."""
         return self.__vec
 
+    """ # work on this
+    cpdef rotate(double[:, :] data: np.ndarray, long angle, float cval: float = np.NaN):
+        cdef Py_ssize_t rows, cols
+        rows, cols = np.asarray(data).shape
+        cdef double theta = np.radians(angle)
+        cdef double c, s
+        c = np.cos(theta)
+        s = np.sin(theta)
+        cdef cnp.ndarray[double, ndim=2, mode='c'] r_matrix = np.array(((c, -s),
+                                                                            (s, c)))
+        print(r_matrix)                                                                    
+        return np.dot(r_matrix, np.asarray(data))
+    """
+
     def get_plotable(self) -> list:
         """Return list for 3D plotting.
 

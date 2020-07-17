@@ -20,6 +20,7 @@ pip-wheel-metadata
 *.vscode
 *.zip
 nkrpy__orbital
+*testing
 # test files
 *.log
 *.tox

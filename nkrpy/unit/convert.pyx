@@ -4,7 +4,7 @@
 
 # external modules
 import numpy as np
-cimport numpy as np
+cimport numpy as cnp
 
 # relative modules
 from ..misc.functions import typecheck
@@ -27,6 +27,12 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 
+def icrs2icrs(icrs, joiner: list=['h', 'm', 's']):
+    icrs = icrs2deg(icrs)[0]
+    icrs = deg2icrs(icrs)[0]
+    assert len(joiner) == len(icrs)
+    return [''.join(x) for x in zip(map(lambda y: '%.2f' % y, icrs), joiner)]
+
 cpdef double[:] split_icrs(str string: str):
     cdef double[:] ret = np.zeros(3, float)
     cdef str _t = ''
@@ -34,12 +40,20 @@ cpdef double[:] split_icrs(str string: str):
     cdef int i
     cdef int count = 0
     cdef str x
+    cdef list nstring = []
+    if string.count('.') > 1:
+        nstring = string.split('.')
+        if len(string) > 3:
+            string = ' '.join(nstring[:-1]) + f'.{nstring[-1]}'
+        else:
+            string = ' '.join(nstring)
     for i, x in enumerate(string):
-        print(_t)
         if str.isdigit(x) or x == '.':
             _t += x
             if i != (lstring - 1):
                 continue
+        if _t == '':
+            continue
         ret[count] = float(_t)
         if count >= 2:
             return ret
@@ -48,7 +62,7 @@ cpdef double[:] split_icrs(str string: str):
     return ret
 
 
-def icrs2deg(icrs) -> np.ndarray:
+def icrs2deg(icrs):
     """Convert ICRS to Degrees.
 
     [[DD, DD, DD], ...]
@@ -64,27 +78,25 @@ def icrs2deg(icrs) -> np.ndarray:
     >>> icrs2deg([['11','11','11.5'], ['11','11','11.5']])
 
     """
-    print('start:',icrs)
     if not typecheck(icrs):
         icrs = [icrs]
+    icrs = list(map(lambda x: str(x).strip(' '), icrs))
     try:
-        ret = np.array(icrs, dtype=np.float)
+        ret = np.array(icrs, dtype=np.float64)
         if len(ret.shape) == 1:
             ret = ret[np.newaxis, :]
-        print('ret:', ret)
 
         assert ret.shape[-1] < 3
     except Exception:
         toconv = list(map(lambda x: split_icrs(str(x)), icrs))
-        ret = np.array(toconv, dtype=np.float)
-        print('toconv:', toconv)
+        ret = np.array(toconv, dtype=np.float64)
 
     for col in range(ret.shape[-1]):
         ret[:, col] /= 60. ** col
     return np.sum(ret, axis=1)
 
 
-def deg2icrs(deg) -> np.ndarray:
+cpdef deg2icrs(deg):
     """Convert degrees to ICRS.
 
     [DD.DDD, ...]
@@ -100,13 +112,16 @@ def deg2icrs(deg) -> np.ndarray:
     if not typecheck(deg):
         deg = [deg]
 
-    ret = np.array(deg, dtype=np.float)
-    toret = np.zeros((ret.shape[0], 3))
-    toret[:, 1] = (ret % 1) * 60.
-    toret[:, 0] = ret - toret[:, 1] / 60.
-    toret[:, 2] = (toret[:, 1] % 1) * 60.
-    toret[:, 1] -= toret[:, 2] / 60.
-    return toret
+    cdef cnp.ndarray[double, ndim=1, mode='c'] ret = np.array(deg, dtype=np.float64)
+    cdef cnp.ndarray[double, ndim=2, mode='c'] toret = np.zeros((ret.shape[0], 4))
+    cdef cnp.ndarray[double, ndim=1, mode='c'] absret = np.abs(ret)
+    toret[:, 0] = ret / absret
+    toret[:, 2] = (absret % 1) * 60.
+    toret[:, 1] = absret - toret[:, 2] / 60.
+    toret[:, 3] = (toret[:, 2] % 1) * 60.
+    toret[:, 2] -= toret[:, 3] / 60.
+    toret[:, 1] *= toret[:, 0]
+    return toret[:, 1:]
 
 
 # http://star-www.st-and.ac.uk/~fv/webnotes/chapter8.htm
@@ -176,7 +191,7 @@ def gal2b1950(ga):
     l, b = map(nkrpy__radians, ga)
     pole_ra = nkrpy__radians(192.25)
     pole_dec = nkrpy__radians(27.4)
-    posangle = nkrpy__radians(123.0-90.0)
+    posangle = nkrpy__radians(123.0 - 90.0)
     ra = np.atan2((np.cos(b) * np.cos(l - posangle)),
                   (np.sin(b) * np.cos(pole_dec) -
                    np.cos(b) * np.sin(pole_dec) * np.sin(l - posangle))

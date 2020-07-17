@@ -13,7 +13,9 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 sep = os.sep
 
-supported = {'pyx': 0, 'f90': 1, 'c': 3, 'i': 2}  # supported extensions
+supported = {'pyd': 0, 'pyx': 1,
+             'f90': 2,
+             'c': 3, 'i': 4}  # supported extensions
 supported_inverse = dict((v, k) for k, v in supported.items())
 
 
@@ -98,52 +100,52 @@ def load_ext(extname: str, files: list, fext: str) -> tuple:
 
 def resolve(files: list) -> list:
     """Resolve filenames in heirarchical order."""
-    def get_ext(f: str) -> int:
+    def get_ext(ext: str) -> int:
         """Get the extension for a filename."""
         try:
-            ext = f.split('.')[-1]
             if ext not in supported:
                 return -1
             return supported[ext]
         except Exception:
             return -1
-    _t = [[f, get_ext(f)] for i, f in enumerate(files)]
-    _t.sort(key=lambda x: x[1])
-    _t = list(map(lambda x: x[0], _t))
-    return _t
+
+    def get_fname_ext(f: str) -> str:
+        ext = f.split('.')[-1]
+        return f.replace(f'.{ext}', ''), ext, get_ext(ext)
+
+    _t = [get_fname_ext(f) for f in files]
+    _t.sort(key=lambda x: x[2])
+    _s = set()
+    ret = []
+    for f in _t:
+        if f[0] in _s:
+            continue
+        ret.append(f)
+        _s.update([f[0]])
+    return ret
 
 
 extensions = []  # hold all exts
-extensions_name = set()
 py_modules = []  # hold any aggregates from SWIGs
 # walk through all files
 aggregate = []
 for path, dirnames, filenames in os.walk(f'.{sep}nkrpy{sep}'):
     for filename in filenames:
-        aggregate.append(os.sep.join([path, filename]))
-dict_agg = {}
-for file in aggregate:
-    file_ext = file.split('.')[-1]
-    if file_ext not in supported:
-        continue
-    file = file.replace(f'.{file_ext}', '')
-    if file not in dict_agg:
-        dict_agg[file] = []
-    dict_agg[file].append(supported[file_ext])
-for file in dict_agg:
-    ext = dict_agg[file]
-    ext.sort()
-    ext = ext[0]
-    fname = file.replace(sep, '.').strip('.')
-    file += f'.{supported_inverse[ext]}'
-    ext, pym = load_ext(fname, [file], supported_inverse[ext])
+        if filename.startswith('__'):
+            continue
+        if filename.split('.')[-1] not in supported:
+            continue
+        x = os.sep.join([path, filename]).replace(f'{sep}{sep}', sep)
+        aggregate.append(x)
+aggregate = resolve(aggregate)
+for f in aggregate:
+    fname = f[0].strip('.').replace(sep, '.').strip('.')
+    print(fname, [f'{f[0]}.{f[1]}'], f[1])
+    ext, pym = load_ext(fname, [f'{f[0]}.{f[1]}'], f[1])
     if ext is not None:
-        if pym is None:
-            extensions_name.add(fname)
         extensions.append(ext)
     if pym is not None:
         py_modules.append(pym)
-        extensions_name.add(pym)
 
 # The below is used to populate the settings dictionary to pass for
 # building of the dunders and into `setuptools.setup`

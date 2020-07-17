@@ -31,9 +31,11 @@ OKBLUE = '\033[94m'
 OKGREEN = '\033[92m'
 WARNING = '\033[93m'
 FAIL = '\033[91m'
+SUCCESS = OKGREEN
 BOLD = '\033[1m'
+RESET = '\033[0m'  # resets color and format
 
-_RST_ = '\033[0m'  # resets color and format
+_RST_ = RESET
 _BLD = '\033[1m'
 _DIM = '\033[2m'
 _UND = '\033[4m'

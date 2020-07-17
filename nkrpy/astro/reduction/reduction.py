@@ -47,14 +47,7 @@ def split_into_tspec_orders(wav: np.ndarray, conserve: bool = True):
     wavelength orders more, otherwise will simply yield
     wavelengths in those ranges.
     """
-    orders = []
-    ind = np.full(wav.shape, False, dtype=bool)
-    for order in tspec_orders:
-        od_ind = (wav > order[0]) & (wav < order[-1])
-        if conserve:
-            od_ind = od_ind & (~ind)
-        ind += od_ind
-        orders.append(od_ind)
+    orders = [np.where(np.logical_and(wav > x[0], wav < x[-1]))[0] for x in tspec_orders]
     return orders
 
 

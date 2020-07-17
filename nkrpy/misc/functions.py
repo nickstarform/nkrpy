@@ -3,19 +3,69 @@
 # internal modules
 from operator import attrgetter
 from collections.abc import Iterable
+import inspect
 
 # external modules
 import numpy as np
 
 # relative modules
+from . import colours
 
 # global attributes
 __all__ = ('typecheck', 'addspace', 'between',
            'find_nearest', 'strip', 'get', 'list_comp',
-           'add', 'find_max', 'deep_resolve')
+           'add', 'find_max', 'deep_resolve', 'help', 'help_api')
 __doc__ = """Just generic functions that I use a good bit."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
+__LINEWIDTH__ = 79
+
+
+def help(func_or_class, colour: bool = True):
+    ret = help_api(func_or_class, colour)
+    print(ret)
+
+
+def help_api(func_or_class, colour: bool = False):
+    name = func_or_class.__name__
+    top_level_docs = func_or_class.__doc__ if func_or_class.__doc__ else ''
+    top_level_mod = func_or_class.__module__ if '__module__' in dir(func_or_class) else ''
+    name = (f'{top_level_mod}.{name}').upper()
+    ret = ''
+    if '__class__' not in dir(func_or_class):
+        args = str(inspect.signature(func_or_class))
+    else:
+        dirs = [d for d in dir(func_or_class) if not d.startswith('_')]
+        dirs = [getattr(func_or_class, d) for d in dirs]
+        args = ''
+        for d in dirs:
+            inner_name = d.__name__
+            inner_docs = d.__doc__ if d.__doc__ else ''
+            inspected_inner = inspect.signature(d).parameters
+            inner_args = ', '.join([inspected_inner for i, v in enumerate(inspected_inner) if i > 0])
+            toplevel = f'{inner_name}: {inner_args}'
+            args += toplevel + '\n'
+            if len(inner_docs) > 20:
+                args += ('-' * len(toplevel)) + '\n'
+                args += inner_docs + '\n'
+            else:
+                args += f': {inner_docs}' + '\n'
+    if colour:
+        ret += colours.HEADER + colours._BLD
+    spacer = ' ' * int(__LINEWIDTH__ / 2 - len(name) / 2 - 1)
+    ret += ('=' * __LINEWIDTH__) + '\n'
+    ret += spacer + name + spacer + '\n'
+    ret += ('=' * __LINEWIDTH__) + '\n'
+    if colour:
+        ret += colours._RST_ + colours.OKBLUE
+    ret += top_level_docs + '\n'
+    ret += ('-' * __LINEWIDTH__) + '\n'
+    if colour:
+        ret += colours.WARNING
+    ret += args
+    if colour:
+        ret += colours._RST_
+    return ret
 
 
 def deep_resolve(iterable):

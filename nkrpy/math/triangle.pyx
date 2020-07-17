@@ -8,8 +8,8 @@ import itertools
 import numpy as np
 
 # relative modules
-from ..math import vector
-from ..math.vector import BaseVectorArray
+from . import vector
+from .vector import BaseVectorArray
 
 # global attributes
 __all__ = ('Triangle', 'recenter')

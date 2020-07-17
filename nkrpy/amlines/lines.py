@@ -38,12 +38,14 @@ class Lines(object):
         cls.__base_config = frozendict(**{'band': 'nir', 'unit': 'meters',
                                           'xlower': -1, 'xupper': -1,
                                           'aperture': None,
-                                          'remove_lines': set()})
+                                          'remove_lines': set(),
+                                          'allowed_lines': set()})
         return super(Lines, cls).__new__(cls)
 
     def __init__(self, band: str = 'nir', unit: str = 'meters',
                  xlower: float = -1, xupper: float = -1,
-                 aperture: float = None, remove_lines: list = None):
+                 aperture: float = None, remove_lines: list = None,
+                 allowed_lines: list = None):
         """Initilization Magic Method."""
         self.__config = dict(self.__base_config)
         self.__lines = {}
@@ -51,11 +53,18 @@ class Lines(object):
         self.__base_atomiclines = frozendict(**self.__base_atomiclines[self.__config['band']])  # noqa
         self.__config['unit'] = Unit.resolve_unit(unit)['name']
         if remove_lines is None:
-            remove_lines = [remove_lines]
+            remove_lines = []
+        if allowed_lines is None:
+            allowed_lines = []
+        if remove_lines == ['all']:
+            remove_lines = set(self.__base_atomiclines.keys())
+        if allowed_lines == ['all']:
+            allowed_lines = set(self.__base_atomiclines.keys())
         self.__config.update({'xlower': xlower,
                               'xupper': xupper,
                               'aperture': aperture,
-                              'remove_lines': set(remove_lines)})
+                              'remove_lines': set(remove_lines),
+                              'allowed_lines': set(allowed_lines)})
         self.__populate_lines()
         self.__refresh()
 
@@ -66,6 +75,8 @@ class Lines(object):
 
     def __populate_lines(self):
         for linename, lineinfo in self.__base_atomiclines.items():
+            if linename in self.__config['remove_lines'] and linename not in self.__config['allowed_lines']:
+                continue
             vals = Unit(**({'baseunit': lineinfo['unit'],
                             'convunit': self.__config['unit'],
                             'vals': lineinfo['val']}))
@@ -129,6 +140,7 @@ class Lines(object):
 
     def __refresh(self):
         """Refresh all computations."""
+        self.remove_lines([])
         self.__compute_aperture()
         self.__generate_regions()
 
@@ -177,7 +189,6 @@ class Lines(object):
             labels[ln] = np.array([np.median(_tmp[key_idx, :][s, 1]) for s in split if _tmp[key_idx, :][s, 1].shape[0] > 0]).tolist()  # noqa
         return labels
 
-
     def reset(self):
         """."""
         self.__reset()
@@ -218,7 +229,7 @@ class Lines(object):
         self.__compute_aperture()
         return self
 
-    def remove_lines(self, linenames: list):
+    def remove_lines(self, linenames: list, remove_all: bool = False):
         """Remove the list of lines from output.
 
         This works by adding ut to the __regions dict.
@@ -229,11 +240,41 @@ class Lines(object):
             The List[str] of linenames to remove.
 
         """
-        self.__config['remove_lines'] = self.__config['remove_lines']\
-            .union(set(linenames))
-        for line in self.__config['remove_lines']:
+        if len(self.__config['remove_lines']) > 0:
+            self.__config['remove_lines'] = self.__config['remove_lines']\
+                .union(set(linenames))
+        else:
+            self.__config['remove_lines'] = set(linenames)
+        for line in (self.__config['remove_lines'] if not remove_all else self.__lines):
+            if line in self.__config['allowed_lines']:
+                continue
             if line in self.__lines:
                 del self.__lines[line]
+        return self
+
+    def add_lines(self, linenames: list):
+        """Add the list of lines to output.
+
+        Overrides removal
+
+        This works by adding ut to the __regions dict.
+
+        Parameters
+        ----------
+        linenames: list
+            The List[str] of linenames to add.
+
+        """
+        if len(self.__config['allowed_lines']) > 0:
+            self.__config['allowed_lines'] = self.__config['allowed_lines']\
+                .union(set(linenames))
+        else:
+            self.__config['allowed_lines'] = set(linenames)
+        for line in self.__config['allowed_lines']:
+            if line in self.__config['remove_lines']:
+                self.__config['remove_lines'].remove(line)
+        self.__populate_lines()
+        self.__refresh()
         return self
 
     def remove_regions(self, limits):

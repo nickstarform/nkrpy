@@ -4,30 +4,79 @@ Outline
 
 :Web: `nkrpy`_
 :Author: `Nickalas Reynolds`_ email@nickreynolds.xyz
-:Author Web: `http://nickreynolds.xyz`_
-:Date: 2020-01-04 20:49:14.109410
-:Description: This is my own personaly python files that can be useful. They are not guaranteed to work. Just things I tend to use a lot.
+:Date: 2020-01-28 00:50:19.833084
+:Description: Originally was just a collection of python programs that I 
+
+    found myself using repeatidly. Migrating a lot of more
+
+    efficient modules and made more general.
+
+
+
+If you would like to run the development version, please pull
+
+    from the github instead as the pypi distribution excludes
+
+    the docs, tests, and other potentially useful things.
+
 :Desc. Cont...: This file is auto-generated from bin/outlinegen.py
 
 .. _`Nickalas Reynolds`: mailto:email@nickreynolds.xyz
-.. _`http://nickreynolds.xyz`: http://nickreynolds.xyz
 .. _`nkrpy`: http://github.com/nickalaskreynolds/nkrpy
 
 * nkrpy/
 
-  * logger/
+  * image/
 
-    * logger.py   <--
+    * centering.cpython-37m-x86_64-linux-gnu.so    <--
+
+    * image_interp.cpython-37m-x86_64-linux-gnu.so <--
+
+    * centering.c                                  <--
+
+    * image_interp.pyx                             <--
+
+    * centering.pyx                                <--
+
+    * image_interp.c                               <--
+
+    * image_reproj.pyx.testing                     <--
+
+  * misc/
+
+    * errors.py     <--
+
+    * colours.py    <--
+
+    * decorators.py <--
+
+    * frozendict.py <--
+
+    * constants.py  <--
+
+    * mp.py         <--
+
+    * functions.py  <--
 
   * astro/
 
-    * radio_functions.py <--
+    * keplerian.h                               <--
 
-    * keplerian.py       <--
+    * misc.py                                   <--
 
-    * convert_jy_to_k.py <--
+    * keplerian.cpython-37m-x86_64-linux-gnu.so <--
 
-    * astro.py           <--
+    * convert_jy_to_k.py                        <--
+
+    * radio_functions.py                        <--
+
+    * keplerian.pyx                             <--
+
+    * keplerian.c                               <--
+
+    * observing/
+
+      * guidecam_thumbnail.py <--
 
     * dustmodels/
 
@@ -39,107 +88,57 @@ Outline
 
         * oh1994.tsb <--
 
-    * observing/
-
-      * guidecam_thumbnail.py <--
-
     * reduction/
+
+      * plottingtspec.py <--
 
       * apoexpcal.pro    <--
 
       * reduction.py     <--
 
-      * plottingtspec.py <--
-
       * arcsat/
 
-        * reduction.py       <--
+        * arcsat_file.py     <--
 
         * arcsat_mosaic.py   <--
 
-        * arcsat_file.py     <--
+        * reduction.py       <--
 
         * template_config.py <--
 
     * mercury/
 
-      * plotting.py        <--
+      * file_loader.py     <--
 
-      * config_plotting.py <--
+      * plotting.py        <--
 
       * config_orbit.py    <--
 
-      * file_loader.py     <--
-
       * orbit.py           <--
 
-  * unit/
-
-    * convert.py  <--
-
-    * unit.py     <--
-
-    * _unit.py    <--
-
-  * publication/
-
-    * plots.py    <--
-
-    * format.py   <--
-
-  * image/
-
-    * image_interp.py <--
-
-    * image_reproj.py <--
-
-  * misc/
-
-    * mp.py         <--
-
-    * decorators.py <--
-
-    * functions.py  <--
-
-    * constants.py  <--
-
-    * errors.py     <--
-
-    * colours.py    <--
-
-  * math/
-
-    * sampler.py  <--
-
-    * miscmath.py <--
-
-    * fit.py      <--
-
-    * image.py    <--
-
-    * gp/
+      * config_plotting.py <--
 
   * io/
+
+    * files.py      <--
+
+    * check_file.py <--
 
     * sizeof.py     <--
 
     * load.py       <--
 
-    * config.py     <--
+    * stdio.py      <--
 
-    * files.py      <--
+    * config.py     <--
 
     * sorting.py    <--
 
-    * stdio.py      <--
-
-    * check_file.py <--
-
     * check_file_templates/
 
-      * default.py <--
-
       * sh.py      <--
+
+      * default.py <--
 
       * python.py  <--
 
@@ -149,11 +148,77 @@ Outline
 
   * amlines/
 
-    * lines.py          <--
-
     * atomicline.py.new <--
 
+    * lines.py          <--
+
     * __linelist.py     <--
+
+  * publication/
+
+    * format.py   <--
+
+    * plots.py    <--
+
+  * math/
+
+    * sampler.c                                <--
+
+    * image.c                                  <--
+
+    * vector.cpython-37m-x86_64-linux-gnu.so   <--
+
+    * miscmath.pyx                             <--
+
+    * sampler.cpython-37m-x86_64-linux-gnu.so  <--
+
+    * fit.c                                    <--
+
+    * miscmath.c                               <--
+
+    * fit.pyx                                  <--
+
+    * vector.c                                 <--
+
+    * miscmath.cpython-37m-x86_64-linux-gnu.so <--
+
+    * sampler.pyx                              <--
+
+    * fit.cpython-37m-x86_64-linux-gnu.so      <--
+
+    * image.pyx                                <--
+
+    * image.cpython-37m-x86_64-linux-gnu.so    <--
+
+    * vector.pyx                               <--
+
+    * gp/
+
+      * gp.py        <--
+
+      * gmm.py       <--
+
+      * functions.py <--
+
+  * unit/
+
+    * unit.pyx                                <--
+
+    * convert.c                               <--
+
+    * convert.cpython-37m-x86_64-linux-gnu.so <--
+
+    * _unit.py                                <--
+
+    * convert.pyx                             <--
+
+    * unit.cpython-37m-x86_64-linux-gnu.so    <--
+
+    * unit.c                                  <--
+
+  * logger/
+
+    * logger.py   <--
 
 
 

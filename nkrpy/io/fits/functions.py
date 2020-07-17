@@ -12,11 +12,46 @@ import numpy as np
 from ...misc.functions import typecheck
 
 # global attributes
-__all__ = ('read', 'write', 'make_nan', 'make_zero',
-           'header_radec', 'create_header', 'reference')
+__all__ = ('read', 'write', 'make_nan', 'make_zero', 'get_resolving_power',
+           'header_radec', 'create_header', 'reference', 'get_wcs_from_header')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
+
+
+def __resolve_header(h, key):
+    h__keys = list(h.keys())
+    keys = list(map(lambda x: x.lower(), h__keys))
+    if key.lower() in keys:
+        idx = keys.index(key)
+        return h[h__keys[idx]]
+    else:
+        return None
+
+
+def get_resolving_power(h=None, d=None):
+    """d (if provided) must be 1d array of x vals"""
+    if h is None and d is None:
+        return
+    if h is None:
+        df = np.diff(d)
+        rp = df / d[:-1]
+        return np.median(rp)
+    else:
+        return __resolve_header(h, f'rp')
+
+
+def get_wcs_from_header(h: dict, axis=1):
+    """Create WCS array from header: dict."""
+    numvals = __resolve_header(h, f'NAXIS{axis}')
+    crval = __resolve_header(h, f'CRVAL{axis}')
+    crval = crval if crval else 0
+    crpix = __resolve_header(h, f'CRPIX{axis}')
+    crpix = crpix if crpix else 0
+    crdel = __resolve_header(h, f'CRDEL{axis}')
+    crdel = crdel if crdel else __resolve_header(h, f'CDELT{axis}')
+    crdel = crdel if crdel else __resolve_header(h, f'CD{axis}_{axis}')
+    return reference(crval, crpix, crdel, numvals)
 
 
 def create_header(h):
@@ -94,7 +129,7 @@ def read(fname: str):
                 if h.header['XTENSION'].upper() == 'BINTABLE':
                     continue
             header.append(h.header)
-            data.append(h.data.astype(float))
+            data.append(h.data)
     return header, data
 
 
@@ -251,10 +286,9 @@ def reference(crval: float, crpix: int, cdelt: float, num: int):
         The number of pixels.
 
     """
-    a = np.arange(1, num + 1, dtype=np.float)
-    b = crval - cdelt * crpix
+    a = np.arange(0, num, dtype=np.float)
     a *= cdelt
-    a += b
+    a += crval - crpix
     return a
 
 # end of code

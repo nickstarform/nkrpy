@@ -38,14 +38,7 @@ endobj
 endobj
 7 0 obj
 <<
-/A <<
-/S /URI /Type /Action /URI (http://nickreynolds.xyz)
->> /Border [ 0 0 0 ] /Rect [ 133.0394 728.4665 231.4094 740.4665 ] /Subtype /Link /Type /Annot
->>
-endobj
-8 0 obj
-<<
-/Annots [ 4 0 R 5 0 R 6 0 R 7 0 R ] /Contents 13 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 12 0 R /Resources <<
+/Annots [ 4 0 R 5 0 R 6 0 R ] /Contents 13 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 12 0 R /Resources <<
 /Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
 >> /Rotate 0 
   /Trans <<
@@ -53,7 +46,7 @@ endobj
 >> /Type /Page
 >>
 endobj
-9 0 obj
+8 0 obj
 <<
 /Contents 14 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 12 0 R /Resources <<
 /Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
@@ -63,25 +56,35 @@ endobj
   /Type /Page
 >>
 endobj
+9 0 obj
+<<
+/Contents 15 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 12 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
 10 0 obj
 <<
-/PageLabels 15 0 R /PageMode /UseNone /Pages 12 0 R /Type /Catalog
+/PageLabels 16 0 R /PageMode /UseNone /Pages 12 0 R /Type /Catalog
 >>
 endobj
 11 0 obj
 <<
-/Author (Nickalas Reynolds email@nickreynolds.xyz) /CreationDate (D:20200104204916+06'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20200104204916+06'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
+/Author (Nickalas Reynolds email@nickreynolds.xyz) /CreationDate (D:20200128005020+06'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20200128005020+06'00') /Producer (ReportLab PDF Library - www.reportlab.com) 
   /Subject (\(unspecified\)) /Title (Outline) /Trapped /False
 >>
 endobj
 12 0 obj
 <<
-/Count 2 /Kids [ 8 0 R 9 0 R ] /Type /Pages
+/Count 3 /Kids [ 7 0 R 8 0 R 9 0 R ] /Type /Pages
 >>
 endobj
 13 0 obj
 <<
-/Length 11533
+/Length 10526
 >>
 stream
 1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
@@ -140,27 +143,6 @@ q
 1 0 0 1 6 3 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL 13.04937 0 Td (Author Web:) Tj T* -13.04937 0 Td ET
-Q
-Q
-q
-1 0 0 1 91.03937 3 cm
-q
-0 0 .501961 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (http://nickreynolds.xyz) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 42 709.7165 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 3 cm
-q
-0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL 48.03937 0 Td (Date:) Tj T* -48.03937 0 Td ET
 Q
 Q
@@ -168,35 +150,87 @@ q
 1 0 0 1 91.03937 3 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (2020-01-04 20:49:14.109410) Tj T* ET
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (2020-01-28 00:50:19.833084) Tj T* ET
 Q
 Q
 q
 Q
 Q
 q
-1 0 0 1 42 682.7165 cm
+1 0 0 1 42 673.7165 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 15 cm
+1 0 0 1 6 39 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL 14.69937 0 Td (Description:) Tj T* -14.69937 0 Td ET
 Q
 Q
 q
+1 0 0 1 91.03937 39 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Originally was just a collection of python programs that I) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 21 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (found myself using repeatidly. Migrating a lot of more) Tj T* ET
+Q
+Q
+q
 1 0 0 1 91.03937 3 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 14 Tm /F1 10 Tf 12 TL .877889 Tw (This is my own personaly python files that can be useful. They are not guaranteed to work.) Tj T* 0 Tw (Just things I tend to use a lot.) Tj T* ET
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (efficient modules and made more general.) Tj T* ET
 Q
 Q
 q
 Q
 Q
 q
-1 0 0 1 42 667.7165 cm
+1 0 0 1 42 655.7165 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (If you would like to run the development version, please pull) Tj T* ET
+Q
+Q
+q
+1 0 0 1 42 649.7165 cm
+Q
+q
+1 0 0 1 42 619.7165 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 0 2 Tm  T* ET
+q
+1 0 0 1 20 18 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (from the github instead as the pypi distribution excludes) Tj T* ET
+Q
+Q
+q
+1 0 0 1 20 0 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (the docs, tests, and other potentially useful things.) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 42 619.7165 cm
+Q
+q
+1 0 0 1 42 613.7165 cm
+Q
+q
+1 0 0 1 42 598.7165 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -217,54 +251,192 @@ q
 Q
 Q
 q
-1 0 0 1 42 661.7165 cm
+1 0 0 1 42 592.7165 cm
 Q
 q
-1 0 0 1 42 661.7165 cm
+1 0 0 1 42 592.7165 cm
 Q
 q
 1 0 0 1 42 92.17323 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 554.5433 cm
+1 0 0 1 6 485.5433 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
 Q
 Q
 q
-1 0 0 1 23 554.5433 cm
+1 0 0 1 23 485.5433 cm
 q
 BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (nkrpy/) Tj T* ET
 Q
 Q
 q
-1 0 0 1 23 548.5433 cm
+1 0 0 1 23 479.5433 cm
 Q
 q
-1 0 0 1 23 548.5433 cm
+1 0 0 1 23 479.5433 cm
 Q
 q
-1 0 0 1 23 518.5433 cm
+1 0 0 1 23 341.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 15 cm
+1 0 0 1 6 123 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
 Q
 Q
 q
-1 0 0 1 23 15 cm
+1 0 0 1 23 123 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (logger/) Tj T* ET
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (image/) Tj T* ET
 Q
 Q
 q
-1 0 0 1 23 9 cm
+1 0 0 1 23 117 cm
+Q
+q
+1 0 0 1 23 117 cm
+Q
+q
+1 0 0 1 23 105 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (centering.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 99 cm
+Q
+q
+1 0 0 1 23 87 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image_interp.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 81 cm
+Q
+q
+1 0 0 1 23 69 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (centering.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 63 cm
+Q
+q
+1 0 0 1 23 51 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image_interp.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 45 cm
+Q
+q
+1 0 0 1 23 33 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (centering.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 27 cm
+Q
+q
+1 0 0 1 23 15 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image_interp.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
 Q
 q
 1 0 0 1 23 9 cm
@@ -283,7 +455,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (logger.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image_reproj.pyx.testing <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -296,34 +468,225 @@ q
 Q
 Q
 q
-1 0 0 1 23 512.5433 cm
+1 0 0 1 23 335.5433 cm
 Q
 q
-1 0 0 1 23 32.54331 cm
+1 0 0 1 23 197.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 465 cm
+1 0 0 1 6 123 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
 Q
 Q
 q
-1 0 0 1 23 465 cm
+1 0 0 1 23 123 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (misc/) Tj T* ET
+Q
+Q
+q
+1 0 0 1 23 117 cm
+Q
+q
+1 0 0 1 23 117 cm
+Q
+q
+1 0 0 1 23 105 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (errors.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 99 cm
+Q
+q
+1 0 0 1 23 87 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (colours.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 81 cm
+Q
+q
+1 0 0 1 23 69 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (decorators.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 63 cm
+Q
+q
+1 0 0 1 23 51 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (frozendict.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 45 cm
+Q
+q
+1 0 0 1 23 33 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (constants.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 27 cm
+Q
+q
+1 0 0 1 23 15 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (mp.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (functions.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 191.5433 cm
+Q
+q
+1 0 0 1 23 11.54331 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 165 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 165 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (astro/) Tj T* ET
 Q
 Q
 q
-1 0 0 1 23 459 cm
+1 0 0 1 23 159 cm
 Q
 q
-1 0 0 1 23 459 cm
+1 0 0 1 23 159 cm
 Q
 q
-1 0 0 1 23 447 cm
+1 0 0 1 23 147 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -336,17 +699,17 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (radio_functions.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (keplerian.h <) Tj (--) Tj T* ET
 Q
 Q
 q
 Q
 Q
 q
-1 0 0 1 23 441 cm
+1 0 0 1 23 141 cm
 Q
 q
-1 0 0 1 23 429 cm
+1 0 0 1 23 129 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -359,17 +722,40 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (keplerian.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (misc.py <) Tj (--) Tj T* ET
 Q
 Q
 q
 Q
 Q
 q
-1 0 0 1 23 423 cm
+1 0 0 1 23 123 cm
 Q
 q
-1 0 0 1 23 411 cm
+1 0 0 1 23 111 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (keplerian.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 105 cm
+Q
+q
+1 0 0 1 23 93 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -389,10 +775,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 405 cm
+1 0 0 1 23 87 cm
 Q
 q
-1 0 0 1 23 393 cm
+1 0 0 1 23 75 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -405,17 +791,141 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (astro.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (radio_functions.py <) Tj (--) Tj T* ET
 Q
 Q
 q
 Q
 Q
 q
-1 0 0 1 23 387 cm
+1 0 0 1 23 69 cm
 Q
 q
-1 0 0 1 23 303 cm
+1 0 0 1 23 57 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (keplerian.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 51 cm
+Q
+q
+1 0 0 1 23 39 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (keplerian.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 33 cm
+Q
+q
+1 0 0 1 23 3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 15 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 15 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (observing/) Tj T* ET
+Q
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (guidecam_thumbnail.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+Q
+Q
+ 
+endstream
+endobj
+14 0 obj
+<<
+/Length 11873
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 42 92.17323 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 698.5433 Tm  T* ET
+q
+1 0 0 1 23 354.5433 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 341 Tm  T* ET
+q
+1 0 0 1 23 267 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -541,59 +1051,6 @@ q
 Q
 Q
 q
-1 0 0 1 23 297 cm
-Q
-q
-1 0 0 1 23 267 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 15 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 15 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (observing/) Tj T* ET
-Q
-Q
-q
-1 0 0 1 23 9 cm
-Q
-q
-1 0 0 1 23 9 cm
-Q
-q
-1 0 0 1 23 -3 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (guidecam_thumbnail.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-Q
-q
-Q
-Q
-q
 1 0 0 1 23 261 cm
 Q
 q
@@ -634,7 +1091,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (apoexpcal.pro <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (plottingtspec.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -657,7 +1114,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (reduction.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (apoexpcal.pro <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -680,7 +1137,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (plottingtspec.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (reduction.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -727,7 +1184,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (reduction.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (arcsat_file.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -773,7 +1230,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (arcsat_file.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (reduction.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -855,7 +1312,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (plotting.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (file_loader.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -878,7 +1335,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (config_plotting.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (plotting.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -924,29 +1381,6 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (file_loader.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 9 cm
-Q
-q
-1 0 0 1 23 -3 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
 BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (orbit.py <) Tj (--) Tj T* ET
 Q
 Q
@@ -954,113 +1388,6 @@ q
 Q
 Q
 q
-1 0 0 1 23 -3 cm
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 26.54331 cm
-Q
-q
-1 0 0 1 23 -9.456693 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 21 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 21 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (unit/) Tj T* ET
-Q
-Q
-q
-1 0 0 1 23 15 cm
-Q
-q
-1 0 0 1 23 15 cm
-Q
-q
-1 0 0 1 23 3 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (convert.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-Q
-q
-Q
-Q
-q
-Q
-Q
- 
-endstream
-endobj
-14 0 obj
-<<
-/Length 11460
->>
-stream
-1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
-q
-1 0 0 1 42 107.7165 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-BT 1 0 0 1 6 683 Tm  T* ET
-q
-1 0 0 1 23 663 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-BT 1 0 0 1 6 17 Tm  T* ET
-q
-1 0 0 1 23 15 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (unit.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
 1 0 0 1 23 9 cm
 Q
 q
@@ -1077,7 +1404,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (_unit.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (config_plotting.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1090,476 +1417,16 @@ q
 Q
 Q
 q
-1 0 0 1 23 657 cm
-Q
-q
-1 0 0 1 23 609 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 33 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 33 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (publication/) Tj T* ET
-Q
-Q
-q
-1 0 0 1 23 27 cm
-Q
-q
-1 0 0 1 23 27 cm
-Q
-q
-1 0 0 1 23 15 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (plots.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 9 cm
-Q
-q
-1 0 0 1 23 -3 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (format.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
 1 0 0 1 23 -3 cm
 Q
 q
 Q
 Q
 q
-1 0 0 1 23 603 cm
+1 0 0 1 23 348.5433 cm
 Q
 q
-1 0 0 1 23 555 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 33 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 33 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (image/) Tj T* ET
-Q
-Q
-q
-1 0 0 1 23 27 cm
-Q
-q
-1 0 0 1 23 27 cm
-Q
-q
-1 0 0 1 23 15 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image_interp.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 9 cm
-Q
-q
-1 0 0 1 23 -3 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image_reproj.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 549 cm
-Q
-q
-1 0 0 1 23 429 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 105 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 105 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (misc/) Tj T* ET
-Q
-Q
-q
-1 0 0 1 23 99 cm
-Q
-q
-1 0 0 1 23 99 cm
-Q
-q
-1 0 0 1 23 87 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (mp.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 81 cm
-Q
-q
-1 0 0 1 23 69 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (decorators.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 63 cm
-Q
-q
-1 0 0 1 23 51 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (functions.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 45 cm
-Q
-q
-1 0 0 1 23 33 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (constants.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 27 cm
-Q
-q
-1 0 0 1 23 15 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (errors.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 9 cm
-Q
-q
-1 0 0 1 23 -3 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (colours.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 423 cm
-Q
-q
-1 0 0 1 23 321 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 87 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 87 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (math/) Tj T* ET
-Q
-Q
-q
-1 0 0 1 23 81 cm
-Q
-q
-1 0 0 1 23 81 cm
-Q
-q
-1 0 0 1 23 69 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sampler.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 63 cm
-Q
-q
-1 0 0 1 23 51 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (miscmath.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 45 cm
-Q
-q
-1 0 0 1 23 33 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (fit.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 27 cm
-Q
-q
-1 0 0 1 23 15 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image.py <) Tj (--) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 9 cm
-Q
-q
-1 0 0 1 23 -3 cm
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (gp/) Tj T* ET
-Q
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 -3 cm
-Q
-q
-Q
-Q
-q
-1 0 0 1 23 315 cm
-Q
-q
-1 0 0 1 23 69 cm
+1 0 0 1 23 102.5433 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -1596,7 +1463,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sizeof.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (files.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1619,7 +1486,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (load.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (check_file.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1642,7 +1509,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (config.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sizeof.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1665,7 +1532,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (files.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (load.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1688,7 +1555,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sorting.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (stdio.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1711,7 +1578,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (stdio.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (config.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1734,7 +1601,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (check_file.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sorting.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1781,7 +1648,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (default.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sh.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1804,7 +1671,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sh.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (default.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1899,10 +1766,10 @@ q
 Q
 Q
 q
-1 0 0 1 23 63 cm
+1 0 0 1 23 96.54331 cm
 Q
 q
-1 0 0 1 23 -3 cm
+1 0 0 1 23 30.54331 cm
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
@@ -1939,7 +1806,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (lines.py <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (atomicline.py.new <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1962,7 +1829,7 @@ Q
 q
 1 0 0 1 23 -3 cm
 q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (atomicline.py.new <) Tj (--) Tj T* ET
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (lines.py <) Tj (--) Tj T* ET
 Q
 Q
 q
@@ -1998,34 +1865,858 @@ q
 Q
 Q
 q
+1 0 0 1 23 24.54331 cm
+Q
+q
+1 0 0 1 23 -11.45669 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 21 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 21 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (publication/) Tj T* ET
+Q
+Q
+q
+1 0 0 1 23 15 cm
+Q
+q
+1 0 0 1 23 15 cm
+Q
+q
+1 0 0 1 23 3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (format.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
 1 0 0 1 23 -3 cm
 Q
 q
 Q
 Q
 q
-1 0 0 1 42 107.7165 cm
+Q
 Q
  
 endstream
 endobj
 15 0 obj
 <<
-/Nums [ 0 16 0 R 1 17 0 R ]
+/Length 9278
 >>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+1 0 0 1 42 251.7165 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 539 Tm  T* ET
+q
+1 0 0 1 23 537 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 -1 Tm  T* ET
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (plots.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 531 cm
+Q
+q
+1 0 0 1 23 177 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 339 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 339 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (math/) Tj T* ET
+Q
+Q
+q
+1 0 0 1 23 333 cm
+Q
+q
+1 0 0 1 23 333 cm
+Q
+q
+1 0 0 1 23 321 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sampler.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 315 cm
+Q
+q
+1 0 0 1 23 303 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 297 cm
+Q
+q
+1 0 0 1 23 285 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (vector.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 279 cm
+Q
+q
+1 0 0 1 23 267 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (miscmath.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 261 cm
+Q
+q
+1 0 0 1 23 249 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sampler.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 243 cm
+Q
+q
+1 0 0 1 23 231 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (fit.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 225 cm
+Q
+q
+1 0 0 1 23 213 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (miscmath.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 207 cm
+Q
+q
+1 0 0 1 23 195 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (fit.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 189 cm
+Q
+q
+1 0 0 1 23 177 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (vector.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 171 cm
+Q
+q
+1 0 0 1 23 159 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (miscmath.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 153 cm
+Q
+q
+1 0 0 1 23 141 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (sampler.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 135 cm
+Q
+q
+1 0 0 1 23 123 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (fit.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 117 cm
+Q
+q
+1 0 0 1 23 105 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 99 cm
+Q
+q
+1 0 0 1 23 87 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (image.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 81 cm
+Q
+q
+1 0 0 1 23 69 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (vector.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 63 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 51 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 51 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (gp/) Tj T* ET
+Q
+Q
+q
+1 0 0 1 23 45 cm
+Q
+q
+1 0 0 1 23 45 cm
+Q
+q
+1 0 0 1 23 33 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (gp.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 27 cm
+Q
+q
+1 0 0 1 23 15 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (gmm.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (functions.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 171 cm
+Q
+q
+1 0 0 1 23 33 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 123 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 123 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (unit/) Tj T* ET
+Q
+Q
+q
+1 0 0 1 23 117 cm
+Q
+q
+1 0 0 1 23 117 cm
+Q
+q
+1 0 0 1 23 105 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (unit.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 99 cm
+Q
+q
+1 0 0 1 23 87 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (convert.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 81 cm
+Q
+q
+1 0 0 1 23 69 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (convert.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 63 cm
+Q
+q
+1 0 0 1 23 51 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (_unit.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 45 cm
+Q
+q
+1 0 0 1 23 33 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (convert.pyx <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 27 cm
+Q
+q
+1 0 0 1 23 15 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (unit.cpython-37m-x86_64-linux-gnu.so <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (unit.c <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 27 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 15 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 15 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (logger/) Tj T* ET
+Q
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 9 cm
+Q
+q
+1 0 0 1 23 -3 cm
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 -3 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL 10.5 0 Td (\177) Tj T* -10.5 0 Td ET
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (logger.py <) Tj (--) Tj T* ET
+Q
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+1 0 0 1 23 -3 cm
+Q
+q
+Q
+Q
+q
+1 0 0 1 42 251.7165 cm
+Q
+ 
+endstream
 endobj
 16 0 obj
 <<
-/S /D /St 1
+/Nums [ 0 17 0 R 1 18 0 R 2 19 0 R ]
 >>
 endobj
 17 0 obj
 <<
+/S /D /St 1
+>>
+endobj
+18 0 obj
+<<
 /S /D /St 2
 >>
 endobj
+19 0 obj
+<<
+/S /D /St 3
+>>
+endobj
 xref
-0 18
+0 20
 0000000000 65535 f 
 0000000073 00000 n 
 0000000114 00000 n 
@@ -2034,26 +2725,28 @@ xref
 0000000526 00000 n 
 0000000707 00000 n 
 0000000888 00000 n 
-0000001063 00000 n 
-0000001304 00000 n 
-0000001509 00000 n 
-0000001598 00000 n 
-0000001903 00000 n 
-0000001969 00000 n 
-0000013555 00000 n 
-0000025068 00000 n 
-0000025118 00000 n 
-0000025152 00000 n 
+0000001123 00000 n 
+0000001328 00000 n 
+0000001533 00000 n 
+0000001622 00000 n 
+0000001927 00000 n 
+0000001999 00000 n 
+0000012578 00000 n 
+0000024504 00000 n 
+0000033834 00000 n 
+0000033893 00000 n 
+0000033927 00000 n 
+0000033961 00000 n 
 trailer
 <<
 /ID 
-[<e360cb20d8ebbb9855951f43fd253d54><e360cb20d8ebbb9855951f43fd253d54>]
+[<66d81d9b2b89a6a70185540d7ae13241><66d81d9b2b89a6a70185540d7ae13241>]
 % ReportLab generated PDF document -- digest (http://www.reportlab.com)
 
 /Info 11 0 R
 /Root 10 0 R
-/Size 18
+/Size 20
 >>
 startxref
-25186
+33995
 %%EOF

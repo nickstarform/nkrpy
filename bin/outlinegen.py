@@ -68,8 +68,8 @@ def addspace(arbin, spacing='auto'):
             return _add(arbin, spacing)
         elif isinstance(spacing, int):
             return _add(arbin, spacing)
-    raise(TypeError, f'Either input: {arbin} or spacing:' +
-                     f'{spacing} are of incorrect types. NO OBJECTS')
+    raise TypeError(f'Either input: {arbin} or spacing:' +
+                    f'{spacing} are of incorrect types. NO OBJECTS')
 
 
 def _add(sstring, spacing=20):
@@ -139,7 +139,7 @@ def list_files_fmt(startpath, ignore='',
     s, a, b, c, e = formatter
     full = []
     ignore = _strip(ignore.split(','))
-    for root, firs, files in os.walk(startpath):
+    for (root, _, files) in os.walk(startpath):
         level = root.replace(startpath, '').count(os.sep)
         indent = s + a * b * level + c
         base = os.path.basename(root)
@@ -183,15 +183,12 @@ def main():
         f.write(f':Web: `{settings["name"]}`_\n')
         f.write(f':Author: `{settings["author"]}`_ ' +
                 f'{settings["author_email"]}\n')
-        f.write(f':Author Web: `{settings["author_website"]}`_\n')
         f.write(f':Date: {str(datetime.now())}\n')
         f.write(f':Description: {settings["description"]}\n')
         f.write(f':Desc. Cont...: This file is auto-generated from ' +
                 f'bin/{__filename__}.py\n\n')
         f.write(f'.. _`{settings["author"]}`: ' +
                 f'mailto:{settings["author_email"]}\n')
-        f.write(f'.. _`{settings["author_website"]}`: ' +
-                f'{settings["author_website"]}\n')
         f.write(f'.. _`{settings["name"]}`: {settings["url"]}\n\n')
 
     with open(fname, 'a') as f:
@@ -200,7 +197,7 @@ def main():
                            'build,egg,__info__.py,__init__.py,' +
                            '.pyc,__pycache__,' +
                            '.git,dist,ipynb_,orbital,' +
-                           '__init_generator__.py',
+                           '__init_generator__.py,__main__.py, .so',
                            formatter=['', '  ', 1, '* ', '\n'],
                            header_wrap=['both', '**'],
                            pad=True, append='<--', docs=True):

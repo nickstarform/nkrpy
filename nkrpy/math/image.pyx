@@ -1,19 +1,189 @@
 """."""
 # flake8: noqa
+# cython modules
+cimport numpy as cnp
+cimport cython
 
 # internal modules
 
 # external modules
 import numpy as np
+from cython.parallel import prange as crange
+from skimage.transform import rotate as sk__rotate
 
 # relative modules
 from .miscmath import angle_clockwise, ang_vec
+from ..misc import typecheck
 
 # global attributes
-__all__ = ('raster_matrix', 'gen_angles', 'rotate_points', 'rotate_matrix')
+__all__ = ('raster_matrix', 'gen_angles', 'rotate_points',
+           'rotate_matrix', 'shift', 'rotate')
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
+
+
+@cython.boundscheck(False)  # Deactivate bounds checking
+@cython.wraparound(False)   # Deactivate negative indexing.
+cpdef shift(double[:, :, :] data: np.ndarray, long[:] shifts: np.ndarray,
+            bint override: bool = True, float cval: float = np.NaN):
+    """Shift a matrix.
+
+    Shift a matrix by a certain amount. Assumed input size is 3D, those axis 
+    can be blank, just make sure the corresponding shifts are 0.
+
+    Parameters
+    ----------
+    data: np.ndarray
+        The data to shift.
+    shifts: np.ndarray
+        Array of shifts to perform, must correspond to same axis as data.
+    override: bool
+        If set to true, will override initial array.
+            Is slower but memory efficient
+    """
+    cdef double[:, :, :] shifted = np.roll(data, shifts,
+                                           axis=list(range(shifts.shape[0])))
+    cdef int i = 0
+    cdef int j = 0
+    cdef int k = 0
+    if not override:
+        shifted[:shifts[0], ...] = cval
+        shifted[:, :shifts[1], :] = cval
+        shifted[..., :shifts[2]] = cval
+        return np.asarray(shifted)
+    else:
+        for i in range(shifted.shape[0]):
+            for j in range(shifted.shape[1]):
+                for k in crange(shifted.shape[2], nogil=True):
+                    if i < shifts[0] or j < shifts[1] or k < shifts[2]:
+                        data[i, j, k] = cval
+                        continue
+                    data[i, j, k] = shifted[i, j, k]
+
+
+def rotate(double[:, :] data: np.ndarray,
+           long angle, float cval: float = np.NaN):
+    """Rotate image by a certain angle around its center.
+    Parameters
+    ----------
+    image : ndarray
+        Input image.
+    angle : float
+        Rotation angle in degrees in counter-clockwise direction.
+    Returns
+    -------
+    rotated : ndarray
+        Rotated version of the input.
+    
+    """
+    return sk__rotate(data, angle, resize=False, center=None, order=1,
+                      mode='constant', cval=cval)
+
+
+"""
+https://math.stackexchange.com/questions/2004800/math-for-simple-3d-coordinate-rotation-python
+new_yaxis = -np.cross(new_xaxis, new_zaxis)
+
+# new axes:
+nnx, nny, nnz = new_xaxis, new_yaxis, new_zaxis
+# old axes:
+nox, noy, noz = np.array([1, 0, 0, 0, 1, 0, 0, 0, 1], dtype=float).reshape(3, -1)
+
+# ulgiest rotation matrix you can imagine
+top = [np.dot(nnx, n) for n in [nox, noy, noz]]
+mid = [np.dot(nny, n) for n in [nox, noy, noz]]
+bot = [np.dot(nnz, n) for n in [nox, noy, noz]]
+
+def newit(vec):
+    xn = sum([p*q for p,q in zip(top, vec)])
+    yn = sum([p*q for p,q in zip(mid, vec)])
+    zn = sum([p*q for p,q in zip(bot, vec)])
+    return np.hstack((xn, yn, zn))
+"""
+
+def interpolate(obj, val, dtype='linear'):
+    '''
+    obj can be any iterable form of 1d or 2d. Easily transferable to higher D
+    val is the index for interpolate over
+    dtype is the interpolation technique
+    '''
+    # handle obj types
+    if type(obj) == np.ndarray:
+        shapeO = obj.shape
+    else:
+        shapeO = (len(obj),)
+    # handle val types
+    if type(val) == np.ndarray:
+        shapeV = val.shape
+    elif typecheck(val):
+        shapeV = (len(val), )
+    else:
+        val = [val, ]
+        shapeV = (len(val),)
+
+    def left(obj, val):
+        '''
+        assuming singular value
+        '''
+        if val == 0:
+            return False
+        return obj[int(val) - 1]
+
+    def right(obj, shapeO, val):
+        '''
+        assuming singular value
+        '''
+        if val == -1:
+            return False
+        elif val == (shapeO[0] - 1):
+            return False
+        return obj[val + 1]
+
+    def upper(obj, shapeO, val):
+        '''
+        assuming val is 2D now
+        '''
+        if len(shapeO) == 1:
+            return False
+        elif val[1] >= shapeO[1]:
+            return False
+        return obj[val[0], val[1] + 1]
+
+    def lower(obj, shapeO, val):
+        '''
+        assuming val is 2D now
+        '''
+        if len(shapeO) == 1:
+            return False
+        elif val[1] <= 0:
+            return False
+        return obj[val[0], val[1] - 1]
+
+    def oneD(obj, shapeO, val):
+        for i in val:
+            l, r = left(obj, i), right(obj, shapeO, i)
+            if l and r:
+                obj[i] = interpolate(l, r, obj)
+            elif l:
+                obj[i] = interpolate(l, obj)
+            elif r:
+                obj[i] = interpolate(r, obj)
+
+    def twoD(obj, shapeO, val):
+        for i in val:
+            le, r, u, lo = (left(obj[i[0], :], i[1]),
+                            right(obj[i[0], :], shapeO, i[1]),
+                            upper(obj[:, i[1]], shapeO, i[0]),
+                            lower(obj[:, i[1]], shapeO, i[0]))
+            if le and r and u and lo:
+                horiz = interpolate(le, r, obj)
+                vert  = interpolate(u, lo, obj)
+                obj[val] = np.average(horiz, vert)
+            elif le:
+                obj[i] = interpolate(le, obj)
+            elif r:
+                obj[i] = interpolate(r, obj)
 
 
 def raster_matrix(*args, auto=False, **kwargs):

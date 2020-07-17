@@ -33,7 +33,7 @@ from .misc import (colours, constants, decorators, errors, mp,
 
                    find_nearest, strip, get, list_comp,
 
-                   add, find_max)
+                   add, find_max, help, help_api)
 
 from . import amlines
 
@@ -51,4 +51,6 @@ __all__ = ('math',
 
            'add', 'find_max',
 
-           'amlines')
+           'amlines',
+
+           'help', 'help_api',)

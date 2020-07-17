@@ -19,15 +19,7 @@ clean: clear_pycache
 	@rm -rf ./docs ./build ./nkrpy.egg-info ./dist
 	@find . -name "test-*.log" -type f -print0 | xargs -0 rm -f
 	@find . -name "*.so" -type f -print0 | xargs -0 rm -f
-	@for f in $(find . -name "*.pyx" -type f); do
-		f="${f#'./'}"
-		for i in 'c' 'h'; do
-			f=$(echo "${f}" | awk -F'.' '{print $1}')".${i}"
-			if test -f "${f}"; then
-				rm -f "${f}"
-			fi
-		done
-	done
+	@for f in $(find . -name "*.pyx" -type f); do f="${f#'./'}"; for i in 'c' 'h'; do f=$(echo "${f}" | awk -F'.' '{print $1}')".${i}"; if test -f "${f}"; then rm -f "${f}"; fi; done; done
 
 clear_pycache:
 	@find . -name "__pycache__" -type d -print0 | xargs -0 rm -rf

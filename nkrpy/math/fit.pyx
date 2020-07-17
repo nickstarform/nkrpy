@@ -264,7 +264,7 @@ def ndgauss(x, params):
         if i == 0:
             final = gauss(x, *dim)
         else:
-            final = np.sum(gauss(x, *dim), final, axis=0)
+            final += gauss(x, *dim)
 
     return final
 
