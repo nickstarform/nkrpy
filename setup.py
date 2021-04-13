@@ -1,14 +1,15 @@
-"""The setup.py file for building the module."""
+"""The setup.py file for building the NKRPY module."""
 # internal modules
 from setuptools import setup, find_packages, Extension
 import os
+import importlib
+import inspect
 
 # external modules
 from Cython.Build import cythonize
 import numpy
 
 # global attributes
-__doc__ += """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 sep = os.sep
@@ -51,10 +52,12 @@ def populate_info(kwargs: dict) -> None:
     string.append(f'\n{"=" * len(app)}\n{app}\n{"=" * len(app)}\n')
     string = '\n'.join(string)
     alllines[0] = alllines[0].replace('DESC', 'nkrpy.\n' + string)
-    alllines = '\n'.join(alllines)
+    alllines = ''.join(alllines)
     # actually write the __init__ file
-    with open(f'nkrpy{sep}__init__.py', 'w') as f:
-        f.write(alllines)
+    f = open(f'nkrpy{sep}__init__.py', 'w')
+    f.write(alllines)
+    f.flush()
+    f.close()
     pass
 
 
@@ -99,7 +102,10 @@ def load_ext(extname: str, files: list, fext: str) -> tuple:
 
 
 def resolve(files: list) -> list:
-    """Resolve filenames in heirarchical order."""
+    f"""Resolve filenames in heirarchical order.
+
+    This is based on the "{supported}" heirarchy, where lower numbers override higher ones.
+    """
     def get_ext(ext: str) -> int:
         """Get the extension for a filename."""
         try:
@@ -155,6 +161,7 @@ for path, dirnames, filenames in os.walk(f'.{sep}bin{sep}'):
     for file in filenames:
         fext = file.split('.')[-1]
         file = os.path.join(path, file)
+        #print(file)
         scripts.append(file)
 
 # read .version
@@ -206,7 +213,8 @@ settings = {
         'Programming Language :: Python :: 3 :: Only',
         'Intended Audience :: Developers',
         'Natural Language :: English'
-    ]
+    ],
+    "zip_safe": True,
 }
 
 if __name__ == '__main__':

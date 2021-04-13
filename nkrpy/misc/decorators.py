@@ -8,18 +8,148 @@ import cProfile
 import pstats
 import io
 import time
+from functools import wraps
 
 # external modules
-from IPython import embed
 
 # relative modules
+from .errors import ArgumentError
 
 # global attributes
 __all__ = ('deprecated', 'call_counter', 'timeit', 'checker',
-           'ignore_deprecation_warnings', 'alias', 'aliasClass')
+           'ignore_deprecation_warnings', 'alias', 'aliasClass', 'argCase')
 __doc__ = """Generalized decorators for common usage."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
+
+
+def argCase(case: str):
+    def _case(s: str, ul: str):
+        ul = ul.lower()
+        if ul == 'lower':
+            return s.lower()
+        return s.upper()
+
+    def decorator(function):
+        """Force all arguments to lower/upper case."""
+        def wrapper(*args, **kwargs):
+            args = list(args)
+            for i, a in enumerate(args):
+                if isinstance(a, str):
+                    args[i] = _case(a, case)
+            for k, v in kwargs.items():
+                if isinstance(v, str):
+                    kwargs[k] = _case(v, case)
+            return function(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+class _MethodDecoratorAdaptor(object):
+    def __init__(self, decorator, func):
+        self.decorator = decorator
+        self.func = func
+    def __call__(self, *args, **kwargs):
+        return self.decorator(self.func)(*args, **kwargs)
+    def __get__(self, instance, owner):
+        return self.decorator(self.func.__get__(instance, owner))
+
+def generaldecorator(decorator):
+    """Allows you to use the same decorator on methods and functions,
+    hiding the self argument from the decorator."""
+    def adapt(func):
+        return _MethodDecoratorAdaptor(decorator, func)
+    return adapt
+
+
+def allowed(*allowed_methods):
+    @generaldecorator
+    def wrapper(func):
+        def wrapped(request):
+            if request not in allowed_methods:
+                raise ValueError("Invalid method %s" % request)
+            return func(request)
+        return wrapped
+    return wrapper
+
+
+
+def _construct_master_group():
+    gl = globals()
+    name = ''
+    if '__filename__' in gl:
+        name = f'_{gl["__filename__"]}'
+    name = f'__nkrpy_groups{name}'
+    if name not in gl:
+        gl[name] = {False: {}, True: {}}
+    return gl[name]
+
+
+def _get_group_num(exclusive: bool = False):
+    gl_o = _construct_master_group()
+    gl = gl_o[exclusive]
+    if len(gl) == 0:
+        gl[0] = ()
+        return 0, gl_o, exclusive
+    latest = max(gl.keys())
+    gl[latest + 1] = ()
+    return latest + 1, gl_o, exclusive
+
+
+def normalize_args_kwargs(function, *args, **kwargs):
+    nk = {**kwargs}
+    nk.update(zip(function.__code__.co_varnames, args))
+    return nk
+
+_groupnums = []
+def group(*grouped_args: list, exclusive: bool=False):
+    """Decorator factory forms groups of arguments.
+
+    This can take positional or kwargs. However, the decorator input is the variable names.
+
+    If not invoked in a file, this places into global variables __nkrpy_groups[0...]
+    If invoked in a file, this places into global variables __nkrpy_groups_filename[0...]
+    
+    Usage
+    -----
+    @group(['argument1_group0', 'argument2_group0'], ['argument1_group1', 'argument2_group1'])
+    def func(argument1_group0, argument2_group0, argument1_group1 = None, argument2_group1=None):
+        pass
+    """
+    for groups in grouped_args:
+        num, gl, e = _get_group_num(exclusive)
+        gl[e][num] = tuple(groups)
+        _groupnums.append([e, num])
+    def decorator(function):
+        def inner(*args, **kwargs):
+            if function.__name__ not in ('group', 'inner'):
+                nk = normalize_args_kwargs(function, *args, **kwargs)
+                for e, num in _groupnums:
+                    groups = gl[e][num]
+                    set_args = set(groups)
+                    _t = set_args - nk.keys()
+                    _t = set_args - _t
+                    gl[e][num] = tuple(_t)
+                    if e and any([nk[k] is not None for k in gl[e][num]]):
+                        raise ArgumentError()
+            return function(*args, **kwargs)
+        return inner
+    return decorator
+
+def exclusive(*grouped_args: list):
+    return 
+""" for testing
+del gl['__nkrpy_groups_notafile']
+print('Before Decorate')
+@group(['pos1', 'kpos1', 'notinkwargs'])
+@group(['pos2', 'kpos2'])
+def cube(pos1, pos2, kpos1 = None, kpos2 = None, ungrouped = None):
+    pass
+
+print('After Decorate')
+cube(1,2,3,4,5)
+print('After call')
+"""
 
 
 def _counter():
@@ -143,6 +273,7 @@ def checker(f):
 
 def debug(f):
     """Embeds IPython console for debug."""
+    from IPython import embed
     def wrap(*args, **kwargs):
         embed()
         _t = f(*args, **kwargs)

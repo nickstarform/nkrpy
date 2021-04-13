@@ -51,7 +51,7 @@ def split_into_tspec_orders(wav: np.ndarray, conserve: bool = True):
     return orders
 
 
-def determine_order_tspec(wav):
+def determine_order_tspec(wav, sort: bool=False):
     """Determine order given wavelength range.
 
     Specifically for APO Tspec instrument, try
@@ -70,25 +70,15 @@ def determine_order_tspec(wav):
         List of all the orders spanned
 
     """
-    assert wav[0] < wav[-1]
-    eva = [i for i, x in enumerate(tspec_orders) if wav[0] >= x[0]]
-    if len(eva) == 0:
-        upper = 4
-    else:
-        upper = min(eva)
-    eva = [i for i, x in enumerate(tspec_orders) if wav[-1] <= x[1]]
-    if len(eva) == 0:
-        lower = 0
-    else:
-        lower = max(eva)
-    if lower == upper:
-        return [upper + 3]
-    if lower > upper:
-        return [lower + 3]
-    ret = [x + 3 for x in range(lower, upper + 1)]
-    if len(ret) == 0:
-        print(lower, upper, wav[0], wav[-1])
-    return ret
+    if sort:
+        wav.sort()
+    if not isinstance(wav, np.ndarray):
+        wav = np.array(wav)
+    orders = np.ones(wav.shape, dtype=np.int)
+    for i, lims in enumerate(tspec_orders):
+        mask = ~(~(wav >= lims[0]) + ~(wav <= lims[1]))
+        orders[mask] = i + 3
+    return orders
 
 
 def plotting(ax, xmin, xmax, x, y, tempsource, line, count, start=False):

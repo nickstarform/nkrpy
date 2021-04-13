@@ -1,9 +1,12 @@
 """Misc Common Functions."""
 
 # internal modules
-from operator import attrgetter
+from operator import attrgetter, add
 from collections.abc import Iterable
 import inspect
+from collections import Mapping
+from itertools import chain
+from functools import reduce
 
 # external modules
 import numpy as np
@@ -14,11 +17,39 @@ from . import colours
 # global attributes
 __all__ = ('typecheck', 'addspace', 'between',
            'find_nearest', 'strip', 'get', 'list_comp',
-           'add', 'find_max', 'deep_resolve', 'help', 'help_api')
+           'add', 'find_max', 'deep_resolve', 'help', 'help_api', 'flatten_dict', 'deep_get_single', 'deep_get_generator', 'deep_set', 'classdocgen')
 __doc__ = """Just generic functions that I use a good bit."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 __LINEWIDTH__ = 79
+
+
+def dict_split(kwarg, tosplit: list = []):
+    """Split dict based list of keys."""
+    cut_kwarg = {}
+    ret = {}
+    for k in kwarg:
+        if k in tosplit:
+            ret[k] = kwarg[k]
+        else:
+            cut_kwarg[k] = kwarg[k]
+    return cut_kwarg, ret
+
+
+
+def classdocgen(clas):
+    def grab_first_line(func):
+        if func.__doc__ is None:
+            return ''
+        doc = func.__doc__.splitlines()
+        if len(doc) == 0:
+            return ''
+        return doc[0]
+
+    methods = [f'{f}: {grab_first_line(getattr(clas, f))}' for f in dir(clas) if not f.startswith('_') and callable(getattr(clas, f))]
+    spacer = '''
+'''
+    return spacer.join(methods)
 
 
 def help(func_or_class, colour: bool = True):
@@ -35,14 +66,17 @@ def help_api(func_or_class, colour: bool = False):
     if '__class__' not in dir(func_or_class):
         args = str(inspect.signature(func_or_class))
     else:
-        dirs = [d for d in dir(func_or_class) if not d.startswith('_')]
-        dirs = [getattr(func_or_class, d) for d in dirs]
+        dirsnames = [d for d in dir(func_or_class) if not d.startswith('_')]
+        dirs = [getattr(func_or_class, d) for d in dirsnames]
         args = ''
-        for d in dirs:
-            inner_name = d.__name__
+        for i, d in enumerate(dirs):
+            #print(dir(d))
+            if '__name__' in dir(d):
+                inner_name = d.__name__
+            else:
+                inner_name = dirsnames[i]
             inner_docs = d.__doc__ if d.__doc__ else ''
-            inspected_inner = inspect.signature(d).parameters
-            inner_args = ', '.join([inspected_inner for i, v in enumerate(inspected_inner) if i > 0])
+            inner_args = str(inspect.signature(d))
             toplevel = f'{inner_name}: {inner_args}'
             args += toplevel + '\n'
             if len(inner_docs) > 20:
@@ -68,7 +102,128 @@ def help_api(func_or_class, colour: bool = False):
     return ret
 
 
+def __get(dct, key, default):
+    return reduce(lambda d, k: d.get(k, default) if isinstance(d, dict) else default, key, dct)
+
+def deep_get_generator(dct: dict, *keys, default=None, delim: str = '.'):
+    """Resolve keys by splitting the list via '.'.
+
+    Usage
+    =====
+    test = {
+        'a': 1,
+        'b': {
+            'aa': 11,
+            'bb': {
+                'aaa': 111,
+            },
+        },
+    }
+    deep_get(test, 'a', 'b.aa', 'b.bb.aaa', 'b.bb.bbb')
+    # return 1, 11, 111, None
+    """
+    for key in keys:
+        key = key.split(delim)
+        yield __get(dct, key, default)
+
+def deep_get_single(dct: dict, key, default=None, delim: str = '.'):
+    """Resolve keys by splitting the list via '.'.
+
+    Usage
+    =====
+    test = {
+        'a': 1,
+        'b': {
+            'aa': 11,
+            'bb': {
+                'aaa': 111,
+            },
+        },
+    }
+    deep_get(test, 'a', 'b.aa', 'b.bb.aaa', 'b.bb.bbb')
+    # return 1, 11, 111, None
+    """
+    key = key.split(delim) if isinstance(key, str) else key
+    return __get(dct, key, default)
+
+def deep_set(dct, key, value, delim: str = '.'):
+    """Set key by splitting the str via delim.
+
+    Usage
+    =====
+    test = {
+        'a': 1,
+        'b': {
+            'aa': 11,
+            'bb': {
+                'aaa': 111,
+            },
+        },
+    }
+    111 == test['b']['bb']['aaa'] # True
+    deep_set(test, 'b.bb.aaa', 333)
+    111 == test['b']['bb']['aaa'] # False
+    333 == test['b']['bb']['aaa'] # True
+    # 
+    """
+    keys = key.split(delim)
+    i = 0
+    while i < len(keys) - 1:
+        k = keys[i]
+        i += 1
+        dct = dct.get(k)
+    dct[keys[-1]] = value
+
+
+def flatten_dict(d, join=add, lift=lambda x: x, only_keys: bool = False):
+    """Flatten a dictionary intelligently.
+
+    This is a little complicated
+
+    Usage
+    =====
+    from nkrpy.misc.functions import flatten_dict
+    test = {
+        'a': 1,
+        'b': {
+            'aa': 11,
+            'bb': {
+                'aaa': 111,
+            },
+        },
+    }
+    flatten_dict(test, lift=lambda x: (x,), only_keys=True)
+
+    Parameters
+    ==========
+    d: dict
+        The dictionary to flatten
+    join: function
+        The method by which to stack the 'lifts'
+    lift: function
+        A lambda function by which to transform the keys
+    only_keys: bool
+        Flag to only return the keys or return a full dupe
+
+    """
+    _FLAG_FIRST = object()
+    results = []
+    def visit(sd, r, partKey):
+        for key, value in sd.items():
+            nk = lift(key) if partKey is _FLAG_FIRST else join(partKey, lift(key))
+            if isinstance(value, Mapping):
+                visit(value, r, nk)
+            else:
+                if not only_keys:
+                    r.append((nk, value))
+                else:
+                    r.append(nk)
+    visit(d, results, _FLAG_FIRST)
+    return results
+
+
 def deep_resolve(iterable):
+    """Deep resolver to resolve the lowest possible element of an iterable."""
     if not isinstance(iterable, Iterable) or isinstance(iterable, str):
         yield (iterable, )
     try:
@@ -77,6 +232,7 @@ def deep_resolve(iterable):
                 yield element
     except TypeError:
         yield (iterable, )
+
 
 def get(iterable, **attrs):
     """Find first instance of element in iterable.

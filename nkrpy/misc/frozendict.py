@@ -41,7 +41,7 @@ class FrozenDict(collections.Mapping):
 
     def __contains__(self, key):
         """Dunder."""
-        return key in self._keys
+        return key in self.__dict
 
     def __iter__(self):
         """Dunder."""
@@ -49,7 +49,7 @@ class FrozenDict(collections.Mapping):
 
     def __len__(self):
         """Dunder."""
-        return len(self._keys)
+        return len(self.__dict)
 
     def __repr__(self):
         """Dunder."""
@@ -63,6 +63,9 @@ class FrozenDict(collections.Mapping):
                 h ^= hash((key, value))
             self._hash = h
         return self._hash
+
+    def get_dict(self):
+        return self.__dict
 
     def __copy__(self):
         """Dunder."""

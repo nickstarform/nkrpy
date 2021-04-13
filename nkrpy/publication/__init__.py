@@ -1,8 +1,18 @@
 """."""
-from .format import (scientific_format, decimal_format, fortran_format,
-                     general_format, wrapper)
-from .plots import set_style, Arrow3D
+from . import cmaps
+from . import _format
+from ._format import *
+from . import _plots
+from ._plots import *
 
-__all__ = ('set_style', 'Arrow3D',
-           'scientific_format', 'decimal_format',
-           'general_format', 'fortran_format', 'wrapper')
+__all__ = ['cmaps'] +\
+          _format.__all__ +\
+          _plots.__all__ +\
+
+
+PACKAGES = __all__.copy()
+PACKAGES.sort()
+
+# end of code
+
+# end of file

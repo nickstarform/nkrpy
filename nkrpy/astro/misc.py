@@ -15,16 +15,17 @@ def Keplerian_Rotation(mass, velocity, Distance, inclination):
 
 # external modules
 import numpy as np
+
 # from scipy.optimize import curve_fit
 
 # relative modules
 from ..misc.constants import h, c, kb, msun, jy, mh
 from .dustmodels import kappa
-from ..unit.unit import Unit as nc__unit  # noqa
-from ..misc.functions import typecheck
+from nkrpy import Unit as nc__unit  # noqa
+from nkrpy import constants
 
 # global attributes
-__all__ = ("dustmass", "planck_nu", "planck_wav", "ecc", "WCS", "construct_lam")
+__all__ = ("dustmass", "planck_nu", "planck_wav", "ecc", "construct_lam", "freq_vel", "vel_freq")
 __doc__ = """."""
 __filename__ = __file__.split("/")[-1].strip(".py")
 __path__ = __file__.strip(".py").strip(__filename__)
@@ -34,9 +35,16 @@ __path__ = __file__.strip(".py").strip(__filename__)
 # also there is misc trash in nkrpy.io.files.functions regarding header generation
 
 
+def freq_vel(freq: np.ndarray, restfreq: float):
+    return (restfreq - freq) / restfreq * constants.c
+
+
+def vel_freq(vel: np.ndarray, restfreq: float):
+    return restfreq - (vel / constants.c * restfreq)
+
+
 def construct_lam(lammin, lammax, Res=None, dlam=None):
-    """
-    Construct a wavelength grid by specifying either a resolving power (`Res`)
+    """Construct a wavelength grid by specifying either a resolving power (`Res`)
     or a bandwidth (`dlam`)
     Parameters
     ----------
@@ -105,101 +113,20 @@ def construct_lam(lammin, lammax, Res=None, dlam=None):
 
     return lam, dlam
 
-class _base_wcs_class(object):
-    """Base Class object for WCS solving.
-
-    This is a backend class, don't use.
-    """
-
-    def __init__(self, delt, pix, unit, val, **kwargs):
-        self.kwargs = {'val': val, 'pix': pix, 'del': delt, 'uni': unit}
-        if kwargs:
-            self.kwargs = kwargs.update(self.kwargs)
-
-    def __call__(self, val: float = np.nan, return_type: str = 'pix'):
-        assert return_type in {'pix', 'wcs'}
-        if not typecheck(val) and val == np.nan:
-            return self.kwargs
-        if return_type == 'pix':
-            pix = (val - self.kwargs['val']) / self.kwargs['del'] + \
-                self.kwargs['pix']
-            if isinstance(pix, np.ndarray):
-                assert pix.all() >= 0
-                return pix
-            assert pix >= 0
-            return pix
-        val = (val - self.kwargs['pix']) * self.kwargs['del'] + \
-            self.kwargs['val']
-        return val
-
-
-class WCS(object):
-    """Generalized WCS object."""
-
-    def __init__(self, header: dict = None, file=None):
-        """Generalized WCS object.
-
-        To access the available axis after the header is loaded
-
-        Parameters
-        ----------
-        header: dict
-            A dictionary containing the common header items.
-            Will search for ctype# to determine the axes and then look
-                for other common header names.
-        file: [optional]
-            Can insert either a string or a bytes like object. Must be a fits
-                file with a proper header
-
-        Example
-        -------
-        from nkrpy.io import fits
-        a = fits.read('oussid.s15_0.Per33_L1448_IRS3B_sci.spw25.cube.I.iter1.image.fits')
-        a = dict(a[0][0])
-        b = WCS(a)
-        b(500, 'wcs')
-        b(51.28827040497872, 'pix')
-        b(500, 'wcs', 'dec--sin')
-        b(30.7503474380, 'pix', 'dec--sin')
-        b(50, 'wcs', 'freq')
-        """
-        assert not (header is None and file is None)
-        head_lower = dict([[t.lower().replace(' ', ''), t]
-                           for t in header.keys()])
-        self.headlower = head_lower
-        self.header = header
-        naxis = [t for t in self.headlower if 'ctype' in t]
-        self.axis = {}
-        for t in naxis:
-            axis_heads = [[x.replace('r', '').replace('c', '')[:3], x]
-                          for x in self.headlower if x.startswith('c') and
-                          x.endswith(f'{t[-1]}')]
-            axis_heads.sort(key=lambda x: x[0])
-            vals = [self.header[self.headlower[h[1]]] for h in axis_heads if 'typ' != h[0]]
-            self.axis[t] = _base_wcs_class(*vals)
-
-    def __call__(self, val = None, return_type: str = None, axis: str = 'ra---sin'):
-        if val == None:
-            return self.get_axes()
-        axis = axis.lower()
-        types = [[str(self.header[self.headlower[x]]).lower(), x] for x in self.headlower]
-        types = dict(types)
-        assert axis in types
-        axis_name = types[axis]
-        return self.axis[axis_name](val, return_type)
-
-    def get_axis(self, unit: str = 'freq'):
-        for a in self.axis:
-            if unit in self.header[self.headlower[a]].lower():
-                return int(a[-1])
-
-    def get_axes(self):
-        return [self.header[wcs.headlower[axis]] for axis in self.axis]
-
 
 def ecc(a, b):
     """Determine eccentricity given semi-major and semi-minor."""
     return (1. - ((a ** 2) / (b ** 2))) ** 0.5
+
+
+def inverse_planck_wav(radiance=None, val=None, unit=None):
+    """Inverse Plank Function in wavelength."""
+    wav = nc__unit(baseunit=unit, convunit='cm', vals=val)
+    a = 2.0 * h * c ** 2
+    b = (h * c / (wav * kb))
+    temp = b / np.log(a / (wav ** 5 * radiance) + 1)
+    # returns in units of K
+    return temp
 
 
 def planck_wav(temp=None, val=None, unit=None):
@@ -215,7 +142,7 @@ def planck_wav(temp=None, val=None, unit=None):
 def planck_nu(temp=None, val=None, nu_unit=None):
     """Plank Function in frequency."""
 
-    nu = nc__unit(baseunit=nu_unit, convunit='hz', vals=val)
+    nu = nc__unit(baseunit=nu_unit, convunit='hz', vals=val).get_vals()[0]
     a = 2.0 * h / c ** 2
     b = (h * nu / (kb * temp))
     intensity = a * (nu ** 3) / (np.exp(b) - 1.0)
@@ -239,27 +166,23 @@ def dustmass(dist=100, dist_unit="pc", val=0.1,
     opacity
     Assuming temp in Kelvin, flux in Janskys
     """
-    dist = nc__unit(baseunit=dist_unit, convunit='cm',
-                vals=dist)[0]  # to match the opacity units
-    wav = nc__unit(baseunit=val_unit, convunit='microns',
-               vals=val)  # to search opcaity models
-    intensity = planck_nu(temp, wav('hz')[0], "hz") * 1.E26  # noqa
-    # embed()
+    dist = nc__unit(baseunit=dist_unit, convunit='cm', vals=dist).get_vals()[0]  # to match the opacity units
+    wav = nc__unit(baseunit=val_unit, convunit='microns', vals=val)  # to search opcaity models
+    intensity = np.ravel(planck_nu(temp, wav('hz'), "hz"))[0] * 1.E26  # noqa
     if not opacity:
-        opacity = kappa(wav,
+        opacity = kappa(wav.get_vals()[0],
                         model_name=model_name,
                         density=gas_density,
                         beta=beta)  # cm^2/g
     if not isinstance(opacity, (tuple, list, np.ndarray)):
         opacity = [opacity]
-    toret = "For the various opacities:\n(cm^2/g)...(Msun)\n"
+    print(opacity, type(opacity))
     _ret = []
     for x in opacity:
+        print(type(x), type(dist), type(flux), type(intensity))
         _tmp = (dist ** 2 * flux / x / intensity / msun)  # noqa in msun units (no ISM assump.)
-        # print(x, dist, flux, intensity, _tmp)
-        toret += "{}...{}\n".format(x, _tmp)
-        _ret.append(np.array([x, _tmp]))
-    return toret, np.array(_ret)
+        _ret.append([x, _tmp])
+    return np.array(_ret)
 
 
 def true_emissive_mass(flux,

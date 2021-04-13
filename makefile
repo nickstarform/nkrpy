@@ -15,14 +15,11 @@ doc:
 	@python3 ./bin/outlinegen.py
 	@sh ./bin/docgen.sh
 
-clean: clear_pycache
-	@rm -rf ./docs ./build ./nkrpy.egg-info ./dist
-	@find . -name "test-*.log" -type f -print0 | xargs -0 rm -f
-	@find . -name "*.so" -type f -print0 | xargs -0 rm -f
-	@for f in $(find . -name "*.pyx" -type f); do f="${f#'./'}"; for i in 'c' 'h'; do f=$(echo "${f}" | awk -F'.' '{print $1}')".${i}"; if test -f "${f}"; then rm -f "${f}"; fi; done; done
+clean:
+	-@for f in $$(find ./nkrpy/ -type f -name "*.pyx"); do path=$$(dirname "$${f}"); fname=$$(basename "$${f}"); echo "$${path}/$${fname}"; fname="$${fname::-4}"; for i in "c" "h" "*so"; do f=$$(find "$${path}" -type f -name "$${fname}.$${i}"); if $$(test -e "$${f}"); rm -f "$${f}"; fi; done; done
 
 clear_pycache:
-	@find . -name "__pycache__" -type d -print0 | xargs -0 rm -rf
+	-@find . -name "__pycache__" -type d -print0 | xargs -0 rm -rf
 
 test:
 	tox

@@ -3,7 +3,12 @@
 OPT="${1}"
 NAME="${2}"
 loc=$(which template)
-loc="${loc%/template}/templates/"
+loc="${loc%/template}/"
+
+if [ -d "${loc}templates/" ]
+    # this should correct whether the nkrpy/bin path is added to bash or if pip3 install nkrpy is used and files are unpacked to $INSTALL/bin
+    loc="${loc}/templates/" # if path is added
+
 dest=$(pwd)
 
 possible_templates=('py' 'rst' 'md' 'sh')
@@ -15,6 +20,7 @@ elif [ "${OPT}" == '--help' ] || [ "${OPT}" == 'help' ] || [ "${OPT}" == '-help'
     echo 'The layout is <template type name>'
     echo 'Just call <template py fname> or comma separate <template py,rst fname>'
     echo 'fname is simply the name of the destination to create'
+    echo 'Add additional templates to templates/'
     exit
 fi
 

@@ -1,3 +1,4 @@
+# flake8: noqa
 """General colour definitions.
 
 A color init string consists of one or more of the following numeric codes:
@@ -23,6 +24,59 @@ COLOR_NUMBER is from 0 to 255.
 # relative modules
 
 # global attributes
+__all__ = (
+# high intensity background
+'IBLACK_BKGD',
+'IRED_BKGD',
+'IGREEN_BKGD',
+'IYELLOW_BKGD',
+'IBLUE_BKGD',
+'IMAGENTA_BKGD',
+'ICYAN_BKGD',
+'IWHITE_BKGD',
+# high intensity text
+'IBLACK_TEXT',
+'IRED_TEXT',
+'IGREEN_TEXT',
+'IYELLOW_TEXT',
+'IBLUE_TEXT',
+'IMAGENTA_TEXT',
+'ICYAN_TEXT',
+'IWHITE_TEXT',
+# background
+'BLACK_BKGD',
+'RED_BKGD',
+'GREEN_BKGD',
+'YELLOW_BKGD',
+'BLUE_BKGD',
+'MAGENTA_BKGD',
+'CYAN_BKGD',
+'WHITE_BKGD',
+# text
+'BLACK_TEXT',
+'RED_TEXT',
+'GREEN_TEXT',
+'YELLOW_TEXT',
+'BLUE_TEXT',
+'MAGENTA_TEXT',
+'CYAN_TEXT',
+'WHITE_TEXT',
+# special
+'HEADER',
+'OKBLUE',
+'OKGREEN',
+'WARNING',
+'FAIL',
+'SUCCESS',
+'BOLD',
+'RESET',
+'DIMINISH',
+'UNDERLINE',
+'BLINK',
+'REVERSE',
+'HIDDEN',
+'BOLDUNDERLINE',
+'BOLD2UNDERLINE')
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
@@ -35,64 +89,56 @@ SUCCESS = OKGREEN
 BOLD = '\033[1m'
 RESET = '\033[0m'  # resets color and format
 
-_RST_ = RESET
-_BLD = '\033[1m'
-_DIM = '\033[2m'
-_UND = '\033[4m'
-_BLK = '\033[5m'  # only in supported terms, otherwise shown as reverse
-_RVS = '\033[7m'
-_HID = '\033[8m'
-_BU = '\033[1m\033[4m'
+DIMINISH = '\033[2m'
+UNDERLINE = '\033[4m'
+BLINK = '\033[5m'  # only in supported terms, otherwise shown as reverse
+REVERSE = '\033[7m'
+HIDDEN = '\033[8m'
+BOLDUNDERLINE = '\033[1m\033[4m'
 # ends the format (only un-reverse is working)
-_BLD_ = '\033[21m'
-_DIM_ = '\033[22m'
-_UND_ = '\033[22m'
-_BLK_ = '\033[25m'
-_RVS_ = '\033[27m'
-_HID_ = '\033[28m'
-_BU_ = '\033[21m\033[22m'
+BOLD2UNDERLINE = '\033[21m'
 
 # Maps 16 color to 256 colors
 
 # Regular Colors
-Black = '\033[38;5;0m'
-Red = '\033[38;5;1m'
-Green = '\033[38;5;2m'
-Yellow = '\033[38;5;3m'
-Blue = '\033[38;5;4m'
-Magenta = '\033[38;5;5m'
-Cyan = '\033[38;5;6m'
-White = '\033[38;5;7m'
+BLACK_TEXT   = '\033[38;5;0m'
+RED_TEXT     = '\033[38;5;1m'
+GREEN_TEXT   = '\033[38;5;2m'
+YELLOW_TEXT  = '\033[38;5;3m'
+BLUE_TEXT    = '\033[38;5;4m'
+MAGENTA_TEXT = '\033[38;5;5m'
+CYAN_TEXT    = '\033[38;5;6m'
+WHITE_TEXT   = '\033[38;5;7m'
 
 # Background
-On_Black = '\033[48;5;0m'
-On_Red = '\033[48;5;1m'
-On_Green = '\033[48;5;2m'
-On_Yellow = '\033[48;5;3m'
-On_Blue = '\033[48;5;4m'
-On_Magenta = '\033[48;5;5m'
-On_Cyan = '\033[48;5;6m'
-On_White = '\033[48;5;7m'
+BLACK_BKGD   = '\033[48;5;0m'
+RED_BKGD     = '\033[48;5;1m'
+GREEN_BKGD   = '\033[48;5;2m'
+YELLOW_BKGD  = '\033[48;5;3m'
+BLUE_BKGD    = '\033[48;5;4m'
+MAGENTA_BKGD = '\033[48;5;5m'
+CYAN_BKGD    = '\033[48;5;6m'
+WHITE_BKGD   = '\033[48;5;7m'
 
 # High Intensty
-IBlack = '\033[38;5;8m'
-IRed = '\033[38;5;9m'
-IGreen = '\033[38;5;10m'
-IYellow = '\033[38;5;11m'
-IBlue = '\033[38;5;12m'
-IMagenta = '\033[38;5;13m'
-ICyan = '\033[38;5;14m'
-IWhite = '\033[38;5;15m'
+IBLACK_TEXT   = '\033[38;5;8m'
+IRED_TEXT     = '\033[38;5;9m'
+IGREEN_TEXT   = '\033[38;5;10m'
+IYELLOW_TEXT  = '\033[38;5;11m'
+IBLUE_TEXT    = '\033[38;5;12m'
+IMAGENTA_TEXT = '\033[38;5;13m'
+ICYAN_TEXT    = '\033[38;5;14m'
+IWHITE_TEXT   = '\033[38;5;15m'
 
 # High Intensty backgrounds
-On_IBlack = '\033[48;5;8m'
-On_IRed = '\033[48;5;9m'
-On_IGreen = '\033[48;5;10m'
-On_IYellow = '\033[48;5;11m'
-On_IBlue = '\033[48;5;12m'
-On_IMagenta = '\033[48;5;13m'
-On_ICyan = '\033[48;5;14m'
-On_IWhite = '\033[48;5;15m'
+IBLACK_BKGD   = '\033[48;5;8m'
+IRED_BKGD     = '\033[48;5;9m'
+IGREEN_BKGD   = '\033[48;5;10m'
+IYELLOW_BKGD  = '\033[48;5;11m'
+IBLUE_BKGD    = '\033[48;5;12m'
+IMAGENTA_BKGD = '\033[48;5;13m'
+ICYAN_BKGD    = '\033[48;5;14m'
+IWHITE_BKGD   = '\033[48;5;15m'
 
 # end of code
 

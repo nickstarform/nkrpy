@@ -64,7 +64,26 @@ def jy_2_k(freq: float, theta_major: float,
 
 @validate
 def convert_file(filename: str, jy_k: bool = False, k_jy: bool = False) -> tuple:
-    """."""
+    """Convert a file between the types jy and kelvin.
+
+    File must have restfrq bmaj bmin bunit defined
+
+    Parameters
+    ----------
+    filename: str
+        name of the file to convert. Must
+    jy_k: bool
+        default False, convert from jy to kelvin
+    k_jy: bool
+        default False, convert from kelvin to jy
+
+    Returns
+    -------
+    tuple
+        "conversionType_oldFilename", newHeader, new3DData
+
+    """
+    assert not (jy_k and k_jy)
     header, data = nkrpy_read(filename)
     header = header[0]
     data = data[0]
