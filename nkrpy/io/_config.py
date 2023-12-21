@@ -13,7 +13,8 @@ exit = sys.exit
 # relative modules
 from nkrpy.misc.errors import ConfigError
 from nkrpy.misc.decorators import deprecated
-from nkrpy.misc.colours import FAIL, RESET, HEADER
+from nkrpy.misc import Format
+FAIL, RESET, HEADER = Format('FAIL'), Format('RESET'), Format('HEADER')
 from nkrpy.misc.functions import typecheck, flatten_dict, deep_get_single, deep_set
 
 # global attributes
@@ -398,6 +399,9 @@ class Config(ConfigClass):
                 warnings.warn(str(KeyError(f'''Keys: `{required_keys}` are not found in target: {target.keys()}
 
                     These keys are missing: {required_keys - target_keys}''')), stacklevel=2)
+                print(f'''Keys: `{required_keys}` are not found in target: {target.keys()}
+
+                    These keys are missing: {required_keys - target_keys}''')
                 exit()
         return __flattened_target
 

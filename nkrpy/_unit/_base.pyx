@@ -28,10 +28,15 @@ class BaseVals(UnitClass):
     __slots__ = ['vals', '__inplace']
 
     def __init__(self, vals, inplace: bool = False):
+        if isinstance(vals, self.__class__):
+            vals = vals.vals
         self.__inplace = inplace
         if not inplace:
             vals = deepcopy(vals)
         self.vals = vals
+
+    def tolist(self):
+        return [s for s in self.vals]
 
     def __len__(self):
         if not typecheck(self.vals):

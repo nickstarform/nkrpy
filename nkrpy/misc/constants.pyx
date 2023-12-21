@@ -7,7 +7,7 @@
 # relative modules
 
 # global attributes
-__all__ = ('c','h','g','kb','a','sb','qe','ev','na','me','mp','mh2','mn','mh','amu','pi','golden','hour','day','year','calcPi','au','pc','yr','msun','rsun','lsun','msolsys','mmoon','mearth','rmoon','rearth','medd','j2000','kzen','kepler','pole_j2000_ra','pole_j2000_dec','posangle_j2000','pole_b1950_ra','pole_b1950_dec','posangle_b1950','jy','restfreq_hi','restfreq_co','cm2perkkms_hi','abun_ratio_c18o_c17o','abun_ratio_c18o_h2','abun_ratio_c17o_co','abun_ratio_co_h2','abun_ratio_h13cop_h2')
+__all__ = ['c','h','g','kb','a','sb','qe','ev','na','me','mp','mh2','mn','mh','amu','pi','golden','hour','day','year','calcPi','au','pc','yr','msun','rsun','lsun','msolsys','mmoon','mearth','rmoon','rearth','medd','j2000','kzen','kepler','pole_j2000_ra','pole_j2000_dec','posangle_j2000','pole_b1950_ra','pole_b1950_dec','posangle_b1950','jy','restfreq_hi','restfreq_co','cm2perkkms_hi','abun_ratio_c18o_c17o','abun_ratio_c18o_h2','abun_ratio_c17o_co','abun_ratio_co_h2','abun_ratio_h13cop_h2']
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
@@ -35,34 +35,6 @@ hour = 3.6e3              # s
 day  = 8.64e4             # s
 year = 3.1557600e7        # s
 
-def calcPi(limit):
-    q, r, t, k, n, l = 1, 0, 1, 1, 3, 3
-
-    decimal = limit
-    counter = 0
-
-    while counter != decimal + 1:
-            if 4 * q + r - t < n * t:
-                    # yield digit
-                    yield n
-                    if counter == 0:
-                        yield '.'
-                    if decimal == counter:
-                            break
-                    counter += 1
-                    nr = 10 * (r - n * t)
-                    n = ((10 * (3 * q + r)) // t) - 10 * n
-                    q *= 10
-                    r = nr
-            else:
-                    nr = (2 * q + r) * l
-                    nn = (q * (7 * k) + 2 + (r * l)) // (t * l)
-                    q *= k
-                    t *= l
-                    l += 2
-                    k += 1
-                    n = nn
-                    r = nr
 
 
 # %&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&%&

@@ -7,16 +7,191 @@ import shutil
 # external modules
 
 # relative Modules
-from ..misc.colours import RESET, OKBLUE
+from ..misc import Format
+RESET, OKBLUE = Format('RESET'), Format('OKBLUE')
 from ..misc.functions import typecheck, list_comp, addspace, strip
 from .template import template as check_file
+from .._types import FileClass
 
 # global attributes
 __all__ = ['copytree', 'list_files',
-           'list_files_fmt', 'freplace']
+           'list_files_fmt', 'freplace', 'File', 'Files']
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
+
+
+class File(FileClass):
+    SUPPORTED_EXT = ['fits', 'bin', 'hdf5', 'txt']
+
+    def __init__(self, filename: str = '', ext: str = None):
+        self.reset()
+        self.load(filename=filename, ext=ext)
+        pass
+
+    @staticmethod
+    def __get_path_fname_ext(fname: str):
+        if fname == '':
+            return
+        path = fname.split(os.sep)
+        if len(path) == 1:
+            path = os.getcwd()
+        else:
+            path = os.sep.join(path[:-1])
+        fname = fname.replace(path, '')
+        ext = fname.split('.')
+        if len(ext) == 0:
+            return
+        elif len(ext) == 1:
+            ext = ['txt']
+        else:
+            ext = ext[-1]
+        fname = fname.replace(f'.{ext}', '')
+        return path, fname, ext
+
+    def reset(self):
+        self.__file = {
+            'ext': None,
+            'data': None,
+            'filename': None,
+            'path': None,
+        }
+        pass
+
+    def refresh(self):
+        self.load(filename)
+        pass
+
+    def data(self):
+        return self.__file['data']
+
+    def load(self, filename: str, ext: str = None):
+        fparams = self.__get_path_fname_ext(filename)
+        if ext in [None, '']:
+            path, fname, ext = fparams
+        else:
+            path, fname, _ = fparams
+        realname = os.sep.join([path, fname]) + f'.{ext}'
+        if ext == 'fits':
+            from . import _fits
+            loader = _fits.read
+        elif ext in ['hdf5', 'hf5']:
+            from . import _hdf5
+            loader = _hdf5.read
+        data = loader(realname)
+        self.__file = {
+            'ext': ext,
+            'data': data,
+            'filename': fname,
+            'path': path,
+        }
+
+    def write(self, filename: str, data):
+        fparams = self.__get_path_fname_ext(filename)
+        if ext in [None, '']:
+            path, fname, ext = fparams
+        else:
+            path, fname, _ = fparams
+        realname = os.sep.join([path, fname]) + f'.{ext}'
+        if ext == 'fits':
+            from . import _fits
+            writer = _fits.write
+        elif ext in ['hdf5', 'hf5']:
+            from . import _hdf5
+            writer = _hdf5.write
+        writer(realname, self.__file['data'])
+
+class Files(FileClass):
+
+    SUPPORTED_EXT = ['fits', 'bin', 'hdf5', 'txt']
+
+    def __init__(self, filename: str = '', ext: str = None):
+        self.reset()
+        self.load(filename=filename, ext=ext)
+        pass
+
+    @staticmethod
+    def __get_path_fname_ext(fname: str):
+        if fname == '':
+            return
+        path = fname.split(os.sep)
+        if len(path) == 1:
+            path = os.getcwd()
+        else:
+            path = os.sep.join(path[:-1])
+        fname = fname.replace(path, '')
+        ext = fname.split('.')
+        if len(ext) == 0:
+            return
+        elif len(ext) == 1:
+            ext = ['txt']
+        else:
+            ext = ext[-1]
+        fname = fname.replace(f'.{ext}', '')
+        return path, fname, ext
+
+    def listfiles(self):
+        return self.__files.keys()
+
+    def get(self, filename: str):
+        fparams = self.__get_path_fname_ext(filename)
+        path, fname, ext = fparams
+        realname = os.sep.join([path, fname]) + f'.{ext}'
+        if realname in self.__files:
+            return self.__files[realname]
+
+    def reset(self):
+        self.__files = {}
+        pass
+
+    def refresh(self, filename: str = None):
+        if filename is None:
+            for fn in self.__files:
+                self.refresh(fn)
+        if filename not in self.__files:
+            return
+        self.load(filename)
+        pass
+
+    def load(self, filename: str, ext: str = None):
+        fparams = self.__get_path_fname_ext(filename)
+        if ext in [None, '']:
+            path, fname, ext = fparams
+        else:
+            path, fname, _ = fparams
+        realname = os.sep.join([path, fname]) + f'.{ext}'
+        if realname in self.__files:
+            return
+        if ext == 'fits':
+            from . import _fits
+            loader = _fits.read
+        elif ext in ['hdf5', 'hf5']:
+            from . import _hdf5
+            loader = _hdf5.read
+        data = loader(realname)
+        self.__files[realname] = {
+            'ext': ext,
+            'data': data,
+            'filename': fname,
+            'path': path,
+        }
+
+    def write(self, filename: str, data):
+        fparams = self.__get_path_fname_ext(filename)
+        if ext in [None, '']:
+            path, fname, ext = fparams
+        else:
+            path, fname, _ = fparams
+        realname = os.sep.join([path, fname]) + f'.{ext}'
+        if realname not in self.__files:
+            return
+        if ext == 'fits':
+            from . import _fits
+            writer = _fits.write
+        elif ext in ['hdf5', 'hf5']:
+            from . import _hdf5
+            writer = _hdf5.write
+        writer(realname, self.__files[realname]['data'])
 
 
 def freplace(filein, olddata, newdata):

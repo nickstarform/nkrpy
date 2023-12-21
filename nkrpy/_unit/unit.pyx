@@ -19,23 +19,21 @@ from numpy import array as np_array
 
 # relative modules
 from ..misc.functions import typecheck
-from ..misc.constants import c as n_c  # imported as cgs
-from ..misc.constants import kb as n_kb  # imported as cgs
-from ..misc.constants import h  # imported as cgs
+from ..misc import constants as n_c  # imported as cgs
 from ..misc import constants   # imported as cgs
 from ._unit import units
-from ..math import _convert as nkrpy__convert
+from .._math import _convert as nkrpy__convert
 from ._base import BaseUnit, BaseVals
 from .._types import UnitClass
 
 # global attributes
-__all__ = ('Unit',)
+__all__ = ['Unit',]
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
-cdef long c, kb
-c = n_c * 1E8  # A/s
-kb = n_kb * 1E-7  # SI
+cdef double c, kb
+c = n_c.c * 1E8  # A/s
+kb = n_c.kb * 1E-7  # SI
 
 
 def checknum(num):
@@ -381,7 +379,7 @@ class Unit(UnitClass):
 
     def __calc(self, v, baseunit: dict=None,
                finalunit: dict=None):
-        vals = deepcopy(v)
+        vals = BaseVals(v, inplace=False)
         if baseunit is None or finalunit is None:
             return vals
         ctype, ftype = baseunit['type'], finalunit['type']
@@ -408,17 +406,17 @@ class Unit(UnitClass):
         elif ((ctype == 'freq') and (ftype == 'wave') or
               (ctype == 'wave') and (ftype == 'freq')):
             vals *= baseunit['fac']
-            vals.reciprocal()
+            vals = 1 / vals
             vals *= c
         elif (ctype == 'energy') and (ftype == 'freq'):
-            vals *= baseunit['fac'] / h
+            vals *= baseunit['fac'] / n_c.h
         elif (ctype == 'freq') and (ftype == 'energy'):
-            vals *= baseunit['fac'] * h
+            vals *= baseunit['fac'] * n_c.h
         elif ((ctype == 'energy') and (ftype == 'wave') or
               (ctype == 'wave') and (ftype == 'energy')):
             vals *= baseunit['fac']
-            vals.reciprocal()
-            vals *= h * c
+            vals = 1 / vals
+            vals *= n_c.h * c
         vals /= finalunit['fac']
         return vals
 

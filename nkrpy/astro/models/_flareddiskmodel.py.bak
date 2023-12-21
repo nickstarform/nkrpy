@@ -1,0 +1,498 @@
+"""."""
+# flake8: noqa
+# cython modules
+cimport numpy as np
+
+# internal modules
+from copy import deepcopy
+
+# external modules
+import numpy as np
+from astropy.convolution import convolve, Gaussian2DKernel
+from scipy.signal import convolve as scipy__convolve
+
+# relative modules
+from ...misc import constants
+from ..._math._miscmath import width_convolution_kernel
+from .._wcs import WCS
+from ...misc import FrozenDict
+from ...io import fits
+
+# global attributes
+__all__ = ['FlaredDiskModel']
+__doc__ = """."""
+__filename__ = __file__.split('/')[-1].strip('.py')
+__path__ = __file__.strip('.py').strip(__filename__)
+
+
+
+class DiskModelException(Exception):
+
+    def __init__(self, message, errors):
+        super().__init__(message)
+        self.errors = errors
+    pass
+
+
+class DiskModel_Base(object):
+    def __init__(self, **kwargs):
+        self._kwargs = [FrozenDict(**kwargs)]
+        self.cube = None
+        self._basecube = None
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def __call__(self, **kwargs):
+        self.cube = None
+        self._basecube = None
+        self._kwargs.append(kwargs)
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        num_models = len(self._kwargs)
+        return f'<class DiskModel_Base {num_models}>'
+
+
+    def __add__(self, obj):
+        if _basecube is None:
+            self._basecube = self.cube ** 1
+        if isinstance(obj, DiskModel_Base):
+            self._kwargs.append(kwargs)
+            self.cube += obj.cube
+            return self
+        raise DiskModelException('Invalid Object addition. Comparison object isn\'t a <DiskModel_Base> object')
+
+    def __sub__(self, obj):
+        if _basecube is None:
+            self._basecube = self.cube ** 1
+        if isinstance(obj, DiskModel_Base):
+            self._kwargs.append(kwargs)
+            self.cube -= obj.cube
+            return self
+        raise DiskModelException('Invalid Object addition. Comparison object isn\'t a <DiskModel_Base> object')
+
+    def revert(self):
+        self._args = [self._args[0]]
+        self._kwargs = [self._kwargs[0]]
+        self.cube = deepcopy(self._basecube)
+    pass
+
+
+INTENSITY_LAWS = ['gaussian', 'powerlaw']
+VELOCITY_PROFILES = ['keplerian', 'infall']
+
+
+FlaredDiskModel_kwargs = dict(
+                 # some base params
+                 noise = None, # must be in flux density / beam
+                 fwhm_linewidth=None, # in km/s
+                 wcs=None, # can take a nkrpy.astro.WCS object instead of the image params
+                 # image params
+                 imsize = None, numchans=None, # cube params
+                 beam=[None, None, None], # beam params in arcsec jy/beam Noise, bma, bmi, bpa
+                 restfreq = None, # line params restfreq in hz, restfreq assumed at nchan center
+                 channelwidth=None, # in hz 
+                 cellsize=None, # in deg
+                 # system params
+                 mstar=1, peakint=None, vsys=None, # in msun, intensity/beam, km/s, 
+                 centerpix=[None, None], # source center
+                 centerwcs=[None, None], # center in deg coordinates
+                 distance_pc=None,
+                 # disk params all in deg
+                 inclination=None, # defined 0 is faceon in degrees
+                 position_angle=None, # defined east of north Blue in degrees
+                 r_inner=None, # Truncates the inner of the disk
+                 r_truncate=None, # hard truncates the disk
+                 rc_taper=None, # begins truncate at rc w/ exp decay
+                 radial_intensity_law='gaussian',
+                 radial_intensity_gaussian_fwhm=None, # eqn e^r^2/2sig^2
+                 radial_intensity_pwrlw_pwr=None,
+                 radial_intensity_pwrlw_rc=None, # eqn (r/rc) ** -pwr
+                 velocity_profile=[None], 
+                 # envelope param
+                 velocity_profile_rc=None, # eqn vr = sqrt(2G*mstar/r - (G*mstar*rc/r**2)) and vtheta = sqrt(2G*mstar*rc/r))
+                 envelope_r_truncate=None,
+                 envelope_sph_flux=None, # in intensity/beam
+)
+
+
+class FlaredDiskModel(DiskModel_Base):
+    # handle everything in pixels, every parameter must be declared
+    __fwhm2sig = 1 / (2 * np.sqrt(2 * np.log(2)))
+    __log2 = np.log(2)
+    __deg2rad = np.pi / 180.
+    __gmsun = constants.g * constants.msun
+    def __init__(self, *args, **kwargs):
+        superkwargs = {**FlaredDiskModel_kwargs, **kwargs}
+        if len(args) > 0:
+            masterkeys = list(FlaredDiskModel_kwargs.keys())
+            for i, v in enumerate(args):
+                superkwargs[masterkeys[i]] = v
+        super().__init__(**superkwargs)
+        self.reset_params()
+        self.refresh_params()
+        assert superkwargs['inclination'] != 90
+        assert superkwargs['radial_intensity_law'] in INTENSITY_LAWS
+        assert all([k in VELOCITY_PROFILES for k in superkwargs['velocity_profile']])
+
+    def __call__(self, resolve_wcs = False, **kwargs):
+        if kwargs:
+            super().__call__(**kwargs)
+            if resolve_wcs:
+                self.solveWCSparams(kwargs)
+            self.refresh_params()
+        if not hasattr(self, '_pa'):
+            self.refresh_params()
+        self.__make_cube()
+
+    def reset_params(self):
+        super().__init__(**self._kwargs[0])
+        self.solveWCSparams(self._kwargs[0])
+        self.__ones_image = np.ones((self.imsize, self.imsize), dtype=float)
+        self._theta = self.__ones_image - 1 # theta = 0 along the l.o.s.
+        self._intensity = self.__ones_image - 1
+        self._vtheta = self.__ones_image - 1
+        self._vr = self.__ones_image - 1
+        self._vproj = self.__ones_image - 1
+        self._noise_image = self.__ones_image - 1
+
+    def refresh_params(self):
+        self._pa = (-self.position_angle + 90) * self.__deg2rad
+        self._inc = self.inclination * self.__deg2rad
+        self._sinp = np.sin(self._pa)
+        self._cosp = np.cos(self._pa)
+        self._cosi = np.cos(self._inc)
+        self._sini = np.sin(self._inc)
+        self._cosi2 = self._cosi**2
+        self.deg2cm =  3600 * self.distance_pc * constants.au
+        self.pixel2cm =  self.cellsize * self.deg2cm
+        self.r_inner *= self.deg2cm
+        self.r_truncate *= self.deg2cm
+        self.rc_taper *= self.deg2cm
+        self.radial_intensity_pwrlw_rc *= self.deg2cm
+        self.velocity_profile_rc *= self.deg2cm
+        self.envelope_r_truncate *= self.deg2cm
+        self.radial_intensity_gaussian_fwhm *= self.deg2cm
+        self.radial_intensity_gaussian_sigma = self.radial_intensity_gaussian_fwhm * self.__fwhm2sig
+        self.sigma_linewidth = self.fwhm_linewidth * self.__fwhm2sig
+        if self.noise is not None:
+            self._noise_image = np.random.normal(loc=0, scale=self.noise * self.beam2pixel, size=self.__ones_image.shape)
+
+    def solveWCSparams(self, wcs=None):
+        if hasattr(self, 'wcs'):
+            wcs = self.wcs
+        else:
+            self.wcs = wcs
+        self.imsize = wcs.axis1['axis']
+        self._imsize_ar = np.arange(self.imsize)
+        self.numchans=wcs.axis3['axis'] # cube params
+        beam=wcs.get_beam() # beam params in arcsec jy/beam Noise, bma, bmi, bpa
+        restfreq = wcs.get_head('restfrq') # line params restfreq in hz, fwhm in km/s
+        self.channelwidth=wcs.axis3['delt'] # in hz
+        self.cellsize=abs(wcs.axis1['delt']) # in deg
+        self.centerpix[1] = wcs(self.centerwcs[1], 'pix', wcs.axis2['dtype'])
+        self.centerpix[0] = wcs(self.centerwcs[0], 'pix', wcs.axis1['dtype'], declination_degrees=self.centerwcs[1])
+        self.centerwcs[0] = wcs(self.imsize / 2, 'wcs', wcs.axis1['dtype'], declination_degrees=self.centerwcs[1])
+        self.centerwcs[1] = wcs(self.imsize / 2, 'wcs', wcs.axis2['dtype'])
+        if all([b is not None for b in beam]):
+            self.beam = beam
+        if restfreq is not None:
+            self.restfreq = restfreq
+        self.beam2pixel =  np.pi * self.beam[0] * self.beam[1] / (4 * self.__log2) / self.cellsize ** 2
+
+        self._velocities = (self.restfreq - self.wcs.array(return_type='wcs', axis=self.wcs.axis3['dtype'])) / self.restfreq * constants.c * 1e-5# in cm / s to km/s
+        pass
+
+    def makeWCS(self):
+        # write fits from base params
+        wcs = WCS({
+            'naxis1': self.imsize,
+            'cdelt1': -self.cellsize,
+            'crpix1': self.centerpix[0],
+            'crval1': self.centerwcs[0],
+            'cunit1': 'deg',
+            'ctype1': 'ra---sin',
+            'naxis2': self.imsize,
+            'cdelt2': self.cellsize,
+            'crpix2': self.centerpix[1],
+            'crval2': self.centerwcs[1],
+            'cunit2': 'deg',
+            'ctype2': 'dec--sin',
+            'naxis3': self.numchans,
+            'cdelt3': self.channelwidth,
+            'crpix3': self.numchans / 2,
+            'crval3': self.restfreq,
+            'cunit3': 'Hz',
+            'ctype3': 'freq',
+            'restfrq': self.restfreq,
+            'bma': self.beam[0],
+            'bmi': self.beam[1],
+            'bpa': self.beam[-1],
+        })
+        self.wcs = wcs
+        return wcs
+
+    def writeFits(self, filename):
+        if not filename.endswith('.fits'):
+            filename += '.fits'
+        if hasattr(self, 'convolved_cube'):
+            data = self.convolved_cube
+        elif hasattr(self, 'cube'):
+            data = self.cube
+        else:
+            data = self.__ones_image
+        header = self.wcs.create_fitsheader_from_axes()
+        fits.write(f=filename, data=data, header=header)
+        pass
+
+    def __solve_kernel(self, bma, bmi, bpa):
+        bma, bmi = map(lambda x: x * self.__fwhm2sig / self.cellsize, (bma, bmi))
+        smoothing_kernel = Gaussian2DKernel(x_stddev=bmi, y_stddev=bma, theta=bpa * self.__deg2rad).array[np.newaxis, ...]
+        self.__kernel = smoothing_kernel
+        pass
+
+    def __convolve(self, cube):
+        # beam params assumed to be pixels
+        #Creating a Gaussian smoothing kernel. 
+        # astropy
+        # convolved_cube = convolve(array = cube, kernel=self.__kernel)
+        convolved_cube = scipy__convolve(in1 = cube, in2=self.__kernel, mode='same', method='fft')
+        return convolved_cube
+
+    def convolve_beam(self, bma=None, bmi=None, bpa=None): # convolve beam into cube
+        # beam params assumed in deg
+        if bma is not None:
+            self.__solve_kernel(bma, bmi, bpa)
+        if not hasattr(self, '__kernel'):
+            self.__solve_kernel(*self.beam)
+
+        self.convolved_cube = self.__convolve(self.cube)
+        # kind of an adhoc treatment
+        if self.inclination > 80:
+            if bma is None:
+                bma, bmi, bpa = self.beam
+            a = -2
+            b = bma * self.__fwhm2sig
+            b_int = int(round(b, 0))
+            kernel3D = np.zeros((self.cube.shape[0], b_int, b_int), dtype=float)
+            for i in range(self.cube.shape[0]):
+                i_med = abs(i + 1 - self.cube.shape[0] / 2)
+                width = b + i_med * a
+                kernel3D[i, ...] = Gaussian2DKernel(x_stddev=width, y_stddev=width, theta=0, x_size=b_int, y_size=b_int)
+            self.__kernel = kernel3D
+            self.convolved_cube = self.__convolve(cube = self.convolved_cube)
+        return self.convolved_cube
+
+    def __make_cube(self):
+        # in pixels
+        ra_offset = -(self._imsize_ar - self.centerpix[0])
+        dec_offset = (self._imsize_ar - self.centerpix[1])
+        ra_grid, dec_grid = np.meshgrid(ra_offset, dec_offset)
+        x_grid = (-ra_grid * self._cosp - dec_grid * self._sinp) # disk major axis
+        y_grid = (-ra_grid * self._sinp + dec_grid * self._cosp) # disk minor axis
+        x_grid2 = x_grid ** 2
+        y_grid2 = y_grid ** 2
+
+        mask = y_grid != 0
+
+        # now pull from local def
+        theta = self._theta
+        vproj = self._vproj
+        vtheta = self._vtheta
+        vr = self._vr
+        intensity = self._intensity
+
+
+        theta[mask] = 2 * np.arctan((y_grid[mask] / self._cosi) \
+                                 / (x_grid[mask] \
+                                    + np.sqrt(x_grid2[mask] + (y_grid2[mask] / self._cosi2)))) # - np.pi / 2
+        r = np.sqrt(x_grid2 + (y_grid2 / self._cosi2)) #  in pixels
+        r *= self.pixel2cm # in cm
+        rin = self.r_inner 
+        rout = self.r_truncate
+        valid_radii =(r >= rin) * (r <= rout) * mask
+        if self.radial_intensity_law == 'gaussian':
+            """Gaussian Intensity
+            
+            Fr = f0 * e ^ -(r - r_inner) / 2s ** 2 | cutoff at r_outer
+            """
+            intensity[valid_radii] = np.exp(-r[valid_radii] ** 2 /(2 * self.radial_intensity_gaussian_sigma ** 2))
+        elif self.radial_intensity_law == 'powerlaw':
+            """Powerlaw Intensity
+
+            Fr = F0 * (r - r_inner) ^ i | cutoff at r_outer
+            """
+            intensity[valid_radii] = r[valid_radii] ** self.radial_intensity_pwrlw_pwr
+        elif self.radial_intensity_law == 'ring':
+            """Constant Flux Density Ring
+
+            Fr = f0 between disk_radii_inner and disk_radii_outer
+            """
+            intensity[valid_radii] = 1
+        if self.rc_taper < self.r_truncate:
+            """Taper disk
+
+            Fr = f0 between disk_radii_inner and disk_radii_outer
+            """
+            taper_radii = (r >= self.rc_taper) * (r <= self.r_truncate)
+            intensity[taper_radii] = 0.5  - np.arctan(r[taper_radii] - self.rc_taper) / np.pi
+        intensity *= self.peakint / intensity.max()
+        if self.envelope_r_truncate > 0:
+            """Spherical envelope
+
+            Fr = f0 between disk_radii_inner and disk_radii_outer
+            """
+            env_radii = (r > self.velocity_profile_rc) * (r < self.envelope_r_truncate)
+            intensity[env_radii] = self.envelope_sph_flux
+        rc = self.velocity_profile_rc
+
+        # envelope portion of velocity
+        gmmstar = self.__gmsun * self.mstar
+        gmmstar_rc = self.__gmsun * self.mstar * rc
+        mask = r >= rc
+        if mask.sum() > 0:
+            gmm_r = gmmstar  / r[mask]
+            gmmrc_r2 = gmmstar_rc / (r[mask] ** 2)
+            if 'infall' in self.velocity_profile:
+                vr[mask] = np.sqrt(2 * gmm_r - gmmrc_r2)
+            if 'keplerian' in self.velocity_profile:
+                vtheta[mask] = np.sqrt(gmm_r)
+        # now disk portion
+        mask = (r < rc) * (r != 0)
+        if mask.sum() > 0:
+            gmm_r = gmmstar / r[mask]
+            gmmrc_r2 = gmmstar_rc / (r[mask] ** 2)
+            if 'infall' in self.velocity_profile:
+                vr[mask] = np.sqrt(2 *  gmm_r - gmmrc_r2) # in cm/s
+            if 'keplerian' in self.velocity_profile:
+                vtheta[mask] = np.sqrt(gmm_r) # assume Keplerian rotation within rc
+        # make projections
+        mask = r != 0
+        #                                RADIAL                         TANGENTIAL
+        vproj[mask] = (np.cos(theta[mask]) * vtheta[mask] + np.sin(theta[mask]) * vr[mask]) * self._sini * 1e-5 # in cm / s to km/s
+        
+        # now create cube VELOCITY, RA, DEC
+        self.cube = intensity[np.newaxis,...] * np.exp(-(self._velocities[..., np.newaxis, np.newaxis]- vproj + self.vsys)**2 / (2 * self.sigma_linewidth ** 2))
+        if self.noise is not None and self.noise > 0:
+            intensity += self._noise_image 
+            self.cube += self._noise_image[np.newaxis, ...]
+        self.intensityimage = intensity
+        pass
+
+
+def test():
+    import time
+    import cProfile
+    global starttime
+    starttime = time.time()
+    def profiletime():
+        global starttime
+        print(time.time() - starttime)
+        starttime = time.time()
+    p = cProfile.Profile()
+    wcs = WCS({
+        'naxis1': 1024,
+        'cdelt1': -1e-2/3600,
+        'crpix1': 500,
+        'crval1': 50,
+        'cunit1': 'deg',
+        'ctype1': 'ra---sin',
+        'naxis2': 1024,
+        'cdelt2': 1e-2/3600,
+        'crpix2': 500,
+        'crval2': 50,
+        'cunit2': 'deg',
+        'ctype2': 'dec--sin',
+        'naxis3': 65,
+        'cdelt3': -50.57e3,
+        'crpix3': 33,
+        'crval3': 100e9 - 4.5 * 1e3 * 1e2 / constants.c * 100e9,
+        'cunit3': 'Hz',
+        'ctype3': 'freq',
+        'restfrq': 100e9,
+        'bmaj': 7e-2/3600,
+        'bmin': 2.5e-2/3600,
+        'bpa': 40,
+        'specsys': 'lsrk',
+        'velref': 257,
+        'velo-lsr': 4.5,
+        'bunit': 'Jy/beam',
+        'btype': 'intensity',
+        'radesys': 'icrs',
+    })
+    fdm = FlaredDiskModel(
+        wcs=wcs,
+        noise = 25e-4, # must be in flux density / beam
+        fwhm_linewidth=0.1, # in km/s
+        # system params
+        mstar=1, peakint=1, vsys=4.5, # in msun, intensity/beam, km/s, 
+        centerwcs=[50, 50], # center in deg coordinates
+        distance_pc=400,
+        # disk params all in deg
+        inclination=45, # defined 0 is faceon in degrees
+        position_angle=45, # defined east of north Blue in degrees
+        r_inner=0, # Truncates the inner of the disk
+        r_truncate=6/3600, # hard truncates the disk
+        rc_taper=10 / 3600, # begins truncate at rc w/ exp decay
+        radial_intensity_law='gaussian',
+        radial_intensity_gaussian_fwhm=5 / 3600, # eqn e^r^2/2sig^2
+        radial_intensity_pwrlw_pwr=0,
+        radial_intensity_pwrlw_rc=np.inf, # eqn (r/rc) ** -pwr
+        velocity_profile=['keplerian'], 
+        # envelope param
+        velocity_profile_rc=20/3600, # eqn vr = sqrt(2G*mstar/r - (G*mstar*rc/r**2)) and vtheta = sqrt(2G*mstar*rc/r))
+        envelope_r_truncate=0,
+        envelope_sph_flux=10e-6, # in intensity/beam
+    )
+    import pprofile
+    prof = pprofile.Profile()
+    profiletime()
+    #p.enable()
+    fdm()
+    #p.disable()
+    profiletime()
+    print('Finished Setup')
+    #p.dump_stats('/tmp/fdm.prof')
+    fdm.writeFits(filename='/tmp/fdm.fits')
+    fits.write(f='/tmp/fdm-intensity.fits', data=fdm.intensityimage, header=fdm.wcs.create_fitsheader_from_axes())
+    #p.enable()
+    with prof():
+        fdm.convolve_beam()
+    prof.print_stats()
+    #p.disable()
+    profiletime()
+    print('Finished convolved.')
+    #p.dump_stats('/tmp/fdm_convolve.prof')
+    fdm.writeFits(filename='/tmp/fdm_convolve.fits')
+    import matplotlib.pyplot as plt
+    rf = wcs.get_head('restfreq')
+    channelvsys = int(round(wcs(rf - fdm.vsys * 1e3*1e2 / constants.c * rf, return_type='pix', axis=wcs.axis3['dtype']), 0))
+    fig, ax = plt.subplots()
+    moment0 = np.nansum(fdm.cube, axis=0)
+    ax.imshow(moment0, origin='lower', cmap='magma')
+    fig.savefig('/tmp/fdm-m0.pdf', dpi=150)
+    ax.cla()
+    ax.imshow(np.nansum(fdm.cube[:channelvsys, ...], axis=0),origin='lower', cmap='magma')
+    fig.savefig('/tmp/fdm-bm0.pdf', dpi=150)
+    ax.cla()
+    ax.imshow(np.nansum(fdm.cube[channelvsys:, ...], axis=0),origin='lower', cmap='magma')
+    fig.savefig('/tmp/fdm-rm0.pdf', dpi=150)
+    ax.cla()
+    moment0 = np.nansum(fdm.convolved_cube, axis=0)
+    ax.imshow(moment0, origin='lower', cmap='magma')
+    fig.savefig('/tmp/fdm_convolve-m0.pdf', dpi=150)
+    ax.cla()
+    ax.imshow(np.nansum(fdm.convolved_cube[:channelvsys, ...], axis=0),origin='lower', cmap='magma')
+    fig.savefig('/tmp/fdm_convolve-bm0.pdf', dpi=150)
+    ax.cla()
+    ax.imshow(np.nansum(fdm.convolved_cube[channelvsys:, ...], axis=0),origin='lower', cmap='magma')
+    fig.savefig('/tmp/fdm_convolve-rm0.pdf', dpi=150)
+    ax.cla()
+
+if __name__ == '__main__':
+    test()
+

@@ -6,31 +6,66 @@
 import numpy as np
 
 # relative modules
+from ..._types import LinesClass
 from ... import Unit
-from nkrpy.astro._atomiclines import linelist as base_lines
+from . import linelist as base_lines
 from ...misc.frozendict import FrozenDict as frozendict
-from nkrpy.math.miscmath import tolerance_split
+from ..._math._miscmath import rolling_average_value
 
-__doc__ = """
-Houses all useful atomic lines and short program for parsing.
-
-The overview of how this module operates on the backend,
- * User defines a band (NIR, etc), a unit (meters, Hz, etc),
-    and possibly limits.
- * The program will try to resolve the band to the known bands
-    and the unit to the known units.
- * Then it will populate a preliminary configuration dict
- * Then this dict is fed into the nkrpy.unit resolver and
-    this is saved to a new dict
- * If regions were specified, then they are regenerated.
-"""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
-__all__ = ('Lines',)
+__all__ = ['Lines',]
 
 
-class Lines(object):
-    """."""
+class Lines(LinesClass):
+    """ Define and extract common atomic Lines
+
+    Houses all useful atomic lines and short program for parsing.
+
+    The overview of how this module operates on the backend,
+     * User defines a band (NIR, etc), a unit (meters, Hz, etc),
+        and possibly limits.
+     * The program will try to resolve the band to the known bands
+        and the unit to the known units.
+     * Then it will populate a preliminary configuration dict
+     * Then this dict is fed into the nkrpy.unit resolver and
+        this is saved to a new dict
+     * If regions were specified, then they are regenerated.
+
+    Parameters
+    ----------
+    band: str
+        common band to extract. Default 'nir'
+    unit: str
+        common unit to convert lines to
+    xlower: float
+        The lower limit to extract in units specified as unit
+    xupper: float
+        The upper limit to extract units specified as unit
+    aperture: float
+        The spacing to greedily consume lines by
+    remove_lines: list
+        This is very particular. But removes these lines from the output line list. Names must match exactly
+    allowed_lines: list
+        Similary this allows lines. This overrides remove lines if specified. Names must match exactly.
+
+    Methods
+    -------
+    add_lines
+    aperture
+    is_line
+    refresh
+    remove_lines
+    remove_region
+    reset
+    resolve_band
+    return_config
+    return_labels
+    return_lines
+    return_types
+    iterate_base_atomiclines
+
+    """
     __types = base_lines.keys()
     __base_atomiclines = frozendict(**base_lines)
 
@@ -43,15 +78,12 @@ class Lines(object):
                                           'allowed_lines': set()})
         return super(Lines, cls).__new__(cls)
 
-    def __init__(self, band: str = 'nir', unit: str = 'meters',
+    def setup(self, band: str = 'nir', unit: str = 'meters',
                  xlower: float = -1, xupper: float = -1,
                  aperture: float = None, remove_lines: list = None,
                  allowed_lines: list = None):
-        """Initilization Magic Method."""
-        self.__config = dict(self.__base_config)
-        self.__lines = {}
+        self.__reset()
         self.__config['band'] = self.resolve_band(band)
-        self.__base_atomiclines = frozendict(**self.__base_atomiclines[self.__config['band']])  # noqa
         self.__config['unit'] = Unit.resolve_unit(unit)['name']
         if remove_lines is None:
             remove_lines = []
@@ -69,9 +101,16 @@ class Lines(object):
         self.__populate_lines()
         self.__refresh()
 
+
+    def __init__(self, *args, **kwargs):
+        """Initilization Magic Method."""
+        self.setup(*args, **kwargs)
+
     def __reset(self):
         """Reset the class attributes."""
+        self.__lines = {}
         self.__config = dict(self.__base_config)
+        self.__base_atomiclines = frozendict(**self.__base_atomiclines[self.__config['band']])  # noqa
         self.__populate_lines()
 
     def __populate_lines(self):
@@ -94,14 +133,31 @@ class Lines(object):
         if ap is None or ap <= 0:
             self.__populate_lines()
             return
-        __ap = []
-        if not line_agnostic:
-            for key in self.__lines:
+        if line_agnostic:
+            _ap = []
+            keylist = {}
+            for i, key in enumerate(self.__lines.keys()):
+                if key not in keylist:
+                    keylist[key] = i
                 vals = self.__lines[key]['vals']
                 self.__lines[key]['vals'] = []
-                for group in tolerance_split(vals, ap, True):
-                    self.__lines[key]['vals'].append(np.median(group))
-            return
+                _ap.extend(list(zip(np.array(vals), len(vals) * [i])))
+
+            _ap = (rolling_average_value(np.array(_ap), ap)).tolist()
+
+            for i, row in enumerate(_ap):
+                row = [[abs(row[-1] - val), key] for key, val in keylist.items()]
+                row.sort(key=lambda x: x[0])
+                row = row[0]
+                key = row[-1]
+                self.__lines[key]['vals'].append(row[0])
+        else:
+            for i, key in enumerate(self.__lines.keys()):
+                vals = self.__lines[key]['vals']
+                _ap = (rolling_average_value(np.array(vals), ap)).tolist()
+                if isinstance(_ap, float) or isinstance(_ap, int):
+                    _ap = [_ap]
+                self.__lines[key]['vals'] = _ap
 
     def __generate_regions(self):
         """Resolve regions.
@@ -115,29 +171,12 @@ class Lines(object):
 
         """
         xlower, xupper = self.__config['xlower'], self.__config['xupper']
-        if (xlower == -1) and (xupper == -1):
-            return
-        if xupper == -1:
-            xupper = np.inf
-        keys = list(self.__lines.keys())
-        _tmp = np.array([[i, line] for i, ln in enumerate(keys)
-                         for line in self.__lines[ln]['vals']]).reshape(-1, 2)  # noqa
-        ind = ~(_tmp[:, 1] >= xlower)
-        ind += ~(_tmp[:, 1] <= xupper)
-        ind = ~ind
-        for key in range(len(keys)):
-            key_idx = _tmp[ind, 0] == key
-            ln = keys[key]
-            if (key_idx.shape[0] == 0) or\
-               (_tmp[ind, 1][key_idx].shape[0] == 0):
-                del self.__lines[ln]
-                continue
-            self.__lines[ln]['vals'] = _tmp[ind, 1][key_idx]
+        self.remove_region(xlower=xlower, xupper=xupper)
 
     def __refresh(self):
         """Refresh all computations."""
         self.remove_lines([])
-        self.__compute_aperture()
+        self.__compute_aperture(line_agnostic = False)
         self.__generate_regions()
 
     @classmethod
@@ -162,29 +201,16 @@ class Lines(object):
         """Return lines within the region."""
         return frozendict(**self.__config)
 
-    def return_labels(self, mindistance: float = 0.005):
+    def return_labels(self):
         """Return all labels.
 
         mindistance: float
             The minimum distance between labels in units of the labels
         """
         labels = {}
-        ap = mindistance
-        if ap is None or ap < 0.:
-            return
         keys = list(self.__lines.keys())
-        _tmp = np.array([[i, line] for i, ln in enumerate(keys)
-                         for line in self.__lines[ln]['vals']]).reshape(-1, 2)  # noqa
-        for key in range(len(keys)):
-            key_idx = _tmp[:, 0] == key
-            if key_idx.shape[0] < 0:
-                continue
-            ln = keys[key]
-            df = np.abs(np.diff(np.hstack([_tmp[key_idx, 1], [np.inf]])))
-            indices = np.arange(df.shape[0])
-            idx = indices[(df > ap)] + 1
-            split = np.split(indices, idx)
-            labels[ln] = np.array([np.median(_tmp[key_idx, :][s, 1]) for s in split if _tmp[key_idx, :][s, 1].shape[0] > 0]).tolist()  # noqa
+        for k, v in self.__lines.items():
+            labels[k] = v['vals']
         return labels
 
     def reset(self):
@@ -311,27 +337,8 @@ class Lines(object):
             A list with 2 parameters of floats.
 
         """
-        keys = list(self.__lines.keys())
-        _tmp = np.array([[i, line] for i, ln in enumerate(keys)
-                        for line in self.__lines[ln]['vals']]).reshape(-1, 2)  # noqa
-        ind = np.zeros(_tmp.shape[0], dtype=bool)  # noqa
         for x in limits:
-            xlower, xupper = x
-            if (xlower == -1) and (xupper == -1):
-                return self
-            if xupper == -1:
-                xupper = np.inf
-            _ind = ~(_tmp[:, 1] >= xlower)
-            _ind += ~(_tmp[:, 1] <= xupper)
-            ind += _ind
-        for key in range(len(keys)):
-            key_idx = _tmp[ind, 0] == key
-            ln = keys[key]
-            if (key_idx.shape[0] == 0) or (_tmp[ind, 1][key_idx].shape[0] == 0):  # noqa
-                del self.__lines[ln]
-                continue
-            self.__lines[ln]['vals'] = _tmp[ind, 1][key_idx]
-        return self
+            self.remove_region(*x)
 
     def remove_region(self, xlower: float, xupper: float):
         """Remove a region.
@@ -344,8 +351,32 @@ class Lines(object):
             The upper bound to revoke linelists
 
         """
-        self.remove_regions([[xlower, xupper], ])
-        return self
+        xlower, xupper = (xlower, xupper) if xlower < xupper else (xupper, xlower)
+        if (xlower == -1 or xlower is None) and (xupper == -1 or xupper is None):
+            return
+        if xupper == -1 or xupper is None:
+            xupper = np.inf
+        if xlower == -1 or xlower is None:
+            xlower = -np.inf
+
+        keys = [k for k in self.__lines.keys()]
+        allvals = [[key_i, v] for key_i, key_name in enumerate(keys) for v in self.__lines[key_name]['vals']]
+        allvals = np.array(allvals, dtype=float)
+        mask = allvals[:, 1] > xlower
+        mask *= allvals[:, 1] < xupper
+        allvals = allvals[mask, :].tolist()
+        ret = {}
+        for i in range(len(allvals)):
+            keyname = keys[int(allvals[i][0])]
+            if keyname in ret:
+                ret[keyname].append(allvals[i][-1])
+            else:
+                ret[keyname] = [allvals[i][-1]]
+        for kn in keys:
+            if kn in ret:
+                self.__lines[kn]['vals'] = ret[kn]
+            else:
+                del self.__lines[kn]
 
 
 def test():
@@ -437,6 +468,7 @@ def test():
     if len(lines['K I']) >= len(baselines['K I']):
         raise Exception('Aperture not reducing properly')
 
+__doc__ = Lines.__doc__
 
 if __name__ == '__main__':
     test()

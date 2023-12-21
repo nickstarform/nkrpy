@@ -1,10 +1,13 @@
 from .logger import *  # noqa
 
-__doc__ = Logger.__doc__  # noqa
+__doc__ = Log.__doc__  # noqa
 
-__all__ = ['Logger']
+# alias
+Logger = Log
 
-PACKAGES = [a for a in dir(Logger) if not a.startswith('__')]
+__all__ = ['Log', 'Logger']
+
+PACKAGES = [a for a in dir(Log) if not a.startswith('__')]
 PACKAGES.sort()
 
 # end of code

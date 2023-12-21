@@ -1,5 +1,7 @@
 """Hold units for Unit class."""
-from ..misc.constants import ev, pi
+ev   =  1.60217733e-12    # Electron volt CGS
+pi   = 3.1415926535897932384626433832795028841
+
 
 __all__ = ('units',)
 

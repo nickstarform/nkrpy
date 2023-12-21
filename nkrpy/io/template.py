@@ -7,7 +7,8 @@
 # relative modules
 from ._config import load_cfg
 from ..misc.functions import strip
-from ..misc.colours import FAIL, RESET
+from ..misc import Format
+FAIL, RESET = Format('FAIL'), Format('RESET')
 
 # global attributes
 __all__ = ['template']

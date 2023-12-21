@@ -1,0 +1,69 @@
+#!/bin/bash
+# Normal Colors
+inf=0
+speed=60
+while getopts ":fqh" opt; do
+    case $opt in
+        f)
+          inf=1
+          ;;
+        q)
+          speed=10
+          ;;
+        h)
+          echo "Check jobs in slurm nicely. If you want to call infinite runs use -f" >&2
+	  exit 1
+          ;;
+        \?)
+          echo "Invalid option: -$OPTARG"
+          exit 1
+          ;;
+    esac
+done
+
+Black='\e[0;30m'        # Green
+Green='\e[0;32m'        # Green
+Yellow='\e[0;33m'       # Yellow
+NC="\e[m"               # Color Reset
+ALERT=${BWhite}${On_Red} # Bold White on red background
+
+uname=`whoami`
+
+# run infinite
+while : ; do
+    qnum=$(squeue --start -u ${uname} | sed '1d' | wc | awk '{print $1}')
+    cjob="$(( `squeue -u $uname | sed '1d' | wc | awk '{print $1}'` - $qnum ))"
+    cjtm=$(squeue -u ${uname} --states RUNNING| sed '1d' |head -n1 |awk '{print $6}')
+    fjtm=$(squeue -u ${uname} -l --states RUNNING| sed '1,2d' |head -n1 |awk '{print $7}')
+    ctime=$(date +%s)
+    if [[ $queue == "N/A" ]]; then queue="";fi
+    if [[ $queue != "" ]] ; then qtime=`date -d"${queue}" +%s`; else qtime=$ctime ;fi
+    timedif="$(( $qtime - $ctime))"
+    convertsecs() {
+     ((h=${1}/3600))
+     ((m=(${1}%3600)/60))
+     ((s=${1}%60))
+     printf "%02d:%02d:%02d\n" $h $m $s
+    }
+    timenow="`date '+%a %d %b %Y %H:%M:%S'` (`date --utc '+%H:%M:%S'`)"
+    if [[ ${cjob} >0 ]] ; then
+        echo -e "${Black}[${timenow}]${Green}Current jobs: ${cjob}, runtime: ${cjtm} of ${fjtm}${NC}"
+    else
+        echo -e "${Black}[${timenow}]${Yellow}No jobs running ${NC}"
+    fi
+    if [[ ${qnum} == 0 ]] ; then
+        echo -e "${Black}[${timenow}]${Yellow}No jobs queued${NC}"
+    elif [[ $queue != "" ]] ; then
+        echo -e "${Black}[${timenow}]${Green}#Jobs: ${qnum}, Starting $(convertsecs ${timedif}) from now.${NC}"
+    else
+        echo -e "${Black}[${timenow}]${Green}#Jobs: ${qnum}, Start time not set.${NC}"
+    fi
+    # break if not infinite
+    if [ "$inf" -eq "0" ]; then
+        exit 0;
+    fi
+    echo '#####################################################'
+    sleep $speed
+done
+
+# end of script

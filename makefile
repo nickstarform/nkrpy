@@ -16,7 +16,7 @@ doc:
 	@sh ./bin/docgen.sh
 
 clean:
-	-@for f in $$(find ./nkrpy/ -type f -name "*.pyx"); do path=$$(dirname "$${f}"); fname=$$(basename "$${f}"); echo "$${path}/$${fname}"; fname="$${fname::-4}"; for i in "c" "h" "*so"; do f=$$(find "$${path}" -type f -name "$${fname}.$${i}"); if $$(test -e "$${f}"); rm -f "$${f}"; fi; done; done
+	-@for f in $$(find ./nkrpy/ -type f -name "*.pyx"); do path=$$(dirname "$${f}"); fname=$$(basename "$${f}"); fname="$${fname::-4}"; for i in "c" "h" "*so"; do f=$$(find "$${path}" -type f -name "$${fname}.$${i}"); if $$(test -e "$${f}"); then rm -f "$${f}"; fi; done; done
 
 clear_pycache:
 	-@find . -name "__pycache__" -type d -print0 | xargs -0 rm -rf

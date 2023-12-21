@@ -4,6 +4,7 @@ from setuptools import setup, find_packages, Extension
 import os
 import importlib
 import inspect
+import glob
 
 # external modules
 from Cython.Build import cythonize
@@ -14,7 +15,7 @@ __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 sep = os.sep
 
-supported = {'pyd': 0, 'pyx': 1,
+supported = {'pyx': 1,
              'f90': 2,
              'c': 3, 'i': 4}  # supported extensions
 supported_inverse = dict((v, k) for k, v in supported.items())
@@ -82,10 +83,12 @@ def load_ext(extname: str, files: list, fext: str) -> tuple:
         The python module name if header interfaces are defined
     """
     pym = None
+    print(extname, files)
     if fext == 'pyx':
         ext = cythonize(Extension(extname, files,
                                   include_dirs=[numpy.get_include()],
-                                  libraries=[], library_dirs=[]),
+                                  libraries=[], library_dirs=[],
+				 ),
                         language_level='3')[0]
     elif fext == 'f90':
         ext = Extension(extname, files, include_dirs=[],
@@ -130,6 +133,12 @@ def resolve(files: list) -> list:
         _s.update([f[0]])
     return ret
 
+
+# need to delete all __pycache__
+for root, dirs, files in os.walk('./'):
+    for d in dirs:
+        if d == '__pycache__':
+            os.system(f'rm -rf {os.path.join(root, d)}')
 
 extensions = []  # hold all exts
 py_modules = []  # hold any aggregates from SWIGs
@@ -181,7 +190,10 @@ with open(os.path.join(os.path.dirname(__file__),
 
 # define package data
 package_data = {
-    '': ['LICENSE', 'README.md', 'requirements.txt', '.version']
+    'META': ['LICENSE', 'README.md', 'requirements.txt', '.version'],
+    'DATA': glob.glob('nkrpy/*.tbl') + glob.glob('nkrpy/*.dat'),
+    'TESTS': ['tests'],
+    'EXAMPLES': ['examples'],
 }
 
 # the general settings handler
@@ -192,12 +204,11 @@ settings = {
     'long_description_content_type': "text/md",
     'version': version,
     'url': 'http://github.com/nickalaskreynolds/nkrpy',
-    'author': 'Nickalas Reynolds',
+    'author': 'Nickalas Reynolds Tran',
     'author_email': 'email@nickreynolds.xyz',
     'license': 'MPL2.0',
     'packages': find_packages(exclude=['tests', 'docs', 'examples']),
     'scripts': scripts,
-    'zip_safe': True,
     'include_package_data': True,
     'package_data': package_data,
     'ext_modules': extensions,
@@ -217,12 +228,25 @@ settings = {
     "zip_safe": True,
 }
 
+
+def print_settings(s):
+    print(64*'#')
+    print(' Setup Settings '.upper().center(64, '#'))
+    print(64*'#')
+    for k,v in s.items():
+        print(str(k).center(64, '-'))
+        print(str(v).center(64, ' '))
+    print(64*'#')
+    print(' END '.upper().center(64, '^'))
+    print(64*'#')
+
 if __name__ == '__main__':
     # now pass into the main functions
     populate_info(settings)
 
     # actually build
     setup(**settings)
+    print_settings(settings)
 
 # end of code
 

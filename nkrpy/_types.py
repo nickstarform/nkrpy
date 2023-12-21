@@ -14,9 +14,24 @@ for typing.
 # relative modules
 
 # global attributes
-__all__ = ['WCSClass', 'UnitClass', 'FileClass', 'LoggerClass', 'PlotClass']
+__all__ = ['WCSClass', 'UnitClass', 'FileClass', 'LoggerClass', 'PlotClass', 'LinesClass', 'ColourClass', 'FormatClass']
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
+
+
+class FormatClass(object):
+    """Colour class for nkrpy.misc.Colours"""
+    pass
+
+
+class ColourClass(object):
+    """Colour class for nkrpy.misc.Colours"""
+    pass
+
+
+class LinesClass(object):
+    """Line class for nkrpy.astro._atomiclines.lines.Lines."""
+    pass
 
 
 class PlotClass(object):

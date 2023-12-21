@@ -7,7 +7,7 @@ from ._plots import *
 
 __all__ = ['cmaps'] +\
           _format.__all__ +\
-          _plots.__all__ +\
+          _plots.__all__
 
 
 PACKAGES = __all__.copy()

@@ -16,8 +16,8 @@ from functools import wraps
 from .errors import ArgumentError
 
 # global attributes
-__all__ = ('deprecated', 'call_counter', 'timeit', 'checker',
-           'ignore_deprecation_warnings', 'alias', 'aliasClass', 'argCase')
+__all__ = ['deprecated', 'call_counter', 'timeit', 'checker',
+           'ignore_deprecation_warnings', 'alias', 'aliasClass', 'argCase']
 __doc__ = """Generalized decorators for common usage."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)

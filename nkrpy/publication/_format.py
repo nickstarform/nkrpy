@@ -10,14 +10,34 @@ import numpy as np
 from ..misc.functions import typecheck
 
 # global attributes
-__all__ = ('scientific_format', 'decimal_format', 'general_format',
-           'fortran_format', 'wrapper', 'ppi')
+__all__ = ['scientific_format', 'decimal_format', 'general_format',
+           'fortran_format', 'wrapper', 'ppi', 'formatlatex']
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 
 ppi = 72
+
+
+
+def formatlatex(value,up, lo, precision=None):
+    highest_prec = f'{min([up, lo]):0.1e}' # this will be some #.####e##
+    num_dec = int(highest_prec.split('e')[-1])
+    if precision is not None:
+        if num_dec > -precision:
+            up += 10 ** (-precision)
+            highest_prec = f'{min([up, lo]):0.1e}' # this will be some #.####e##
+            num_dec = int(highest_prec.split('e')[-1])
+    if num_dec <= 0:
+        # some small number
+        splits = [ ('{' + f':1.{abs(num_dec) + 1}' + 'f}').format(i) for i in [value, up, lo]]
+    elif num_dec > 0:
+        fac = 10 ** (num_dec)
+        splits = [f'{round(i / fac, 1) * fac:n}'  for i in [value, up, lo]]
+    return splits
+
+
 
 def __resolve_format(name: str):
     funcs = globals()

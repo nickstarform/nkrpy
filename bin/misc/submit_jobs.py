@@ -3,89 +3,70 @@
 import subprocess
 import argparse
 import os
-
+import sys
+import importlib.util as ilu
+from pathlib import Path
 # Parse arguments.
-
 parser = argparse.ArgumentParser()
-parser.add_argument('-n', '--test', action='store_true')
+parser.add_argument('-t', '--test', action='store_true', help='Only print the files to run.')
+parser.add_argument('-b', '--benchmark', action='store_true', help='Only return `test` versions of the runfiles')
 args = parser.parse_args()
 
-# Objects to submit jobs for.
+# Get the name of the computer.
+username = os.getlogin() if args.username == '' else args.username
+computername = os.uname() if args.computername == '' else args.computername
 
-disk_masses = {"sources":['CRBR12','GSS30-IRS3','LFAM26','WL17'], \
-        "jobscript":"queue_{0:s}_fit_schooner"}
 
-hops_transition_disks = {"sources":['HH270MMS2','HOPS-65','HOPS-124', \
-        'HOPS-140','HOPS-157','HOPS-163'], \
-        "jobscript":"queue_{0:s}_fit_schooner"}
 
-bhr7 = {"sources":['BHR7'], "jobscript":"queue_{0:s}_cont_schooner"}
+###############################################################
+os.chdir('/home/'+username)
 
-L1527 = {"sources":['L1527'], "jobscript":"queue_{0:s}_diana_schooner"}
-
-hops370 = {"sources":['HOPS-370'], "jobscript":"queue_{0:s}_cont_schooner"}
-
-# Get the total projects dictionary.
-
-projects = {"DiskMasses":disk_masses, \
-        "HOPSTransitionDisks":hops_transition_disks, \
-        "HOPS-370":hops370, \
-        "L1527":L1527, \
-        "BHR7":bhr7, \
-        }
+def run(cmd, test=False):
+    if args.test or test:
+        print(cmd)
+        return
+    os.system(cmd)
 
 # Loop through and determine if a job is running.
-
-for project in projects:
-    # Change directories to the project.
-
-    os.chdir("{0:s}/Analysis".format(project))
-
-    # Now get the dictionary for that project.
-
-    project = projects[project]
-
+for projectname,project in projects.items():
     # Loop through each of the sources in a project.
-
-    for source in project["sources"]:
+    for source, models in project.items():
         # Check what processes are in the queue for this source.
+        for modelname in models:
+            modelpath = '/'.join(['/home', username, projectname, source, modelname]) + '/'
+            modelname = ('-'.join([projectname, source, modelname])).lower()
+            result = subprocess.Popen(['squeue','-u',username,'-o',\
+                    '"%.10i %.9P %.16j %.2t %.10M %.5D %R"'], \
+                    stdout=subprocess.PIPE)
+            jobscript = modelpath+"queue_XXXX_"+computer
+            if args.benchmark:
+                run(f'sbatch {jobscript.replace("XXXX", "test")}', test=True)
+                continue
+            try:
+                output = subprocess.check_output(('grep','({0:s}-(new)?(resume)?)'.format(modelname)), \
+                        stdin=result.stdout).split(b'\n')
+            except subprocess.CalledProcessError:
+                # If none were found, submit a job.
+                # check if job was run before
+                if os.path.exists(modelpath + 'results.hdf5'):
+                    run(f'sbatch {jobscript.replace("XXXX", "resume")}')
+                    continue
+                run(f'sbatch {jobscript.replace("XXXX", "new")}')
+                continue
 
-        result = subprocess.Popen(['squeue','-u','psheehan','-o',\
-                '"%.10i %.9P %.15j %.2t %.10M %.6D %R"'], \
-                stdout=subprocess.PIPE)
-        try:
-            output = subprocess.check_output(('grep','{0:s}'.format(source)), \
-                    stdin=result.stdout).split(b'\n')
-        except subprocess.CalledProcessError:
-            # If none were found, submit a job.
+            # If multiple jobs were found, pass.
 
-            print('sbatch {0:s}'.format(project["jobscript"]).format(source))
-            if not args.test:
-                os.system('sbatch {0:s}'.format(project["jobscript"]).\
-                        format(source))
-            continue
+            if len(output) > 2:
+                continue
 
-        # If multiple jobs were found, pass.
+            # If a job has run for less than 24 hours, pass.
 
-        if len(output) > 2:
-            continue
+            if len(output[0].split()[5].decode("utf-8").split("-")) < 2:
+                continue
 
-        # If a job has run for less than 24 hours, pass.
+            # Otherwise, submit a new process that is dependent on the old one
+            # finishing.
 
-        if len(output[0].split()[5].decode("utf-8").split("-")) < 2:
-            continue
+            jobnumber = output[0].split()[1].decode("utf-8")
 
-        # Otherwise, submit a new process that is dependent on the old one
-        # finishing.
-
-        jobnumber = output[0].split()[1].decode("utf-8")
-
-        print('sbatch --dependency=afterany:{1:s} {0:s}'.\
-                format(project["jobscript"], jobnumber).format(source))
-        if not args.test:
-            os.system('sbatch --dependency=afterany:{1:s} {0:s}'.\
-                    format(project["jobscript"], jobnumber).format(source))
-
-    # Return to the Projects directory.
-
-    os.chdir("../..")
+            run(f'sbatch --dependency=afterany:{jobscript.replace("XXXX", "resume")} {jobnumber}')

@@ -10,28 +10,42 @@ from matplotlib.patches import FancyArrowPatch
 from matplotlib import rcParams
 
 # relative modules
-from ..misc.constants import golden
+from ..misc import constants
+print(constants)
+golden = constants.golden
 
 # global attributes
-__all__ = ('set_style', 'Arrow3D', 'ppi')
+__all__ = ['set_style', 'Arrow3D', 'ppi']
 __doc__ = """."""
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
 ppi = 3. / 0.04167  # pts/inche
 
+styles = {
+    'mnras': f'{__path__}/mnras.mplsty',
+}
 
-def set_style():
+
+def set_style(style: str = None, usetex: bool = False):
     """Setting the style."""
     # Direct input
     # Options
+    if style is not None:
+        style = style.lower()
+        plt.style.use(styles[style])
+        rcParams['text.usetex'] = usetex
+        rcParams['axes.titlesize']      = 'large'
+        return
     font = {'family': 'sans-serif',
-            'weight': 'bold',
-            'size': 16}
-    rcParams['axes.labelsize']      = 8
-    rcParams['xtick.labelsize']     = 7
-    rcParams['ytick.labelsize']     = 7
-    rcParams['legend.fontsize']     = 8
+            'weight': 'bold'}
+    plt.rc('font', **font)
+    rcParams['axes.titlesize']      = 48
+    rcParams['axes.labelsize']      = 12
+    rcParams['axes.labelweight']     = 'bold'
+    rcParams['xtick.labelsize']     = 12
+    rcParams['ytick.labelsize']     = 12
+    rcParams['legend.fontsize']     = 12
     rcParams['axes.linewidth']      = 1.25
     rcParams['xtick.major.size']    = 2.5
     rcParams['xtick.minor.size']    = 1.5
@@ -41,15 +55,12 @@ def set_style():
     rcParams['ytick.minor.size']    = 1.5
     rcParams['ytick.major.width']   = 1.25
     rcParams['ytick.minor.width']   = 1.25
-    rcParams['text.usetex']         = True
+    #rcParams['text.usetex']         = True
     rcParams['xtick.major.pad']     = 6
     rcParams['ytick.major.pad']     = 6
     rcParams['ytick.direction']     = 'in'
     rcParams['xtick.direction']     = 'in'
-    rcParams['figure.figsize']      = 3.5, 3.5/golden
-    plt.rc('font', **font)
-    plt.rc('xtick', labelsize='x-small')
-    plt.rc('ytick', labelsize='x-small')
+    rcParams['figure.figsize']      = 10., 10./golden
 
 
 class Arrow3D(FancyArrowPatch):

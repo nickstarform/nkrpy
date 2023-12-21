@@ -6,16 +6,19 @@ from copy import deepcopy
 
 # external modules
 import numpy as np
+from astropy.wcs import WCS as astropy_WCS
+from astropy.io import fits as astropy__fits
 
 # relative modules
 from ..misc.functions import typecheck
-from ..io import _fits as fits
+from ..io import fits
 from .._types import WCSClass
 from ..misc.decorators import argCase
 from ..misc.frozendict import FrozenDict as frozendict
+from .._unit import Unit
 
 # global attributes
-__all__ = ('WCS',)
+__all__ = ['WCS',]
 __doc__ = '''.'''
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
@@ -27,30 +30,39 @@ class _base_wcs_class(object):
     This is a backend class, don't use.
     '''
 
-    @argCase(case='lower')
-    def __init__(self, delt: float = 0, rpix: float = 0, unit: str = '', rval: float = 0, axis: int = 0, axisnum: int = 0, **kwargs):
-        self.__kwargs = {'rval': rval, 'rpix': rpix, 'delt': delt, 'unit': unit, 'axis': axis, 'axisnum': axisnum}
+    __pi = np.pi
+    __ln2 = np.log(2)
+    def __init__(self, delt: float = 0, rpix: float = 0, unit: str = '', rval: float = 0, axis: int = 0, axisnum: int = 0, dtype: str='', **kwargs):
+        delt, rpix, rval = map(lambda x: round(x, 10), [delt, rpix, rval])
+        self.kwargs = {'rval': rval, 'rpix': rpix, 'delt': delt, 'unit': unit, 'axis': axis, 'axisnum': axisnum, 'dtype': dtype}
         if kwargs:
-            kwargs.update(self.__kwargs)
-            self.__kwargs = kwargs
+            kwargs.update(self.kwargs)
+            self.kwargs = kwargs
 
-    @argCase(case='lower')
+    def set(self, delt: float = 0, rpix: float = 0, unit: str = '', rval: float = 0, axis: int = 0, axisnum: int = 0, dtype: str='', **kwargs):
+        delt, rpix, rval = map(lambda x: round(x, 10), [delt, rpix, rval])
+        self.kwargs = {'rval': rval, 'rpix': rpix, 'delt': delt, 'unit': unit, 'axis': round(axis,0), 'axisnum': axisnum, 'dtype': dtype}
+        if kwargs:
+            kwargs.update(self.kwargs)
+            self.kwargs = kwargs
     def __call__(self, *args, **kwargs):
         return self.__grab_values(*args, **kwargs)
 
     def to_fits(self):
         result = {}
-        axis = self.__kwargs['axisnum']
-        for k, v in self.__kwargs.items():
-            if k in ['rval', 'rpix', 'delt']:
-                result[f'c{k}{axis}'] = v
+        axis = self.kwargs['axisnum']
+        for k, v in self.kwargs.items():
+            if k in ['rval', 'rpix', 'delt', 'unit', 'dtype']:
+                k = k.replace('dtype', 'type')
+                result[f'c{k}{axis}'.upper()] = v
             if k.lower() == 'axis':
-                result[f'n{k}{axis}'] = v
+                result[f'n{k}{axis}'.upper()] = v
         return result
 
     def __copy__(self):
         cls = self.__class__
         result = cls.__new__(cls)
+        result.kwargs = deepcopy(self.kwargs)
         return result
 
     def copy(self):
@@ -61,35 +73,32 @@ class _base_wcs_class(object):
         result = self.__copy__()
         memo[hsh] = result
         return result
-
-    @argCase(case='lower')
-    def __grab_values(self, val: float = np.nan, return_type: str = 'pix', find_nearest: bool = False):
+    def __grab_values(self, val: float = None, return_type: str = 'pix',declination_degrees: float = 0):
         '''Intelligently return desired values.
 
         Usage
         -----
         > If nothing is specified, returns all axes
         > If val and return_type is specified, returns the converted values from either pix or wcs
-        '''
-        assert return_type in {'pix', 'wcs'}
-        if not typecheck(val) and val == np.nan:
-            return self.__kwargs
-        if return_type == 'pix':
-            pix = (val - self.__kwargs['rval']) / self.__kwargs['delt'] + \
-                self.__kwargs['rpix']
-            if isinstance(pix, np.ndarray):
-                if find_nearest:
-                    np.around(pix, 0, pix)
-                pix.astype(int)
-            elif find_nearest:
-                pix = int(np.around(pix, 0))
-            return pix
-        val = (val - self.__kwargs['rpix']) * self.__kwargs['delt'] + \
-            self.__kwargs['rval']
-        return val
 
-    def get(self):
-        return self.__kwargs
+        > If return type is 'pix' then val must be wcs and vice versa
+        '''
+        return_type = 'pix' if return_type.startswith('pix') else 'wcs'
+        if val is None:
+            return self.kwargs
+        delt = self.kwargs['delt'] / np.cos(declination_degrees*np.pi / 180.)
+        if return_type == 'pix':
+            pix = (val - self.kwargs['rval']) / delt + (self.kwargs['rpix'])
+            return pix
+        val = (val - self.kwargs['rpix']) * delt + \
+            self.kwargs['rval']
+        return np.around(val, 10)
+
+    def __dict__(self):
+        return self.kwargs
+
+    def baseget(self):
+        return self.kwargs
 
 _base_wcs_class.__call__.__doc__ = _base_wcs_class._base_wcs_class__grab_values.__doc__
 
@@ -120,44 +129,93 @@ class WCS(WCSClass):
     b(50, 'wcs', 'spectral')
     '''
 
-    def __init__(self, wcs=None):
+    __pi = np.pi
+    __ln2 = np.log(2)
+    def __init__(self, wcs=None, beamtable=None, **kwargs):
+        self.__axis = {}
         if wcs is not None:
             if isinstance(wcs, str):
-                h, d = fits.read(wcs)
-                wcs = h
+                h, _ = fits.read(wcs)
+                wcs = dict(h)
             elif isinstance(wcs, WCSClass):
-                wcs = wcs.header
+                self.resolve(wcs)
+                return
             if str(type(wcs)) == "<class 'astropy.io.fits.header.Header'>":
                 self.header = wcs
-            else:
-                self.header = None
+                wcs = dict(wcs)
+            if isinstance(wcs, list):# assuming two astropy headers in alist
+                if wcs[1]['EXTNAME'].lower().replace(' ', '') == 'beams':
+                    self.beamtable = beamtable if beamtable is not None else wcs[1]
+                self.header = wcs
+                wcs = wcs[0]
             # wcs is now a dictionary of header items
             self.__initialize_from_dict(wcs)
+        elif kwargs:
+            self.__initialize_from_dict(kwargs)
+
+    def resolve(self, wcs):
+        self.header = wcs.get_header()
+        self.__initialize_from_dict(self.header)
+        self.__axis = wcs.get_axes_base_object()
+        self.refresh_axes()
+
+    def __bool__(self):
+        if self.__axis:
+            return True
+        return False
+
+    def __eq__(self, comp):
+        if not isinstance(comp, WCSClass):
+            raise ValueError(f'Not a valid comparison, must compare with another WCSClass-like object.')
+            return False
+        # first make sure same axis
+        if self.get_axes() == comp.get_axes():
+            return True
+
+        for axis in self.__axis:
+            baseaxis = self.__axis[axis].baseget()
+            selfstart = self(0, 'wcs', axis=axis)
+            compstart = comp(0, 'wcs', axis=axis)
+            selfend = self(baseaxis['axis'], 'wcs', axis=axis)
+            compend = comp(baseaxis['axis'], 'wcs', axis=axis)
+            if (selfstart != compstart) or (selfend != compend):
+                return False
+        return True
+
+    @staticmethod
+    def remove_digit(s):
+        return ''.join([i for i in s if not i.isdigit()])
 
     def __initialize_from_dict(self, header: dict):
+        for x in list(header.keys()):
+            if (x.lower().replace(' ', '') == 'cd1_2') or\
+               (x.lower().replace(' ', '') == 'cd2_1'):
+               del header[x]
+            if (x.lower().replace(' ', '') == 'cd1_1') or\
+               (x.lower().replace(' ', '') == 'cd2_2'):
+               header['CDELT' + x.split('_')[-1]] = header[x]
+               del header[x]
+
         head_lower = dict([[t.lower().replace(' ', ''), t]
                            for t in header.keys()])
         self.__header_lower = head_lower
         # define some common switches
-        keys = [['restfreq', 'restfrq']]
+        keys = [['restfreq', 'restfrq'], ['bmaj', 'bma'], ['bmin', 'bmi']]
         for k in keys:
             self.__switch_keys(self.__header_lower, *k)
         self.__header = dict(header)
         naxis = [t for t in self.__header_lower if 'ctype' in t]
-        self.__axis = {}
-        #from IPython import embed; embed() 
-        for t in naxis:
-            axis_heads = [[x.replace('naxis', 'axis').replace('c', '')[:4], x]
+        for ti, t in enumerate(naxis):
+            axis_heads = [[self.remove_digit(x.replace('naxis', 'axis').replace('c', '').replace('type', 'dtype').replace('cd1_1', 'cdelt1').replace('cd2_2', 'cdelt2')), x]
                           for x in self.__header_lower if (x.startswith('c') or x.startswith('naxis')) and
                           x.endswith(f'{t[-1]}')]
             vals = dict([[h[0], self.__header[self.__header_lower[h[1]]]] for h in axis_heads])
-            aname = vals['type'].lower()
-            vals['type'] = aname
+            aname = vals['dtype'].lower()
+            vals['dtype'] = aname
             vals['axisnum'] = int(t[-1])
+            #self.refresh_axes()
             self.__axis[aname] = _base_wcs_class(**vals)
-            setattr(self, f'axis{t[-1]}', self.__axis[aname].get())
-
-    @argCase(case='lower')
+            self.refresh_axes()
     def drop_axis(self, axis: str = 'freq'):
         v = self.get(axis)
         if v is None:
@@ -172,38 +230,34 @@ class WCS(WCSClass):
                 continue
             rk = self.__header_lower[rk]
             del self.__header[rk]
-            if self.header is not None:
-                del self.header[rk]
         # delete from axis dict
         del self.__axis[axis]
         # delete from WCS
         delattr(self, f'axis{num}')
         # delete from header
-
-    @argCase(case='lower')
-    def add_axis(self, axis: str, crval: float, crpix: float, cdelt: float, unit: str, size: int = 0):
+    def add_axis(self, axis_name: str, crval: float, crpix: float, cdelt: float, unit: str, size: int = 0):
         """Add axis to current WCS.
 
         On conflict do nothing.
         """
-        v = self.get(axis)
-        if v is not None:
+        if self.get(axis_name) is not None:
             return
-        unit = Unit.resolve_unit(unit)
-        if unit is None:
-            return
-        unit = unit['name']
-        axisnum = [axis['axisnum'] for axis in self.get_axes()]
-        axisnum = max(axisnum) + 1
-        vals = {'delt': cdelt, 'rpix': crpix, 'unit': unit,  'rval': crval, 'axis': size, 'axisnum': axisnum}
-        self.__axis[axis] = _base_wcs_class(**vals)
-        setattr(self, f'axis{axisnum}', self.__axis[axis].get())
+        axisnum_all = [axis['axisnum'] for _, axis in self.get_axes().items()]
+        axisnum = set(np.arange(1, max(axisnum_all) + 1)) - set(axisnum_all)
+        if len(axisnum) == 0:
+            axisnum = max(axisnum_all) + 1
+        else:
+            axisnum = np.min(list(axisnum))
+        vals = {'delt': cdelt, 'rpix': crpix, 'unit': unit,  'rval': crval, 'axis': size, 'axisnum': axisnum, 'dtype': axis_name}
+        self.__axis[axis_name] = _base_wcs_class(**vals)
+        setattr(self, f'axis{axisnum}', self.__axis[axis_name].baseget())
+        self.refresh_axes()
+        #self.update_fits_header()
+        self.update_WCS_header()
 
     def get_header(self):
         """Get an immutable header."""
         return frozendict(self.__header)
-
-    @argCase(case='lower')
     def set_head(self, key: str, val):
         """Get an immutable header."""
         if key not in self.__header_lower:
@@ -215,7 +269,6 @@ class WCS(WCSClass):
             return
 
     @staticmethod
-    @argCase(case='lower')
     def __switch_keys(d: dict, k1: str, k2: str):
         k = None
         if k1 in d:
@@ -224,44 +277,54 @@ class WCS(WCSClass):
             k = (k2, k1)
         if k is not None:
             d[k[1]] = d[k[0]]
-
-    @argCase(case='lower')
     def get_axis_number(self, axis: str = 'freq'):
         v = self.get(axis)
         return v['axis']
-
-    @argCase(case='lower')
     def __call__(self, *args, **kwargs):
         return self.__grab_values(*args, **kwargs)
-
-    @argCase(case='lower')
-    def __grab_values(self, val = None, return_type: str = None, axis: str = 'ra---sin', find_nearest: bool = False):
+    def __grab_values(self, val = None, return_type: str = 'wcs', axis: str = 'ra---sin', declination_degrees = 0):
         '''Intelligently return desired values.
 
         Usage
         -----
         > If nothing is specified, returns all axes
         > If val and return_type is specified, returns the converted values from either pix or wcs. The axis must be specified
+        > If you are selecting values from the ra axis, need to adjust by factor of cos(declination)
+        > forcing axis to be string, otherwise slows programs.
         '''
         if val is None:
             return self.get_axes()
-        if isinstance(axis, str):
-            axis = self.get_axis_base_object(axis)
-        return axis(val=val, return_type=return_type, find_nearest=find_nearest)
-
-    @argCase(case='lower')
+        axis = self.get_axis_base_object(axis)
+        return axis(val=val, declination_degrees=declination_degrees, return_type=return_type)
     def __str__(self):
         ret = []
         for name, axis in self.__axis.items():
-            ret.append(f'''{name}: {axis.get()}''')
+            ret.append(f'''{name}: {axis.baseget()}''')
         return ' | '.join(ret)
-
-    @argCase(case='lower')
     def __repr__(self):
         return self.__str__()
 
-    @argCase(case='lower')
-    def array(self, start: int = None, stop: int = None, axis: str = 'freq', size: int = None, return_type: str = 'pix', find_nearest: bool = False):
+    def beam2(self):
+        # convert the beamarea to square pixels
+        beam =  self.get_beam()[:-1]
+        return beam[0] * beam[1]
+
+    def beam2as(self):
+        # convert the beamarea to square pixels
+        beam =  self.get_beam()[:-1]
+        return beam[0] * beam[1] * 3600 ** 2
+
+    def beam2pix(self):
+        # convert the beamarea to square pixels
+        return abs(self.__beam2pix(*self.get_beam()[:-1], abs(self.axis1['delt'])))
+
+
+    @classmethod
+    def __beam2pix(cls, bma, bmi, cellsize):
+        # assume all in same coordinates
+        return abs(cls.__pi * bma * bmi / (4* cls.__ln2) / (cellsize ** 2))
+
+    def array(self, start: float = None, stop: float = None, axis: str = 'freq', startstop_type: str = 'pix', size: int = None, return_type: str = 'pix', declination_degrees=0):
         '''Generate an array of the specified axis.
 
         Parameters
@@ -270,19 +333,24 @@ class WCS(WCSClass):
             Default the size of the original axis, otherwise it is the new size, evenly separated from the start/end of the old values
         '''
         axis = self.__get_axis(axis)
+        startstop_type = 'pix' if startstop_type.startswith('pix') else 'wcs'
         if size is None:
-            size = axis.get()['axis']
+            size = axis.baseget()['axis']
         if start is None:
-            array = np.arange(0, axis.get()['axis'], float(axis.get()['axis']/ size))
-        elif start is not None or stop is not None:
-            if start is None or start <= -1:
-                start = 0
-            if stop is None or stop <= -1 or stop == np.inf:
-                stop = size
-            array = np.arange(start, stop + 1, 1)
+            start = 0
+        elif startstop_type == 'wcs':
+            start = self.__grab_values(val=start, return_type='pix', axis=axis, declination_degrees=declination_degrees)
+        if stop is None:
+            stop = axis.baseget()['axis'] - 1
+        elif startstop_type == 'wcs':
+            stop = self.__grab_values(val=stop, return_type='pix', axis=axis, declination_degrees=declination_degrees)
+
+        ite = -1 if axis.baseget()['delt'] < 0 else 1
+        start, stop = sorted([start, stop])
+        array = np.linspace(start=start, stop = stop, num=int(size), dtype=float) + 1
         if return_type == 'wcs':
-            return self.__grab_values(val=array, return_type=return_type, axis=axis, find_nearest=find_nearest)
-        return array
+            return self.__grab_values(val=array, return_type=return_type, axis=axis, declination_degrees=declination_degrees)[::ite]
+        return array[::ite]
 
     def add_history(self, history: str):
         if 'history' not in self.__header_lower:
@@ -290,113 +358,143 @@ class WCS(WCSClass):
             self.__header_lower['history'] = 'HISTORY'
         self.__header['HISTORY'] = str(self.__header['HISTORY']) + history
 
-    def update_header(self):
-        """Update the header with the information from the axis."""
-        header = dict(self.get_header())
-        head_lower = dict([[k.lower(), k] for k in header.keys()])
-        for k in head_lower:
-            if k.startswith('ctype'):
-                rkey = head_lower[k]
-                v = header[rkey]
-                axis = self.get_axis_base_object(v)
-                if axis is None:
-                    continue
-                newaxis = axis.to_fits()
-                newaxis[k] = v
-                for k, v in newaxis.items():
-                    if k not in self.__header_lower:
-                        continue
-                    rk = self.__header_lower[k]
-                    self.__header[rk] = v
+    def update_WCS_header(self):
+        """Update the header current with the information from the axis."""
+        header = self.create_fitsheader_from_axes()
+        self.__header = header
 
-    def create_fits_header(self, override: bool = True):
-        if override:
-            if self.header is not None:
-                header = self.header
-            else:
-                header = {}
-        else:
-            header = {}
-        for k, v in self.get_header().items():
-            try:
-                header[k] = v
-            except ValueError:
-                pass
+    def create_fitsheader_from_axes(self):
+        """Create a fits header from the wcs axis only."""
+        header = {}
+        for _, axis in self.__axis.items():
+            axisfits = axis.to_fits()
+            for k, v in axisfits.items():
+                if isinstance(v, str):
+                    v = v.upper()
+                if len(k.lower().replace('axis', '')) != len(k):
+                    v = int(v)
+                header[k.upper()] = v
+        header['NAXIS'] = len(self.__axis)
+        for h in self.__header:
+            if h not in header:
+                header[h] = self.__header[h]
+        print(header)
         return header
 
-    def refresh(self):
-        """Refresh the axis objects."""
-        self.__initialize_from_dict(self.__header)
+    def update_fits_header(self):
+        """Refresh the header using astropy to make it writable to fits"""
+        self.header = astropy__fits.header.Header(self.__header)
 
-    @argCase(case='lower')
+    def refresh_axes(self):
+        for k in dir(self):
+            if k.startswith('axis'):
+                delattr(self, f'{k}')
+        for i, k in enumerate(self.__axis.keys()):
+            self.__axis[k] = _base_wcs_class(**{**self.__axis[k].baseget(), 'axisnum': i + 1, 'dtype': k})
+            setattr(self, f'axis{i+1}', self.__axis[k].baseget())
+        pass
+
+    def refresh_from_header(self):
+        """Refresh the axis objects."""
+        self.__initialize_from_dict(dict(self.__header))
+
     def get(self, axis: str = 'freq'):
         '''Nice wrapper to quickly get axis params.'''
         axis = self.__get_axis(axis=axis)
         if axis is not None:
-            return axis.get()
+            return axis.baseget()
 
-    @argCase(case='lower')
     def get_head(self, key: str):
         return None if key not in self.__header_lower else self.__header[self.__header_lower[key]]
 
     def get_axes(self):
         '''Nice wrapper to quickly get axis params.'''
-        axes = []
-        for axis in self.__axis.values():
-            axes.append(axis.get())
+        axes = {}
+        for aname, axis in self.__axis.items():
+            axes[aname] = axis.baseget()
         return axes
 
-    @argCase(case='lower')
     def __get_axis(self, axis: str = 'freq'):
         '''Return a single axis based on the unit type (spectral, ra dec).'''
-        axis = axis.lower()
+        if not isinstance(axis, str):
+            axis = axis.kwargs['dtype']
         if axis in self.__axis:
             return self.__axis[axis]
 
-    @argCase(case='lower')
+    def get_beam(self):
+        if hasattr(self, 'beamtable'):
+            bma = self.beamtable['BMAJ']
+            bmi = self.beamtable['BMIN']
+            bpa = self.beamtable['BPA']
+
+            bma, bmi, bpa = map(np.median, (bma, bmi, bpa))
+        else:
+            bma = self.get_head('bmaj')
+            bmi = self.get_head('bmin')
+            bpa = self.get_head('bpa')
+        return bma, bmi, bpa
+
+    def get_beam_pix(self):
+        bma, bmi, bpa = self.get_beam()
+        return abs(bma/self.axis1['delt']), abs(bmi/self.axis1['delt']), bpa
+
+    def set_beam(self, bmaj, bmin, bpa):
+        self.set_head('bmaj', bmaj)
+        self.set_head('bmin', bmin)
+        self.set_head('bpa', bpa)
+        self.refresh_from_header()
+        self.update_WCS_header()
+        self.update_fits_header()
     def get_axis_base_object(self, axis: str = 'freq'):
         '''Return all axes available.'''
         return self.__get_axis(axis)
 
     def get_axes_base_object(self):
         '''Return all axes available.'''
-        return [axis for axis in self.__axis.values()]
-
-    @argCase(case='lower')
-    def shift_axis(self, axis: str = 'ra---sin', unit: str = 'wcs', val: float = 0):
+        return dict([[aname, axis] for aname, axis in self.__axis.items()])
+    def shift_axis(self, val: float = 0, axis: str = 'ra---sin', unit: str = 'wcs'):
         '''Shift the axis.'''
         if val == 0:
             return
         unit = unit.lower()
-        if isinstance(axis, str):
-            axis = self.get_axis_base_object(axis)
-        assert unit in ['wcs', 'pix']
+        axis = self.get_axis_base_object(axis)
+        unit = 'pix' if unit.startswith('pix') else 'wcs'
         if unit == 'wcs':
-            axis.get()['rval'] += val
+            axis.baseget()['rval'] += val
         else:
-            axis.get()['rpix'] += val
+            axis.baseget()['rpix'] += val
+    def center_axis_pix(self, pix: int, width:int, axis='ra---sin'):
+        '''Center the axis.
 
-    def __copy__(self):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        result.__dict__.update(self.__dict__)
-        return result
+        val is the value in wcs coords
+        width is the width in wcs coords
+        Center the current axis onto val with a certain width
+        nearest will center to the closest pixel
+        '''
+        axis_baseobj = self.get_axis_base_object(axis)
+        axis = axis_baseobj.baseget()
+        axis_baseobj.set(delt=axis['delt'], rpix=pix, unit=axis['unit'], rval=axis['rval'], axis=width, axisnum=axis['axisnum'], dtype=axis['dtype'])
+        self.refresh_axes()
+    def center_axis_wcs(self, val: float, width: float = None, axis='ra---sin', declination_degrees=0):
+        '''Center the axis.
 
-    def __deepcopy__(self, memo):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        memo[id(self)] = result
-        for k, v in self.__dict__.items():
-            setattr(result, k, deepcopy(v, memo))
-        return result
+        val is the value in wcs coords
+        width is the width in wcs coords
+        Center the current axis onto val with a certain width
+        nearest will center to the closest pixel
+        '''
+        axis_baseobj = self.get_axis_base_object(axis)
+        axis = axis_baseobj.baseget()
+        if val == 0:
+            return
+        if width is None:
+            return
+        width = abs(width / (axis['delt']))
+        axis_baseobj.set(delt=axis['delt'], rpix=width/2, unit=axis['unit'], rval=val, axis=round(width,0), axisnum=axis['axisnum'], dtype=axis['dtype'])
+        self.refresh_axes()
 
-    def copy(self):
-        '''Shallow Copy.'''
-        return self.__copy__()
-
-    def deepcopy(self):
-        '''Full deep copy.'''
-        return self.__deepcopy__(memo={})
+    def export(self):
+        return dict([[h.upper(), self.__header[v]] for h, v in self.__header_lower.items()])
 
 
 def test():
